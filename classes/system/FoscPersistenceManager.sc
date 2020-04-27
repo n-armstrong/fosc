@@ -24,8 +24,6 @@ FoscPersistenceManager : FoscObject {
     Autogenerates file path when 'path' is nil.
 
     Returns output path and elapsed formatting time when LilyPond output is written.
-
-    !!!TODO: update to abjad 3.0
     -------------------------------------------------------------------------------------------------------- */
     asLY { |path, illustrateFunction ... args|
         var illustration, lyFileName, lyFile;
@@ -65,32 +63,47 @@ FoscPersistenceManager : FoscObject {
     a = FoscNote(60, 1/4);
     b = a.write.asPDF;
     -------------------------------------------------------------------------------------------------------- */
-    asPDF { |lyPath, outputPath, illustrateFunction, removeLY=false ... args|
-        var result, success;
+    asPDF { |lyPath, outputPath, illustrateFunction, flags, removeLY=false ... args|
+        var success;
         if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
         lyPath = this.asLY(lyPath, illustrateFunction, *args);
         outputPath = outputPath ?? { lyPath.splitext[0] };
-        success = FoscIOManager.runLilypond(lyPath, outputPath: outputPath.shellQuote);
+        success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
         if (removeLY) { File.delete(lyPath) };
         outputPath = outputPath ++ ".pdf";
         ^[outputPath, success];
     }
-    // asPDF { |path, illustrateFunction, removeLY=false ... args|
-    //     var result, lyPath, pdfPath, success;
-    //     if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
-    //     if (path.notNil) { lyPath = path.splitext[0] ++ ".ly" };
-    //     result = this.asLY(lyPath, illustrateFunction, *args);
-    //     lyPath = result;
-    //     pdfPath = (lyPath.splitext[0] ++ ".pdf");
-    //     success = FoscIOManager.runLilypond(lyPath);
-    //     if (removeLY) { File.delete(lyPath) };
-    //     ^[pdfPath, success];
-    // }
     /* --------------------------------------------------------------------------------------------------------
     • asPNG
+    
+
+    • Example 1
+
+    a = FoscNote(60, 1/4);
+    n = "basic-usage/images/002";
+    p = "%/docs/%".format(FoscConfiguration.foscRootDirectory, n);
+    f = a.writePNG("%.ly".format(p), p);
+    unixCmd("open %".format(f[0]));
     -------------------------------------------------------------------------------------------------------- */
-    asPNG {
-        ^this.notYetImplemented(thisMethod);
+    asPNG { |lyPath, outputPath, illustrateFunction, clean=true ... args|
+        var flags, success;
+        if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
+        lyPath = this.asLY(lyPath, illustrateFunction, *args);
+        outputPath = outputPath ?? { lyPath.splitext[0] };
+        //flags = "-dbackend=eps -dno-gs-load-fonts -dinclude-eps-fonts --png";
+        flags = "-dbackend=eps -dresolution=100 -dno-gs-load-fonts -dinclude-eps-fonts --png";
+        success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
+        if (success && clean) {
+            #[
+                "%-1.eps",
+                "%-systems.count",
+                "%-systems.tex",
+                "%-systems.texi",
+                "%.ly"
+            ].do { |each| File.delete(each.format(outputPath)) };
+        };
+        outputPath = (outputPath ++ ".png").shellQuote;
+        ^[outputPath, success];
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE PROPERTIES

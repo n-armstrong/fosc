@@ -253,15 +253,15 @@ FoscLilypondFile : FoscObject {
         };
 
         score = FoscScore();
-        multiplier = FoscMultiplier(#[1,20]) * stretch.reciprocal;
+        multiplier = FoscMultiplier(#[1,32]) * stretch.reciprocal;
         set(score).proportionalNotationDuration = FoscSchemeMoment(multiplier.pair);
 
         lilypondFile = FoscLilypondFile(
             score,
-            includes: #[
-                "../stylesheets/default.ily",
-                "../stylesheets/rhythm-maker-docs.ily"
-            ],
+            includes: [
+                "default.ily",
+                "rhythm-maker-docs.ily"
+            ].collect { |each| "%/%".format(FoscConfiguration.foscStylesheetDirectory, each) },
             useRelativeIncludes: true
         );
 

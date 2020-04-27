@@ -577,6 +577,8 @@ FoscSelection : FoscSequence {
 
     a = FoscLeafMaker().(60 ! 8, [1/8]);
     a.show;
+
+    FoscComponent
     -------------------------------------------------------------------------------------------------------- */
     illustrate {
         var items, staff, foundDifferentPitch, score, lilypondFile;
@@ -593,9 +595,10 @@ FoscSelection : FoscSequence {
         };
         if (foundDifferentPitch.not) { staff.lilypondType_('RhythmicStaff') };
         score = FoscScore([staff]);
-        lilypondFile = FoscLilypondFile(score);
-        lilypondFile.headerBlock.tagline = false;
-        ^lilypondFile;
+        // lilypondFile = FoscLilypondFile(score);
+        // lilypondFile.headerBlock.tagline = false;
+        // ^lilypondFile;
+        ^score.illustrate;
     }
     /* --------------------------------------------------------------------------------------------------------
     • includes (abjad: __contains__)
