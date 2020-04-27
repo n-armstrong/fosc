@@ -68,7 +68,7 @@ FoscConfiguration.getLilypondVersionString;
 
 ## Basic usage
 
-### <br>1. Displaying music
+### 1. Displaying music
 
 <br>Display a note.
 ```supercollider
