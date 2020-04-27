@@ -68,6 +68,7 @@ FoscConfiguration.getLilypondVersionString;
 
 ## Basic usage
 
+<br>
 ### 1. Displaying music
 
 <br>Display a note.
@@ -107,6 +108,7 @@ c.show;
 ![](./images/score.png)
 
 
+<br>
 ### 2. Indicators
 
 <br>Indicators attach to leaves.
@@ -119,6 +121,7 @@ a.show;
 ![](./images/indicators.png)
 
 
+<br>
 ### 3. Spanners
 
 <br>Spanners attach to two or more contiguous leaves.
@@ -131,6 +134,7 @@ a.show;
 ![](./images/spanners.png)
 
 
+<br>
 ### 4. Tweaks, overrides, settings
 
 <br>Tweak notehead properties.
@@ -168,6 +172,7 @@ a.show;
 ![](./images/set-score-properties.png)
 
 
+<br>
 ### 5. Generate music with FoscLeafMaker
 
 <br>Integer and/or String elements in 'pitches' slots result in notes
@@ -221,6 +226,7 @@ m.show;
 ![](./images/leaf-maker-7.png)
 
 
+<br>
 ### 6. Generate rhythms with FoscRhythmMaker
 
 <br>'Ratios' embed into 'divisions' as rhythmic proportions.
@@ -274,6 +280,7 @@ a.show;
 ![](./images/rhythm-maker-5.png)
 
 
+<br>
 ### 7. Selections
 
 <br>Select all score components.
@@ -320,6 +327,7 @@ a.show;
 ![](./images/selections-1.png)
 
 
+<br>
 ### 8. Iteration
 
 <br>Iterate over all score components.
