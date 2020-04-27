@@ -131,7 +131,6 @@ FoscIOManager : FoscObject {
         flags = flags ? "";
         outputPath = outputPath ? lilypondBase;
         command = "% % -dno-point-and-click -o % %".format(executablePath, flags, outputPath, lyPath);
-        "command: ".post; command.postln;
         exitCode = systemCmd(command);
         success = (exitCode == 0);
         ^success;
