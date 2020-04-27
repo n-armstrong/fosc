@@ -344,7 +344,7 @@ a.show;
 ```
 ![](./images/iteration-1.png)
 
-<br>Iterate over logical ties.
+<br>Iterate over pitched logical ties.
 ```supercollider
 a = FoscStaff(FoscLeafMaker().(#[60,60,62,nil,64,64], [1/4,1/24,1/12,1/8,1/4,1/4]));
 m = a.selectLeaves;
