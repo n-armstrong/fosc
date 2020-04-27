@@ -1,5 +1,7 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscConfiguration
+
+FoscConfiguration.getLilypondVersionString
 ------------------------------------------------------------------------------------------------------------ */
 FoscConfiguration {
     classvar lilypondExecutablePath="lilypond";
