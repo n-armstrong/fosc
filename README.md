@@ -6,7 +6,7 @@
 
 __Fosc__ is a [SuperCollider][supercollider] API for generating musical notation in [LilyPond][lilypond].
 
-__Fosc__ stands for __FO__rmalised __S__core __C__ontrol (__FO__r __S__uper__C__ollider). It's a close relative of [abjad][abjad], and ports much of abjad's Python code base to SuperCollider.
+__Fosc__ stands for __FOrmalised__ __S__core __C__ontrol (__FO__r __S__uper__C__ollider). It's a close relative of [abjad][abjad], and ports much of abjad's Python code base to SuperCollider.
 
 __Fosc__ lets you:
 
