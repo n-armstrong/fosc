@@ -3,7 +3,7 @@
 [lilypond]: http://lilypond.org/
 [supercollider]: https://supercollider.github.io/
 
-__fosc__ is a [SuperCollider][supercollider] API to [LilyPond][lilypond]. It helps composers to generate scores algorithmically, and to build up complex pieces of music notation in an iterative and incremental way.
+__fosc__ is a [SuperCollider][supercollider] API for generating musical notation in [LilyPond][lilypond].
 
 
 ## Installation
