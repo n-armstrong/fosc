@@ -35,12 +35,12 @@ Download the __fosc__ master branch from this repository. Move the unzipped fold
 
 In your sclang startup file, add code to allow __fosc__ to communicate with LilyPond. __Note__: it's possible that your LilyPond binary may be installed somewhere different to the standard locations below.
 
-####Mac OS X
+__Mac OS X__
 ```supercollider
 FoscConfiguration.lilypondExecutablePath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
 ```
 
-####Linux
+__Linux__
 ```supercollider
 FoscConfiguration.lilypondExecutablePath = "/usr/local/bin/lilypond";
 ```
