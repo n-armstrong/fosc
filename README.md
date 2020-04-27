@@ -170,7 +170,7 @@ a.show;
 
 ### 5. Generate music with FoscLeafMaker
 
-<br>Integer and/or String elements in 'pitches' slots result in notes
+<br>Integer and/or String elements in 'pitches' slot results in notes.
 ```supercollider
 m = FoscLeafMaker();
 m = m.(#[62,64,"F#5","G#5"], [1/4]);
