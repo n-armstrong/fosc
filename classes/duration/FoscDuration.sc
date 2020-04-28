@@ -476,13 +476,6 @@ FoscDuration : FoscFraction {
     Raises assignability error when duration is not assignable.
 
     Returns positive integer.
-
-     if not self.is_assignable:
-            raise AssignabilityError
-        binary_string = mathtools.integer_to_binary_string(self.numerator)
-        digit_sum = sum([int(x) for x in list(binary_string)])
-        dot_count = digit_sum - 1
-        return dot_count
     
     (1..16).do { |num|
         d = FoscDuration(num, 16);
