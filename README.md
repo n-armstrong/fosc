@@ -38,11 +38,11 @@ __Fosc__ lets you:
     information.
 
 
-###<br>2. Install Fosc
+### <br>2. Install Fosc
 Download the __fosc__ master branch from this repository. Move the unzipped folder to your SuperCollider Extensions directory. Information on installing SuperCollider extensions can be found here: https://doc.sccode.org/Guides/UsingExtensions.html. 
 
 
-###<br>3. Configure Fosc
+### <br>3. Configure Fosc
 
 In your sclang startup file, add code to allow __Fosc__ to communicate with LilyPond. __Note__: it's possible that your LilyPond binary may be installed somewhere different to the standard locations below.
 
@@ -67,7 +67,7 @@ FoscConfiguration.getLilypondVersionString;
 
 ## Basic usage
 
-###<br>1. Displaying music
+### <br>1. Displaying music
 
 <br>Display a note.
 ```supercollider
@@ -106,7 +106,7 @@ c.show;
 ![](./images/score.png)
 
 
-###<br>2. Indicators
+### <br>2. Indicators
 
 <br>Indicators attach to leaves.
 ```supercollider
@@ -118,7 +118,7 @@ a.show;
 ![](./images/indicators.png)
 
 
-###<br>3. Spanners
+### <br>3. Spanners
 
 <br>Spanners attach to two or more contiguous leaves.
 ```supercollider
@@ -130,7 +130,7 @@ a.show;
 ![](./images/spanners.png)
 
 
-###<br>4. Tweaks, overrides, settings
+### <br>4. Tweaks, overrides, settings
 
 <br>Tweak notehead properties.
 ```supercollider
@@ -167,7 +167,7 @@ a.show;
 ![](./images/set-score-properties.png)
 
 
-###<br>5. Generate music with FoscLeafMaker
+### <br>5. Generate music with FoscLeafMaker
 
 <br>Integer and/or String elements in 'pitches' slot results in notes.
 ```supercollider
@@ -219,7 +219,7 @@ m.show;
 ![](./images/leaf-maker-7.png)
 
 
-###<br>6. Generate rhythms with FoscRhythmMaker
+### <br>6. Generate rhythms with FoscRhythmMaker
 
 <br>'Ratios' embed into 'divisions' as rhythmic proportions.
 ```supercollider
@@ -282,7 +282,7 @@ a.show;
 ![](./images/rhythm-maker-6.png)
 
 
-###<br>7. Selections
+### <br>7. Selections
 
 <br>Select all score components.
 ```supercollider
@@ -328,7 +328,7 @@ a.show;
 ![](./images/selections-1.png)
 
 
-###<br>8. Iteration
+### <br>8. Iteration
 
 <br>Iterate over all score components.
 ```supercollider
