@@ -20,7 +20,7 @@ __Fosc__ lets you:
 
 ## <br>Installation
 
-### <br>1. Install LilyPond
+### 1. Install LilyPond
 [LilyPond][lilypond] is an open-source program that engraves music notation in an automated way. __Fosc__ uses LilyPond to produce notational output. It's recommended that you install the most recent version of LilyPond directly from the LilyPond website. After you install LilyPond, check to see if LilyPond is callable from your command line.
 
     ~$ lilypond --version
@@ -67,7 +67,7 @@ FoscConfiguration.getLilypondVersionString;
 
 ## <br>Basic usage
 
-### <br>1. Displaying music
+### 1. Displaying music
 
 <br>Display a note.
 ```supercollider
