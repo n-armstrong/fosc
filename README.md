@@ -13,9 +13,9 @@ __Fosc__ lets you:
 
 * Create musical notation in an object-oriented way
 * Generate and transform complex rhythms through rhythm-makers and meter-rewriting
-* Construct powerful component selectors for locating and transforming musical objects in a score
+* Construct powerful component selectors and iterators for transforming musical objects in a score
 * Control all of the typographic details of music notation
-* Play musical scores through the scsynth engine and over MIDI
+* Play musical scores through the scsynth engine and MIDI
 
 
 ## Installation
