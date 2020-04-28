@@ -181,16 +181,16 @@ FoscRhythmMaker : FoscObject {
     
     Returns LilyPond file.
     -------------------------------------------------------------------------------------------------------- */
-    illustrate { |timeSignatures, stretch=1|
+    illustrate { |timeSignatures|
         if (selections.isNil) { throw("%:illustrate: no music to show.".format(this.species)) };
-        ^FoscLilypondFile.rhythm(selections, timeSignatures, stretch: stretch);
+        ^FoscLilypondFile.rhythm(selections, timeSignatures);
     }
     /* --------------------------------------------------------------------------------------------------------
     • show
     -------------------------------------------------------------------------------------------------------- */
-    show { |timeSignatures, stretch=1|
+    show { |timeSignatures|
         var lilypondFile;
-        lilypondFile = this.illustrate(timeSignatures, stretch);
+        lilypondFile = this.illustrate(timeSignatures);
         lilypondFile.show;
     }
     /* --------------------------------------------------------------------------------------------------------

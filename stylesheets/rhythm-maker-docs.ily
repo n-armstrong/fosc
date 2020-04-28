@@ -41,7 +41,7 @@
             (stretchability . 0)
             )
         autoBeaming = ##f
-        proportionalNotationDuration = #(ly:make-moment 1 32)
+        proportionalNotationDuration = #(ly:make-moment 1 20)
         tupletFullLength = ##t
     }
     \context {
