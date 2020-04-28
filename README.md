@@ -12,7 +12,6 @@ __Fosc__ lets you:
 
 
 * Create musical notation in an object-oriented way
-* Model compositional thinking computationally
 * Generate and transform complex rhythms through rhythm-makers and meter-rewriting
 * Construct powerful component selectors for locating and transforming musical objects in a score
 * Control all of the typographic details of music notation
