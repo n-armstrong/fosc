@@ -243,8 +243,6 @@ a.show;
 a = FoscRhythmMaker();
 b = a.(divisions: [2/16,3/16,5/16], ratios: #[[-3,1],[3,2],[4,-3]]);
 c = FoscStaff(b);
-d = FoscInspection(c).duration;
-c.leafAt(0).attach(FoscTimeSignature(d.pair));
 mutate(c).rewritePitches(#[60,62,64,65]);
 c.show;
 ```
