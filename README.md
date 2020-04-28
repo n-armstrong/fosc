@@ -18,7 +18,7 @@ __Fosc__ lets you:
 * Play musical scores through the scsynth engine and MIDI
 
 
-## Installation
+## <br>Installation
 
 ### <br>1. Install LilyPond
 [LilyPond][lilypond] is an open-source program that engraves music notation in an automated way. __Fosc__ uses LilyPond to produce notational output. It's recommended that you install the most recent version of LilyPond directly from the LilyPond website. After you install LilyPond, check to see if LilyPond is callable from your command line.
@@ -65,7 +65,7 @@ FoscConfiguration.getLilypondVersionString;
 ```
 
 
-## Basic usage
+## <br>Basic usage
 
 ### <br>1. Displaying music
 
