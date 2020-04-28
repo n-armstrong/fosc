@@ -763,8 +763,8 @@ FoscObject {
     /* --------------------------------------------------------------------------------------------------------
     • writePNG
     -------------------------------------------------------------------------------------------------------- */
-    writePNG { |path|
-        ^FoscPersistenceManager(this).asPNG(path);
+    writePNG { |path, resolution=200|
+        ^FoscPersistenceManager(this).asPNG(path, resolution: resolution);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: FoscSelection / FoscCopmonent shared interface

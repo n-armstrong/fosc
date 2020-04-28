@@ -85,13 +85,13 @@ FoscPersistenceManager : FoscObject {
     f = a.writePNG("%.ly".format(p), p);
     unixCmd("open %".format(f[0]));
     -------------------------------------------------------------------------------------------------------- */
-    asPNG { |lyPath, outputPath, illustrateFunction, clean=true ... args|
+    asPNG { |lyPath, outputPath, illustrateFunction, resolution=200, clean=true ... args|
         var flags, success;
         if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
         lyPath = this.asLY(lyPath, illustrateFunction, *args);
         outputPath = outputPath ?? { lyPath.splitext[0] };
         //flags = "-dbackend=eps -dno-gs-load-fonts -dinclude-eps-fonts --png";
-        flags = "-dbackend=eps -dresolution=100 -dno-gs-load-fonts -dinclude-eps-fonts --png";
+        flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png".format(resolution);
         success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
         if (success && clean) {
             #[
