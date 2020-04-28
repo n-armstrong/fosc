@@ -229,7 +229,7 @@ a.show;
 ```
 ![](./images/rhythm-maker-1.png)
 
-<br>Negative values in '' result in rests.
+<br>Negative values in 'divisions' result in rests.
 ```supercollider
 a = FoscRhythmMaker();
 a.(divisions: [2/16,3/16,5/16], ratios: #[[-3,1],[3,2],[4,-3]]);
