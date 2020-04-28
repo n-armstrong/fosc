@@ -309,8 +309,7 @@ FoscTimeSignature : FoscObject {
     b >= a;
     -------------------------------------------------------------------------------------------------------- */
     >= { |expr|
-    	if (this.isKindOf(this.species)) { ^(this.duration >= expr.duration) };
-    	^FoscTypeError();
+    	^(this.duration >= expr.duration);
     }
     /* --------------------------------------------------------------------------------------------------------
     • >
@@ -325,8 +324,7 @@ FoscTimeSignature : FoscObject {
     b > a;
     -------------------------------------------------------------------------------------------------------- */
     > { |expr|
-    	if (this.isKindOf(this.species)) { ^(this.duration > expr.duration) };
-    	^FoscTypeError();
+    	^(this.duration > expr.duration);
     }
     /* --------------------------------------------------------------------------------------------------------
     • <=
@@ -339,10 +337,11 @@ FoscTimeSignature : FoscObject {
     b = FoscTimeSignature([2, 4]);
     a <= b;
     b <= a;
+
+    a <= 3;
     -------------------------------------------------------------------------------------------------------- */
     <= { |expr|
-    	if (this.isKindOf(this.species)) { ^(this.duration <= expr.duration) };
-    	^FoscTypeError();
+        ^(this.duration <= expr.duration);
     }
     /* --------------------------------------------------------------------------------------------------------
     • <
@@ -357,8 +356,7 @@ FoscTimeSignature : FoscObject {
     b < a;
     -------------------------------------------------------------------------------------------------------- */
     < { |expr|
-    	if (this.isKindOf(this.species)) { ^(this.duration < expr.duration) };
-    	^FoscTypeError();
+    	^(this.duration < expr.duration);
     }
     /* --------------------------------------------------------------------------------------------------------
     • (abjad: __radd__)
