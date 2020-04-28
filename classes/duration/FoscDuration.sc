@@ -37,6 +37,9 @@ FoscDuration : FoscFraction {
     Adds duration to expr.
 
     Returns duration.
+
+
+    • Example 1
     
 
     Returns duration when expr is a duration.
@@ -45,6 +48,9 @@ FoscDuration : FoscFraction {
     b = FoscDuration(3, 2);
     c = (a + b);
     c.str;
+
+
+    • Example 2
 
     
     Returns nonreduced fraction when expr is a nonreduced fraction.
