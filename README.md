@@ -171,50 +171,48 @@ a.show;
 
 <br>Integer and/or String elements in 'pitches' slot results in notes.
 ```supercollider
-m = FoscLeafMaker();
-m = m.(#[62,64,"F#5","G#5"], [1/4]);
-m.show;
+m = FoscLeafMaker().(pitches: #[62,64,"F#5","G#5"], durations: [1/4]);m.show;
 ```
 ![](./images/leaf-maker-1.png)
 
 <br>Tuple elements in 'pitches' result in chords.
 ```supercollider
-m = FoscLeafMaker().(#[[60,62,64],["F#5","G#5","A#5"]], [1/2]);
+m = FoscLeafMaker().(pitches: #[[60,62,64],["F#5","G#5","A#5"]], durations: [1/2]);
 m.show;
 ```
 ![](./images/leaf-maker-2.png)
 
 <br>Nil-valued elements in 'pitches' result in rests.
 ```supercollider
-m = FoscLeafMaker().(nil, 1/4 ! 4);
+m = FoscLeafMaker().(pitches: nil, durations: 1/4 ! 4);
 m.show;
 ```
 ![](./images/leaf-maker-3.png)
 
 <br>Values passed to 'pitches' can be mixed and matched.
 ```supercollider
-m = FoscLeafMaker().(#[[60,62,64],nil,"C#5","D#5"], [1/4]);
+m = FoscLeafMaker().(pitches: #[[60,62,64],nil,"C#5","D#5"], durations: [1/4]);
 m.show;
 ```
 ![](./images/leaf-maker-4.png)
 
 <br>FoscLeafMaker reads pitches cyclically when the length of 'pitches' is less than the length of 'durations'.
 ```supercollider
-m = FoscLeafMaker().(#[72], [3/8,1/8,3/8,1/8]);
+m = FoscLeafMaker().(pitches: #[72], durations: [3/8,1/8,3/8,1/8]);
 m.show;
 ```
 ![](./images/leaf-maker-5.png)
 
 <br>FoscLeafMaker reads durations cyclically when the length of 'durations' is less than the length of 'pitches'.
 ```supercollider
-m = FoscLeafMaker().(#[72,74,76,77], [1/4]);
+m = FoscLeafMaker().(pitches: #[72,74,76,77], durations: [1/4]);
 m.show;
 ```
 ![](./images/leaf-maker-6.png)
 
 <br>Elements in 'durations' with non-power-of-two denominators result in tuplet-nested leaves.
 ```supercollider
-m = FoscLeafMaker().(#[60,62,64,65], [1/4, 1/12, 1/6, 1/2]);
+m = FoscLeafMaker().(pitches: #[60,62,64,65], durations: [1/4, 1/12, 1/6, 1/2]);
 m.show;
 ```
 ![](./images/leaf-maker-7.png)
@@ -230,7 +228,7 @@ a.show;
 ```
 ![](./images/rhythm-maker-1.png)
 
-<br>Negative ratio values result in rests.
+<br>Negative values in '' result in rests.
 ```supercollider
 a = FoscRhythmMaker();
 a.(divisions: [2/16,3/16,5/16], ratios: #[[-3,1],[3,2],[4,-3]]);

@@ -10,14 +10,14 @@ Usage follows the two-step configure-once / call-repeatedly pattern shown here.
 
 a = FoscRhythmMaker();
 a.(divisions: [1/4], ratios: #[[1,1],[3,2],[4,3]]);
-a.show(stretch: 1.5);
+a.show;
 
 
 • Example 2
 
 a = FoscRhythmMaker();
 a.(divisions: [2/16, 3/16, 5/32], ratios: #[[2,1],[3,2],[4,3]]);
-a.show(stretch: 2);
+a.show;
 
 
 • Example 3 !!!TODO: DEPRECATE THIS BEHAVIOUR ??
@@ -44,7 +44,7 @@ Patterns may be used as arguments.
 
 a = FoscRhythmMaker();
 a.(divisions: [1/8], ratios: Pseq(#[[-2,1],[3,2]], 7));
-a.show(stretch: 2);
+a.show;
 
 
 • Example 6
@@ -280,7 +280,7 @@ FoscRhythmMaker : FoscObject {
     t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
     a = FoscRhythmMaker(tupletSpecifier: t);
     a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m, n]);
-    a.show(stretch: 1.5);
+    a.show;
 
 
     • Example 2
@@ -291,7 +291,7 @@ FoscRhythmMaker : FoscObject {
     t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
     a = FoscRhythmMaker(tupletSpecifier: t);
     a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m, n]);
-    a.show(stretch: 1.5);
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
     prApplyLogicalTieMasks { |selections, masks|
         var container;
