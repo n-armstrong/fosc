@@ -25,7 +25,6 @@
         \Score
         \remove Bar_number_engraver
         \accepts GlobalContext
-        %\override BarNumber.transparent = ##t 
         \override Beam.breakable = ##t
         \override SpacingSpanner.strict-grace-spacing = ##t
         \override SpacingSpanner.strict-note-spacing = ##t
@@ -42,7 +41,6 @@
             (stretchability . 0)
             )
         autoBeaming = ##f
-        %barNumberVisibility = #all-bar-numbers-visible
         proportionalNotationDuration = #(ly:make-moment 1 32)
         tupletFullLength = ##t
     }
@@ -51,11 +49,11 @@
     }
     \context {
         \Staff
-        \remove Time_signature_engraver
+        %\remove Time_signature_engraver
     }
     \context {
         \RhythmicStaff
-        \remove Time_signature_engraver
+        %\remove Time_signature_engraver
     }
 }
 
