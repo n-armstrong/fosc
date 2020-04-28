@@ -171,7 +171,8 @@ a.show;
 
 <br>Integer and/or String elements in 'pitches' slot results in notes.
 ```supercollider
-m = FoscLeafMaker().(pitches: #[62,64,"F#5","G#5"], durations: [1/4]);m.show;
+m = FoscLeafMaker().(pitches: #[62,64,"F#5","G#5"], durations: [1/4]);
+m.show;
 ```
 ![](./images/leaf-maker-1.png)
 
