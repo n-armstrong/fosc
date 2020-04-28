@@ -482,6 +482,109 @@ FoscMutation : FoscObject {
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
+    • rewritePitches
+
+    • Example 1 
+
+    Rewrite written pitches for first three notes.
+
+    a = FoscStaff(FoscLeafMaker().(#[60], 1/16 ! 16));
+    mutate(a).rewritePitches(#[72,71,70]);
+    a.show;
+
+
+    • Example 2
+
+    Rewrite written pitches using a pattern.
+
+    a = FoscStaff(FoscLeafMaker().(#[60], 1/16 ! 16));
+    mutate(a).rewritePitches(Pseq((72,71..67), inf));
+    a.show;
+
+
+    • Example 3
+
+    Rewrite written pitches for first three chords.
+
+    a = FoscStaff(FoscLeafMaker().(#[[60,64]], 1/16 ! 16));
+    mutate(a).rewritePitches(#[[72,69],[71,68],[70,67]]);
+    a.show;
+
+
+    • Example 4
+
+    Replaces chords with notes.
+
+    a = FoscStaff(FoscLeafMaker().(#[[60,64]], 1/16 ! 16));
+    mutate(a).rewritePitches(#[72,71,70]);
+    a.show;
+
+
+    • Example 5
+
+    Replaces notes with chords.
+
+    a = FoscStaff(FoscLeafMaker().(#[60], 1/16 ! 16));
+    a.leafAt(0).attach(FoscArticulation('>'));
+    mutate(a).rewritePitches(#[[72,69],[71,68],[70,67]]);
+    a.show;
+
+
+    • Example 6
+
+    !!!TODO: BROKEN!
+
+    Rewrite written pitches for first three notes in a selection.
+
+    a = FoscLeafMaker().(#[60], 1/16 ! 16);
+    mutate(a).rewritePitches(#[72,71,70]);
+    a.show;
+
+
+    • Example 8
+
+    !!!TODO: selections must be added to a container for now, because of bug in FoscIteration:logicalTies.
+
+    Rewrite written pitches for notes in an array of selections.
+
+    a = FoscStaff(FoscRhythmMaker().(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]]));
+    mutate(a).fuseBySizes(sizes: #[-2,4], isCyclic: true);
+    mutate(a).rewriteBeams(beamEachRun: true);
+    mutate(a).rewritePitches(#[60,62,64]);
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    rewritePitches { |writtenPitches|     
+        var selections;
+
+        case
+        { client.isKindOf(FoscContainer) } {
+            selections = mutate(client).ejectContents;
+            selections = this.prRewritePitches([selections], writtenPitches);
+            client.addAll(selections);
+        }
+        { client.isKindOf(FoscSelection) } {
+            if (client.areContiguousLogicalVoice.not) {
+                //!!! 'throw' not consistently being caught
+                error("%:%: client must contain only contiguous components: %."
+                    .format(this.species, thisMethod.name, client.items));
+            };
+            selections = this.prRewritePitches([selections], writtenPitches);
+            client.instVarPut('items', selections);
+        }
+        {
+            client.isSequenceableCollection
+            && { client.every { |item| item.isKindOf(FoscSelection) } }
+        } {
+            // selections = FoscSelection(client).flat;
+            // selections = pitchSpecifier.([selections], writtenPitches, isCyclic);
+            this.prRewritePitches([selections], writtenPitches);
+        }
+        {
+            throw("%:%: client must be a FoscContainer, a FoscSelection, or an array of FoscSelections: %."
+                .format(this.species, thisMethod.name, client));
+        };
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • scale
 
     Scales mutation client by multiplier.
@@ -875,7 +978,7 @@ FoscMutation : FoscObject {
         };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PUBLIC PROPERTIES
+    // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • client
@@ -884,84 +987,82 @@ FoscMutation : FoscObject {
 
     Returns selection or component.
     -------------------------------------------------------------------------------------------------------- */
-
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // DEPRECATED
+    // PRIVATE INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • replaceMeasureContents
-
-    Replaces contents of measures in client with new_contents.
-
-    Preserves duration of all measures. Skips measures that are too small.Pads extra space at end of measures with spacer skip. Raises stop iteration if not enough measures.
-
-    Returns measures iterated.
-    
-
-    • Example 1
-
-    m = FoscMeasureMaker().([[1, 8], [3, 16]]);
-    a = FoscStaff(m);
-    a.show;
-
-    n = [FoscNote(60, 1/16), FoscNote(62, 1/16), FoscNote(64, 1/16), FoscNote(65, 2/16)];
-    mutate(a).replaceMeasureContents(n);
-    a.show;
-
-    n = [
-        FoscSelection([FoscNote(60, 1/16), FoscNote(62, 1/16)]),
-        FoscSelection([FoscNote(64, 1/16), FoscNote(65, 2/16)])
-    ];
-    mutate(a).replaceMeasureContents(n);
-    a.show;
+    • prRewritePitches
     -------------------------------------------------------------------------------------------------------- */
-    // replaceMeasureContents { |newContents|
-    //     var result, currentMeasure, currentTimeSignature, currentElement, multiplier, preProlatedDuration;
-    //     var duration, candidateDuration;
-    //     result = [];
-    //     currentMeasure = this.client.prNextMeasure;
-    //     result = result.add(currentMeasure);
-    //     currentTimeSignature = currentMeasure.timeSignature;
-    //     currentMeasure.prDelItem((0..currentMeasure.lastIndex));
+    prRewritePitches { |selections, writtenPitches|
+        var n, newSelections, containers, pitches, container, logicalTies, totalLogicalTies;
+        var pitchStream, pitch, logicalTie, newLeaf, newSelection;
 
-    //     while { newContents.notEmpty } {
-    //         currentElement = newContents[0];
-    //         multiplier = currentTimeSignature.impliedProlation;
-    //         preProlatedDuration = currentElement.prGetPreprolatedDuration;
-    //         duration = multiplier * preProlatedDuration;
-    //         candidateDuration = currentMeasure.prGetDuration + duration;
-    //         if (candidateDuration <= currentTimeSignature.duration) {
-    //             currentElement = newContents.removeAt(0);
-    //             currentMeasure.prAddWithoutWithdrawingFromCrossingSpanners(currentElement);
-    //         } {
-    //             currentTimeSignature = FoscTimeSignature(currentTimeSignature);
-    //             currentMeasure.detach(FoscTimeSignature);
-    //             currentMeasure.attach(currentTimeSignature);
-    //             currentMeasure = currentMeasure.prNextMeasure;
-    //             if (currentMeasure.isNil) {
-    //                 throw("Stop Iteration."); //##### TIDY THIS
-    //             };
-    //             result = result.add(currentMeasure);
-    //             currentTimeSignature = currentMeasure.timeSignature;
-    //             currentMeasure.prDelItem((0..currentMeasure.lastIndex));
-    //         };
-    //     };
+        newSelections = [];
+        containers = [];
+        pitches = [];
 
-    //     currentTimeSignature = FoscTimeSignature(currentTimeSignature);
-    //     currentMeasure.detach(FoscTimeSignature);
-    //     currentMeasure.attach(currentTimeSignature);
-    //     currentMeasure.prAddSpacerSkip;
-    //     ^result;
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • splice
+        selections.do { |selection|
+            container = FoscContainer();
+            container.addAll(selection);
+            containers = containers.add(container);
+        };
 
-    Splices components to the right or left of selection.
-    
-    Returns array of components.
-    -------------------------------------------------------------------------------------------------------- */
-    // splice { |components, direction='right', growSpanners=true|
-    //     ^client.prSplice(components, direction, growSpanners);
-    // }
+        logicalTies = all(FoscIteration(selections).logicalTies(pitched: true));
+        totalLogicalTies = logicalTies.size;
+
+        if (writtenPitches.isKindOf(Pattern)) {
+            pitchStream = writtenPitches.asStream;
+            totalLogicalTies.do {
+                block { |break|
+                    pitch = pitchStream.next;
+                    if (pitch.isNil) { break.value };
+                    pitches = pitches.add(pitch);
+                };
+            };
+        } {
+            pitches = writtenPitches;
+        };
+
+        pitches = FoscPitchParser(pitches);
+
+        block { |break|
+            pitches.do { |writtenPitch, i|
+                logicalTie = logicalTies[i];
+                logicalTie.do { |leaf|
+                    case
+                    { leaf.isKindOf(FoscNote) } {
+                        if (
+                            writtenPitch.isSequenceableCollection
+                            || { writtenPitch.isKindOf(FoscPitchSegment) }
+                        ) {
+                            newLeaf = FoscChord(leaf);
+                            newLeaf.writtenPitches_(writtenPitch);
+                            mutate(leaf).replace([newLeaf]);
+                        } {
+                            leaf.writtenPitch_(writtenPitch);
+                        };
+                    }
+                    { leaf.isKindOf(FoscChord) } {
+                        if (
+                            writtenPitch.isSequenceableCollection
+                            || { writtenPitch.isKindOf(FoscPitchSegment) }
+                        ) {
+                            leaf.writtenPitches_(writtenPitch); 
+                        } {
+                            newLeaf = FoscNote(leaf);
+                            newLeaf.writtenPitch_(writtenPitch);
+                            mutate(leaf).replace([newLeaf]);
+                        };
+                    }
+                };
+            };
+        };
+
+        containers.do { |container|
+            newSelection = mutate(container).ejectContents;
+            newSelections = newSelections.add(newSelection);
+        };
+
+        ^newSelections;
+    }
 }

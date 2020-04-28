@@ -239,6 +239,18 @@ a.show;
 ```
 ![](./images/rhythm-maker-2.png)
 
+<br>Add the output of a FoscRhythmMaker to a FoscStaff and rewrite pitches.
+```supercollider
+a = FoscRhythmMaker();
+b = a.(divisions: [2/16,3/16,5/16], ratios: #[[-3,1],[3,2],[4,-3]]);
+c = FoscStaff(b);
+d = FoscInspection(c).duration;
+c.leafAt(0).attach(FoscTimeSignature(d.pair));
+mutate(c).rewritePitches(#[60,62,64,65]);
+c.show;
+```
+![](./images/rhythm-maker-3.png)
+
 <br>Apply sustain mask.
 ```supercollider
 p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
@@ -247,7 +259,7 @@ a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
 ```
-![](./images/rhythm-maker-3.png)
+![](./images/rhythm-maker-4.png)
 
 <br>Same as previous example, but with tuplet and beam specifiers applied to output.
 ```supercollider
@@ -259,7 +271,7 @@ a = FoscRhythmMaker(beamSpecifier: b, tupletSpecifier: t);
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
 ```
-![](./images/rhythm-maker-4.png)
+![](./images/rhythm-maker-5.png)
 
 <br>Apply silence mask.
 ```supercollider
@@ -271,7 +283,7 @@ a = FoscRhythmMaker(beamSpecifier: b, tupletSpecifier: t);
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
 ```
-![](./images/rhythm-maker-5.png)
+![](./images/rhythm-maker-6.png)
 
 
 ### 7. Selections
