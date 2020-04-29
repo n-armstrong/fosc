@@ -120,7 +120,7 @@ a.show;
 
 ### <br>3. Spanners
 
-<br>Spanners attach to selections of two or more contiguous leaves.
+<br>Spanners attach to two or more contiguous leaves.
 ```supercollider
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/8]));
 a.selectLeaves.slur;
@@ -247,9 +247,9 @@ c.show;
 ```
 ![](./images/rhythm-maker-3.png)
 
-<br>Apply sustain mask.
+<br>Apply a sustain mask.
 ```supercollider
-p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
+p = FoscPattern(indices: #[0,1,4,5,17,18,19]);
 m = FoscSustainMask(p, hold: true);
 a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
@@ -257,9 +257,9 @@ a.show;
 ```
 ![](./images/rhythm-maker-4.png)
 
-<br>Same as previous example, but with tuplet and beam specifiers applied to output.
+<br>Apply a sustain mask, and apply tuplet and beam specifiers.
 ```supercollider
-p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
+p = FoscPattern(indices: #[0,1,4,5,17,18,19]);
 m = FoscSustainMask(p, hold: true);
 t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
 b = FoscBeamSpecifier(beamRests: false);
@@ -269,9 +269,9 @@ a.show;
 ```
 ![](./images/rhythm-maker-5.png)
 
-<br>Apply silence mask.
+<br>Apply a silence mask, and apply tuplet and beam specifiers.
 ```supercollider
-p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
+p = FoscPattern(indices: #[0,1,4,5,17,18,19]);
 m = FoscSilenceMask(p);
 t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
 b = FoscBeamSpecifier(beamRests: false);
