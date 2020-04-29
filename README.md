@@ -242,8 +242,7 @@ c.show;
 
 <br>Apply a sustain mask.
 ```supercollider
-p = FoscPattern(indices: #[0,1,4,5,17,18,19]);
-m = FoscSustainMask(p, hold: true);
+m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
 a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
@@ -252,8 +251,7 @@ a.show;
 
 <br>Apply a sustain mask, and apply tuplet and beam specifiers.
 ```supercollider
-p = FoscPattern(indices: #[0,1,4,5,17,18,19]);
-m = FoscSustainMask(p, hold: true);
+m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
 t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
 b = FoscBeamSpecifier(beamRests: false);
 a = FoscRhythmMaker(beamSpecifier: b, tupletSpecifier: t);
@@ -264,8 +262,7 @@ a.show;
 
 <br>Apply a silence mask, and apply tuplet and beam specifiers.
 ```supercollider
-p = FoscPattern(indices: #[0,1,4,5,17,18,19]);
-m = FoscSilenceMask(p);
+m = FoscSilenceMask(FoscPattern(indices: #[0,1,4,5,17,18,19]));
 t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
 b = FoscBeamSpecifier(beamRests: false);
 a = FoscRhythmMaker(beamSpecifier: b, tupletSpecifier: t);
