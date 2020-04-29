@@ -132,7 +132,7 @@ a.show;
 
 ### <br>4. Tweaks, overrides, settings
 
-<br>Tweak notehead properties.
+<br>Tweak LilyPond Grob properties.
 ```supercollider
 a = FoscNote(60, 1/4);
 tweak(a.noteHead).style = 'harmonic';
@@ -140,24 +140,17 @@ a.show;
 ```
 ![](./images/tweak-notehead.png)
 
-<br>Tweak slur interface elements.
+<br>Override LilyPond Grob properties.
 ```supercollider
-a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/8]));
-a[0..].slur(tweaks: #[['color', 'blue'], ['lineThickness', 2]]);
-a.show;
-```
-![](./images/tweak-slur.png)
-
-<br>Override notehead properties.
-```supercollider
-a = FoscNote(60, 1/4);
-override(a).noteHead.color = 'red';
-override(a).noteHead.size = 12;
-a.show;
+a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], 1/8));
+b = FoscScore([a]);
+set(a).instrumentName = FoscMarkup("Violin");
+set(b).proportionalNotationDuration = FoscSchemeMoment(#[1,64]);
+b.show;
 ```
 ![](./images/override-notehead.png)
 
-<br>Set LilyPond properties.
+<br>Set LilyPond Context properties.
 ```supercollider
 a = FoscScore([FoscStaff(FoscLeafMaker().(#[60,62,64,65], 1/8))]);
 set(a[0]).instrumentName = FoscMarkup("Violin");
