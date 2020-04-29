@@ -120,7 +120,7 @@ a.show;
 
 ### <br>3. Spanners
 
-<br>Spanners attach to two or more contiguous leaves.
+<br>Spanners attach to selections of two or more contiguous leaves.
 ```supercollider
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/8]));
 a.selectLeaves.slur;
