@@ -24,7 +24,7 @@ FoscMIDIBundle : FoscObject {
     *new { |logicalTie, manager, amp|
         assert(
             logicalTie.isKindOf(FoscLogicalTie),
-            "FoscPlaybackBundle:new: can't initialize with: %.".format(logicalTie);
+            "%:new: can't initialize with: %.".format(this.species, logicalTie);
         );
         //!!!TODO: check that manager is a FoscMIDIPlaybackManager
         ^super.new.init(logicalTie, manager, amp);

@@ -196,9 +196,10 @@ FoscPlayer : FoscObject {
                     container.prEjectContents;
                 };
             }
-            { music.isKindOf(FoscEventSequence) } {
-                recurse.(music.asFoscSelection);
-            }
+            //!!! DEPRECATED
+            // { music.isKindOf(FoscEventSequence) } {
+            //     recurse.(music.asFoscSelection);
+            // }
             {
                 throw("%:new: bad argument for 'music': %.".format(this.species, music));
             };
