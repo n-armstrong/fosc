@@ -85,7 +85,7 @@ a.show;
 ![](./images/notes.png)
 
 <br>View LilyPond output in the Post window.
-```supercollider
+```lilypond
 a = FoscVoice([FoscNote('C4', 1/4), FoscNote('D4', 1/8)]);
 a.format;
 
@@ -176,7 +176,7 @@ m.show;
 ```
 ![](./images/leaf-maker-1.png)
 
-<br>Tuple elements in 'pitches' result in chords.
+<br>Array elements in 'pitches' result in chords.
 ```supercollider
 m = FoscLeafMaker().(pitches: #[[60,62,64],["F#5","G#5","A#5"]], durations: [1/2]);
 m.show;
