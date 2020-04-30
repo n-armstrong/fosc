@@ -362,3 +362,6 @@ a.show;
 ![](./images/iteration-3.png)
 
 
+## <br>License
+__Fosc__ is free software available under [Version 3 the GNU General Public License](./LICENSE).
+
