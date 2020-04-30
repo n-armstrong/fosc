@@ -142,11 +142,10 @@ a.show;
 
 <br>Override LilyPond Grob properties.
 ```supercollider
-a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], 1/8));
-b = FoscScore([a]);
-set(a).instrumentName = FoscMarkup("Violin");
-set(b).proportionalNotationDuration = FoscSchemeMoment(#[1,64]);
-b.show;
+a = FoscNote(60, 1/4);
+override(a).noteHead.color = 'red';
+override(a).noteHead.size = 12;
+a.show;
 ```
 ![](./images/override-notehead.png)
 
