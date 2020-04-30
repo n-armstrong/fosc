@@ -363,5 +363,5 @@ a.show;
 
 
 ## <br>License
-__Fosc__ is free software available under [Version 3 the GNU General Public License](./LICENSE).
+__Fosc__ is free software available under [Version 3.0 of the GNU General Public License](./LICENSE).
 
