@@ -272,9 +272,9 @@ a.show;
 ```
 ![](./images/rhythm-maker-7.png)
 
-<br>Apply a sustain mask and hold from one onset to the next.
+<br>Apply a sustain mask and fuse leaves between successive onsets.
 ```supercollider
-m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
+m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), fuse: true);
 a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;

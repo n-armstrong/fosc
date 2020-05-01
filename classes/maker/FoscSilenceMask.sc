@@ -32,17 +32,15 @@ FoscSilenceMask : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    var <pattern, <fuseRests;
-    *new { |pattern, fuseRests=true|
+    var <pattern;
+    *new { |pattern|
         if (pattern.isKindOf(FoscSilenceMask)) { pattern = pattern.pattern };
         assert(pattern.isKindOf(FoscPattern),
             "%:new: pattern must be a FoscPattern: %".format(this.species, pattern));
-        assert(fuseRests.isKindOf(Boolean));
-        ^super.new.init(pattern, fuseRests);
+        ^super.new.init(pattern);
     }
-    init { |argPattern, argFuseRests|
+    init { |argPattern|
         pattern = argPattern;
-        fuseRests = argFuseRests;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS
@@ -106,14 +104,14 @@ FoscSilenceMask : FoscObject {
             };
         };
 
-        if (fuseRests) {
-            // group by parentage and contiguity
-            containers.do { |each| each.prUpdateNow(offsets: true) };
-            groupedRests = rests.separate { |a, b|
-                a.parent != b.parent || (a.timespan.stopOffset != b.timespan.startOffset);
-            };
-            groupedRests.do { |each, i| FoscSelection(each).prFuseLeaves };
-        };
+        // if (fuseRests) {
+        //     // group by parentage and contiguity
+        //     containers.do { |each| each.prUpdateNow(offsets: true) };
+        //     groupedRests = rests.separate { |a, b|
+        //         a.parent != b.parent || (a.timespan.stopOffset != b.timespan.startOffset);
+        //     };
+        //     groupedRests.do { |each, i| FoscSelection(each).prFuseLeaves };
+        // };
 
         containers.do { |container|
             newSelection = mutate(container).ejectContents;

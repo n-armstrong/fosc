@@ -8,8 +8,8 @@ Sustain mask.
 
 FoscSustainMask: 'pattern' arg may be a FoscPatternList
 
-mutate(music).sustain(pattern, hold: false, fuseRests: true);
-mutate(music).silence(pattern, fuseRests: true);
+mutate(music).sustain(pattern, fuse: false);
+mutate(music).silence(pattern);
 
 
 
@@ -26,10 +26,10 @@ a.show;
 
 • Example 2
 
-Fuse contiguous leaves when 'hold' is true.
+Fuse contiguous leaves when 'fuse' is true.
 
 p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
-m = FoscSustainMask(p, hold: true);
+m = FoscSustainMask(p, fuse: true);
 a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
@@ -40,7 +40,7 @@ a.show;
 Create a talea pattern.
 
 p = FoscPattern(#[0,1,3], period: 5);
-m = FoscSustainMask(p, hold: true);
+m = FoscSustainMask(p, fuse: true);
 a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
@@ -49,25 +49,28 @@ FoscSustainMask : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    var <pattern, <hold, <fuseRests;
-    *new { |pattern, hold=false, fuseRests=true|
+    var <pattern, <fuse;
+    *new { |pattern, fuse=false|
         if (pattern.isKindOf(FoscSustainMask)) { pattern = pattern.pattern };
         assert(pattern.isKindOf(FoscPattern),
             "%:new: pattern must be a FoscPattern: %".format(this.species, pattern));
-        assert(hold.isKindOf(Boolean));
-        assert(fuseRests.isKindOf(Boolean));
-        ^super.new.init(pattern, hold, fuseRests);
+        assert(fuse.isKindOf(Boolean));
+        ^super.new.init(pattern, fuse);
     }
-    init { |argPattern, argHold, argFuseRests|
+    init { |argPattern, argFuse|
         pattern = argPattern;
-        hold = argHold;
-        fuseRests = argFuseRests;
+        fuse = argFuse;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • value
+
+    m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), fuse: true);
+    a = FoscRhythmMaker();
+    a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
     value { |selections|
         var newSelections, containers, rests, container, logicalTies, totalLogicalTies, matchingLogicalTies;
@@ -88,7 +91,7 @@ FoscSustainMask : FoscObject {
         totalLogicalTies = logicalTies.size;
         matchingLogicalTies = pattern.getMatchingItems(logicalTies);
 
-        if (hold) {
+        if (fuse) {
             indices = matchingLogicalTies.collect { |each| logicalTies.indexOf(each) };
             if (indices.includes(0).not) { indices = [0] ++ indices };
             if (indices.includes(totalLogicalTies).not) { indices = indices ++ [totalLogicalTies] };
@@ -125,14 +128,6 @@ FoscSustainMask : FoscObject {
                 };
             };
 
-        };
-
-        if (fuseRests) {
-            // group by parentage and contiguity
-            containers.do { |each| each.prUpdateNow(offsets: true) };
-            rests.separate { |a, b|
-                a.parent != b.parent || (a.timespan.stopOffset != b.timespan.startOffset);
-            }.do { |each, i| FoscSelection(each).prFuseLeaves };
         };
 
         containers.do { |container|
