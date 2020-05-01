@@ -196,7 +196,7 @@ m.show;
 ```
 ![](./images/leaf-maker-5.png)
 
-<br>Durations are repeated cyclically cyclically when the length of 'durations' is less than the length of 'pitches'.
+<br>Durations are repeated cyclically when the length of 'durations' is less than the length of 'pitches'.
 ```supercollider
 m = FoscLeafMaker().(pitches: #[72,74,76,77], durations: [3/8,1/8]);
 m.show;
@@ -266,14 +266,21 @@ a.show;
 
 <br>Apply a sustain mask.
 ```supercollider
-m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
+m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]));
 a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
 ```
 ![](./images/rhythm-maker-7.png)
 
-<br>Apply a sustain mask, and apply tuplet and beam specifiers.
+<br>Apply a sustain mask and hold from one onset to the next.
+m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
+a = FoscRhythmMaker();
+a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
+a.show;
+![](./images/rhythm-maker-8.png)
+
+<br>Apply a sustain mask, hold, and apply tuplet and beam specifiers.
 ```supercollider
 m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
 t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
@@ -282,7 +289,7 @@ a = FoscRhythmMaker(beamSpecifier: b, tupletSpecifier: t);
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
 ```
-![](./images/rhythm-maker-8.png)
+![](./images/rhythm-maker-9.png)
 
 
 ### <br>7. Selections
