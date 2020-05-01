@@ -60,8 +60,10 @@ FoscConfiguration.lilypondExecutablePath = "/usr/local/bin/lilypond";
 
 ```supercollider
 FoscConfiguration.getLilypondVersionString;
+```
 
--> 2.19.82
+```
+2.19.82
 ```
 
 
@@ -88,8 +90,10 @@ a.show;
 ```lilypond
 a = FoscVoice([FoscNote('C4', 1/4), FoscNote('D4', 1/8)]);
 a.format;
+```
 
--> \new Voice {
+```
+\new Voice {
     c'4
     d'8
 }
@@ -299,8 +303,10 @@ a.show;
 a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
 b = a.selectComponents;
 b.do { |each| each.cs.postln };
+```
 
--> FoscStaff([  ], 'Staff', false)
+```
+FoscStaff([  ], 'Staff', false)
 FoscRest(1/4)
 FoscNote('C4', 1/4)
 FoscNote('D4', 1/4)
@@ -311,8 +317,10 @@ FoscNote('D4', 1/4)
 a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
 b = a.selectComponents(prototype: [FoscNote, FoscRest]);
 b.do { |each| each.cs.postln };
+```
 
--> FoscRest(1/4)
+```
+FoscRest(1/4)
 FoscNote('C4', 1/4)
 FoscNote('D4', 1/4)
 ```
@@ -322,8 +330,10 @@ FoscNote('D4', 1/4)
 a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscChord(#[60,64,67], 1/4)]);
 b = a.selectLeaves(pitched: true);
 b.do { |each| each.cs.postln };
+```
 
--> FoscNote('C4', 1/4)
+```
+FoscNote('C4', 1/4)
 FoscChord("C4 E4 G4", 1/4)
 ```
 
