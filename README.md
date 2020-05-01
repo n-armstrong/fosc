@@ -144,7 +144,6 @@ a.show;
 ```supercollider
 a = FoscNote(60, 1/4);
 override(a).noteHead.color = 'red';
-override(a).noteHead.size = 12;
 a.show;
 ```
 ![](./images/override-notehead.png)
