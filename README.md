@@ -282,12 +282,11 @@ a.show;
 ```
 ![](./images/rhythm-maker-8.png)
 
-<br>Apply a sustain mask, hold, and apply tuplet and beam specifiers.
+<br>Apply a sustain mask, hold, and apply formatting rules with a FoscTupletSpecifier.
 ```supercollider
 m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
 t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
-b = FoscBeamSpecifier(beamRests: false);
-a = FoscRhythmMaker(beamSpecifier: b, tupletSpecifier: t);
+a = FoscRhythmMaker(tupletSpecifier: t);
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
 ```
