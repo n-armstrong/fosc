@@ -371,7 +371,7 @@ FoscNote('C5', 1/8)
 
 <br>Iterate over notes, attach indicators.
 ```supercollider
-a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69,71,72], [1/8]));
+a = FoscStaff(FoscLeafMaker().(#[nil,62,64,65,67,69,71,72], [1/8]));
 a.doComponents({ |note| note.attach(FoscArticulation('>')) }, prototype: FoscNote);
 a.show;
 ```
