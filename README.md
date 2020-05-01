@@ -287,7 +287,7 @@ a.show;
 
 <br>Apply a sustain mask, fuse leaves, and apply formatting rules with a FoscTupletSpecifier.
 ```supercollider
-m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
+m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), fuse: true);
 t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
 a = FoscRhythmMaker(tupletSpecifier: t);
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
