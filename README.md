@@ -63,7 +63,7 @@ FoscConfiguration.getLilypondVersionString;
 ```
 
 ```
-2.19.82
+"2.19.82"
 ```
 
 
