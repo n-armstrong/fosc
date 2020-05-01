@@ -87,7 +87,7 @@ a.show;
 ![](./images/notes.png)
 
 <br>View LilyPond output in the Post window.
-```lilypond
+```supercollider
 a = FoscVoice([FoscNote('C4', 1/4), FoscNote('D4', 1/8)]);
 a.format;
 ```
