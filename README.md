@@ -281,7 +281,7 @@ a.show;
 ```
 ![](./images/rhythm-maker-8.png)
 
-<br>Apply a sustain mask, hold, and apply formatting rules with a FoscTupletSpecifier.
+<br>Apply a sustain mask, fuse leaves, and apply formatting rules with a FoscTupletSpecifier.
 ```supercollider
 m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
 t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
