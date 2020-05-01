@@ -170,7 +170,7 @@ m.show;
 
 <br>Array elements in 'pitches' result in chords.
 ```supercollider
-m = FoscLeafMaker().(pitches: #[[60,64,67],["Eb4","G4","Bb4"]], durations: [1/2]);
+m = FoscLeafMaker().(pitches: #[[60,64,67],['Eb4','G4','Bb4']], durations: [1/2]);
 m.show;
 ```
 ![](./images/leaf-maker-2.png)
@@ -184,7 +184,7 @@ m.show;
 
 <br>Values passed to 'pitches' can be mixed and matched.
 ```supercollider
-m = FoscLeafMaker().(pitches: #[[60,64,67],nil,"Eb4","G4"], durations: [1/4]);
+m = FoscLeafMaker().(pitches: #[[60,64,67],nil,'Eb4','G4'], durations: [1/4]);
 m.show;
 ```
 ![](./images/leaf-maker-4.png)
