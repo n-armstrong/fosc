@@ -274,10 +274,12 @@ a.show;
 ![](./images/rhythm-maker-7.png)
 
 <br>Apply a sustain mask and hold from one onset to the next.
+```supercollider
 m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), hold: true);
 a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
+```
 ![](./images/rhythm-maker-8.png)
 
 <br>Apply a sustain mask, hold, and apply tuplet and beam specifiers.
