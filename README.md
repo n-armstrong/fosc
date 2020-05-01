@@ -345,6 +345,7 @@ a.show;
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69,71,72], [1/8]));
 a.doComponents({ |each| each.cs.postln });
 ```
+
 ```supercollider
 FoscStaff([  ], 'Staff', false)
 FoscNote('C4', 1/8)
