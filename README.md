@@ -161,9 +161,9 @@ a.show;
 
 ### <br>5. Generate music with FoscLeafMaker
 
-<br>Integer and/or String elements in 'pitches' slot results in notes.
+<br>Integer, String or Symbol elements in 'pitches' slot result in notes.
 ```supercollider
-m = FoscLeafMaker().(pitches: #[60,64,"G4","Bb4"], durations: [1/4]);
+m = FoscLeafMaker().(pitches: #[60,64,"G4",'Bb4'], durations: [1/4]);
 m.show;
 ```
 ![](./images/leaf-maker-1.png)
