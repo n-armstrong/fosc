@@ -330,7 +330,7 @@ FoscChord("C4 E4 G4", 1/4)
 
 <br>Attach indicators to all selected pitched leaves.
 ```supercollider
-a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscChord(#[60,64,67], 1/4)]);
+a = FoscStaff(FoscLeafMaker().(#[nil,62,64,65,67,69,71,72], [1/8]));
 b = a.selectLeaves(pitched: true);
 b.do { |each| each.attach(FoscArticulation('>')) };
 a.show;
@@ -342,7 +342,7 @@ a.show;
 
 <br>Iterate over all score components.
 ```supercollider
-a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69], [1/8]));
+a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69,71,72], [1/8]));
 a.doComponents({ |each| each.cs.postln });
 
 -> FoscStaff([  ], 'Staff', false)
@@ -352,11 +352,13 @@ FoscNote('E4', 1/8)
 FoscNote('F4', 1/8)
 FoscNote('G4', 1/8)
 FoscNote('A4', 1/8)
+FoscNote('B4', 1/8)
+FoscNote('C5', 1/8)
 ```
 
 <br>Iterate over notes, attach indicators.
 ```supercollider
-a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69], [1/8]));
+a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69,71,72], [1/8]));
 a.doComponents({ |note| note.attach(FoscArticulation('>')) }, prototype: FoscNote);
 a.show;
 ```
