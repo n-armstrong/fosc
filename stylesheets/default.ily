@@ -1,5 +1,3 @@
-\version "2.19.0"
-
 #(ly:set-option 'relative-includes #t)
 #(set-global-staff-size 18)
 
