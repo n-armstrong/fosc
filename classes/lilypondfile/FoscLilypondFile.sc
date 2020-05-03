@@ -661,8 +661,6 @@ FoscLilypondFile : FoscObject {
     Gets interpreter representation of Lilypond file.
     
     Returns string.
-
-    Gets interpreter representation:
     -------------------------------------------------------------------------------------------------------- */
     asCompileString {
         ^this.notYetImplemented(thisMethod);

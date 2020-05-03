@@ -1,13 +1,12 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscFraction
 
-
-FoscFraction(3).str;
-FoscFraction(3.14159).str;
-FoscFraction([3,2]).str;
-FoscFraction(6,2).str;
-FoscNonreducedFraction(6,2).str;
-FoscFraction().str;
+FoscFraction(3).cs;
+FoscFraction(3.14159).cs;
+FoscFraction([3,2]).cs;
+FoscFraction(6,2).cs;
+FoscNonreducedFraction(6,2).cs;
+FoscFraction().cs;
 ------------------------------------------------------------------------------------------------------------ */
 FoscFraction : AbstractFunction {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

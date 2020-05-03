@@ -6,7 +6,7 @@
 
 __Fosc__ is a [SuperCollider][supercollider] API for generating musical notation in [LilyPond][lilypond].
 
-__Fosc__ stands for FO-rmalised S-core C-ontrol (FO-r S-uperC-ollider). It's a close relative of [Abjad][abjad], and ports much of abjad's Python code base to SuperCollider.
+__Fosc__ stands for FO-rmalised S-core C-ontrol (FO-r S-uperC-ollider). It's a close relative of [Abjad][abjad], and ports much of Abjad's Python code base to SuperCollider.
 
 __Fosc__ lets you:
 
@@ -15,12 +15,13 @@ __Fosc__ lets you:
 * Generate and transform complex rhythms through rhythm-makers and meter-rewriting
 * Construct powerful component selectors and iterators for transforming musical objects in a score
 * Control all of the typographic details of music notation
-* Play musical scores through the scsynth engine and MIDI
+* Play musical scores through scsynth and MIDI
 
 
 ## <br>Installation
 
 ### 1. Install LilyPond
+
 [LilyPond][lilypond] is an open-source program that engraves music notation in an automated way. __Fosc__ uses LilyPond to produce notational output. It's recommended that you install the most recent version of LilyPond directly from the LilyPond website. After you install LilyPond, check to see if LilyPond is callable from your command line.
 
     ~$ lilypond --version
@@ -39,6 +40,7 @@ __Fosc__ lets you:
 
 
 ### <br>2. Install Fosc
+
 Download the __fosc__ master branch from this repository. Move the unzipped folder to your SuperCollider Extensions directory. Information on installing SuperCollider extensions can be found here: https://doc.sccode.org/Guides/UsingExtensions.html. 
 
 
