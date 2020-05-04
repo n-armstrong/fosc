@@ -1,15 +1,6 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscRhythm
 
-n = 200;
-p = Pseq((60..72), inf).asStream.nextN(n);
-d = Prand([1/16,1/8,1/4,1/3,2/5], inf).asStream.nextN(n);
-a = FoscLeafMaker().(pitches: p, durations: d);
-
-b = FoscStaff(a);
-mutate(b[0..]).rewriteMeter(FoscMeter(#[4,4]));
-b.show;
-
 
 • Example 1
 
@@ -37,7 +28,7 @@ a = FoscRhythm(1/4, #[1, -2, [2, [1, 2, 4]]]);
 a.show;
 
 
-• Example 4 !!!TODO: DEPRECATE ?
+• Example 4 !!! DEPRECATED
 
 Floats are interpreted as ties.
 
@@ -62,10 +53,6 @@ FoscRhythm : FoscTreeContainer {
         items = items.collect { |each, i|
             case 
             { each.isInteger } { FoscRhythmLeaf(each) }
-            // this behaviour is deprecated
-            // { each.isFloat } {
-            //     FoscRhythmLeaf(each.asInteger).isTiedToPrevLeaf_(true);
-            // }
             { each.isKindOf(FoscTreeNode) } { each }
             { each.isSequenceableCollection } { FoscRhythm(*each) }
             { throw("%::new: bad value: %.".format(this.species, each.asCompileString)) };
@@ -78,7 +65,7 @@ FoscRhythm : FoscTreeContainer {
     /* --------------------------------------------------------------------------------------------------------
     • doesNotUnderstand
 
-    Delegate methods to FoscRhythmMixin.
+    Delegate to FoscRhythmMixin.
     -------------------------------------------------------------------------------------------------------- */
     doesNotUnderstand { |selector ... args|
         if (mixin.respondsTo(selector)) {
@@ -88,7 +75,7 @@ FoscRhythm : FoscTreeContainer {
         };
     }
     /* --------------------------------------------------------------------------------------------------------
-    • value (abjad: __call__)
+    • value
     -------------------------------------------------------------------------------------------------------- */
     value { |pulseDuration=1|
         var result;
@@ -166,9 +153,9 @@ FoscRhythm : FoscTreeContainer {
     a = FoscRhythm(3/16, [1, -2, FoscRhythm(2, #[1, 2, 4])]);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-    show { |stretch=1|
+    show {
         var lilypondFile;
-        lilypondFile = this.illustrate(stretch);
+        lilypondFile = this.illustrate;
         lilypondFile.show;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -252,7 +239,7 @@ FoscRhythm : FoscTreeContainer {
 
     A sequence describing the relative durations of the nodes in a node's improper parentage.
 
-    The first item in the sequence is the preprolated_duration of the root node, and subsequent items are pairs of the preprolated duration of the next node in the parentage and the total preprolated_duration of that node and its siblings.
+    The first item in the sequence is the preprolatedDuration of the root node, and subsequent items are pairs of the preprolated duration of the next node in the parentage and the total preprolated_duration of that node and its siblings.
 
     Returns array.
     -------------------------------------------------------------------------------------------------------- */
