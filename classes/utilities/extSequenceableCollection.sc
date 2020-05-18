@@ -365,7 +365,7 @@
     /* --------------------------------------------------------------------------------------------------------
     • sortN
 
-    Sort n-dimensional collection in ascending order.
+    Sort an n-dimensional collection in ascending or descending order.
 
 
     • Example 1
@@ -384,17 +384,27 @@
 
     a = { [9.rand, 9.rand, 9.rand] } ! 10;
     a.sortN(reverse: true).printAll;
+
+
+    • Example 4
+
+    Sort from 'startIndex'. If 'startIndex' is 1, then 0th element is ignored in search function.
+
+    a = { [9.rand, 9.rand, 9.rand] } ! 10;
+    a.sortN(startIndex: 1).printAll;
     -------------------------------------------------------------------------------------------------------- */
-    sortN { |reverse=false|
+    sortN { |startIndex=0, reverse=false|
         var func, i, result, minSize, operator;
         
         if (this.rank == 1) { ^this.sort };
 
         operator = if (reverse) { '>' } { '<' };
+        
         func = { |a, b|
-            i = 0;
+            i = startIndex;
             result = true;
             minSize = min(a.size, b.size);
+            
             while { i <= (minSize - 1) } {
                 if (a[i].perform(operator, b[i])) {
                     i = minSize;
@@ -407,8 +417,10 @@
                     };
                 };
             };
+
             result;
         };
+
         ^this.sort(func);
     }
     /* --------------------------------------------------------------------------------------------------------

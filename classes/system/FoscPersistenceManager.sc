@@ -55,21 +55,19 @@ FoscPersistenceManager : FoscObject {
 
     Returns output path.
 
-
-    a = FoscNote(60, 1/4);
-    a.show;
-
+    If 'clean' is true, ly file is deleted.
+    
 
     a = FoscNote(60, 1/4);
     b = a.write.asPDF;
     -------------------------------------------------------------------------------------------------------- */
-    asPDF { |lyPath, outputPath, illustrateFunction, flags, removeLY=false ... args|
+    asPDF { |lyPath, outputPath, illustrateFunction, flags, clean=false ... args|
         var success;
         if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
         lyPath = this.asLY(lyPath, illustrateFunction, *args);
         outputPath = outputPath ?? { lyPath.splitext[0] };
         success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
-        if (removeLY) { File.delete(lyPath) };
+        if (success && clean) { File.delete(lyPath) };
         outputPath = outputPath ++ ".pdf";
         ^[outputPath, success];
     }
@@ -85,7 +83,7 @@ FoscPersistenceManager : FoscObject {
     f = a.writePNG("%.ly".format(p), p);
     unixCmd("open %".format(f[0]));
     -------------------------------------------------------------------------------------------------------- */
-    asPNG { |lyPath, outputPath, illustrateFunction, resolution=200, clean=true ... args|
+    asPNG { |lyPath, outputPath, illustrateFunction, resolution=100, clean=true ... args|
         var flags, success;
         if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
         lyPath = this.asLY(lyPath, illustrateFunction, *args);
@@ -104,6 +102,15 @@ FoscPersistenceManager : FoscObject {
         };
         outputPath = (outputPath ++ ".png").shellQuote;
         ^[outputPath, success];
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • asSVG
+
+    lilypond -dbackend=svg -dcrop file.ly
+    -------------------------------------------------------------------------------------------------------- */
+    asSVG { |lyPath, outputPath, illustrateFunction, crop=true, clean=true ... args|
+        // if (crop) { add "-dcrop" to flags string };
+        ^this.notYetImplemented(thisMethod);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE PROPERTIES

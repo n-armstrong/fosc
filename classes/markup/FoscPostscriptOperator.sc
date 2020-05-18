@@ -1,7 +1,7 @@
 /* --------------------------------------------------------------------------------------------------------
 • FoscPostscriptOperator
 
-- postscript commands: http://www.math.ubc.ca/~cass/courses/ps.html
+Postscript commands: http://www.math.ubc.ca/~cass/courses/ps.html
 
 x = FoscPostscriptOperator('moveto', 1.0, 1.0);
 x.name;
@@ -23,6 +23,22 @@ FoscPostscriptOperator : FoscObject {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC METHODS: SPECIAL METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/* --------------------------------------------------------------------------------------------------------
+	• asCompileString
+
+	x = FoscPostscriptOperator('newpath');
+	x.cs;
+
+	x = FoscPostscriptOperator('moveto', 1.0, 1.0);
+	x.cs;
+	-------------------------------------------------------------------------------------------------------- */
+	asCompileString {
+		if (arguments.isEmpty) {
+			^"FoscPostscriptOperator('%')".format(name);
+		} {
+			^"FoscPostscriptOperator('%', %)".format(name, arguments.join(", "));
+		};
+	}
 	/* --------------------------------------------------------------------------------------------------------
 	• format
 	x = FoscPostscriptOperator('moveto', 1.0, 1.0);

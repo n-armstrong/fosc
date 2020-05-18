@@ -6,11 +6,6 @@ Timespan.
 Timespans are closed-open intervals.
 
 Timespans are immutable.
-
-a = FoscTimespan(0, 10);
-b = FoscTimespan(5, 12);
-c = FoscTimespan(-2, 2);
-d = FoscTimespan(10, 20);
 ------------------------------------------------------------------------------------------------------------ */
 FoscTimespan : FoscObject {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,23 +32,17 @@ FoscTimespan : FoscObject {
 
     Arithmetic mean of 'startOffset' and 'stopOffset'.
 
-
-    • Example 1
-
-    FoscTimespan(0, 10).axis.str;
+    FoscTimespan(0, 10).axis.cs;
     -------------------------------------------------------------------------------------------------------- */
     axis {
-        ^((startOffset + stopOffset) / 2);
+        ^(startOffset + stopOffset) / 2;
     }
     /* --------------------------------------------------------------------------------------------------------
     • duration
 
     Duration of timespan.
 
-
-    • Example 1
-
-    FoscTimespan(0, 10).duration.str;
+    FoscTimespan(0, 10).duration.cs;
     -------------------------------------------------------------------------------------------------------- */
     duration {
         ^(stopOffset - startOffset);
@@ -62,9 +51,6 @@ FoscTimespan : FoscObject {
     • isWellformed
 
     Is true when timespan start offset preceeds timespan stop offset.
-
-
-     • Example 1
 
     FoscTimespan(0, 10).isWellformed;
     -------------------------------------------------------------------------------------------------------- */
@@ -76,10 +62,7 @@ FoscTimespan : FoscObject {
 
     Timespan offsets.
 
-
-    • Example 1
-
-    FoscTimespan(0, 10).offsets.collect { |each| each.str };
+    FoscTimespan(0, 10).offsets.collect { |each| each.cs };
     -------------------------------------------------------------------------------------------------------- */
     offsets {
         ^[startOffset, stopOffset];
@@ -89,51 +72,31 @@ FoscTimespan : FoscObject {
 
     Timespan start offset.
 
-
-    • Example 1
-
-    FoscTimespan(0, 10).startOffset.str;
+    FoscTimespan(0, 10).startOffset.cs;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • stopOffset
 
     Timespan stop offset.
 
-
-    • Example 1
-
-    FoscTimespan(0, 10).stopOffset.str;
+    FoscTimespan(0, 10).stopOffset.cs;
     -------------------------------------------------------------------------------------------------------- */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* --------------------------------------------------------------------------------------------------------
-    • && (abjad: __and__)
-    
-    Logical AND of two timespans.
-    -------------------------------------------------------------------------------------------------------- */
-    && {
-        ^this.notYetImplemented(thisMethod);
-    }
     /* --------------------------------------------------------------------------------------------------------
     • == (abjad: __eq__)
     
     Is true when 'timespan' is a timespan with equal offsets. Otherwise false:
     
     Returns true or false.
+
+    FoscTimespan(1, 3) == FoscTimespan(1, 3);
+
+    FoscTimespan(1, 3) == FoscTimespan(2, 3);
     -------------------------------------------------------------------------------------------------------- */
-    == {
-        ^this.notYetImplemented(thisMethod);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • format
-    
-    Formats timespan.
-    
-    Returns string.
-    -------------------------------------------------------------------------------------------------------- */
-    format {
-        ^this.str;
+    == { |timespan|
+        ^(this.offsets == timespan.offsets);
     }
     /* --------------------------------------------------------------------------------------------------------
     • >= (abjad: __ge__)
@@ -141,9 +104,23 @@ FoscTimespan : FoscObject {
     Is true when 'argument' start offset is greater or equal to timespan start offset. Otherwise false:
     
     Returns true or false.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 12);
+    c = FoscTimespan(-2, 2);
+
+    b >= c;
+    a >= b;
     -------------------------------------------------------------------------------------------------------- */
-    >= {
-        ^this.notYetImplemented(thisMethod);
+    >= { |timespan|
+        if (timespan.stopOffset.isNil) { ^false };
+        if (this.startOffset >= timespan.stopOffset) { ^true };
+        if (
+            this.startOffset == timespan.stopOffset
+            && { this.stopOffset >= timespan.stopOffset }) {
+            ^true;
+        };
+        ^(this.startOffset >= timespan.startOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • > (abjad: __gt__)
@@ -151,9 +128,95 @@ FoscTimespan : FoscObject {
     Is true when 'argument' start offset is greater than timespan start offset. Otherwise false:
     
     Returns true or false.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 12);
+    c = FoscTimespan(-2, 2);
+
+    b > c;
+    a > b;
     -------------------------------------------------------------------------------------------------------- */
-    > {
-        ^this.notYetImplemented(thisMethod);
+    > { |timespan|
+        if (timespan.stopOffset.isNil) { ^false };
+        if (this.startOffset > timespan.stopOffset) { ^true };
+        if (
+            this.startOffset == timespan.stopOffset
+            && { this.stopOffset > timespan.stopOffset }) {
+            ^true;
+        };
+        ^(this.startOffset > timespan.startOffset);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • <= (abjad: __le__)
+    
+    Is true when 'argument' start offset is less than or equal to timespan start offset. Otherwise false:
+
+    Returns true or false.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 12);
+    c = FoscTimespan(-2, 2);
+
+    b <= c;
+    a <= b;
+    -------------------------------------------------------------------------------------------------------- */
+    <= { |timespan|
+        if (timespan.stopOffset.isNil) { ^false };
+        if (this.startOffset <= timespan.stopOffset) { ^true };
+        if (
+            this.startOffset == timespan.stopOffset
+            && { this.stopOffset <= timespan.stopOffset }) {
+            ^true;
+        };
+        ^(this.startOffset <= timespan.startOffset);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • < (abjad: __lt__ )
+    
+    Is true when 'argument' start offset is less than timespan start offset. Otherwise false:
+    
+    Returns true or false.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 12);
+    c = FoscTimespan(-2, 2);
+
+    b < c;
+    a < b;
+    -------------------------------------------------------------------------------------------------------- */
+    < { |timespan|
+        if (timespan.stopOffset.isNil) { ^false };
+        if (this.startOffset < timespan.stopOffset) { ^true };
+        if (
+            this.startOffset == timespan.stopOffset
+            && { this.stopOffset < timespan.stopOffset }) {
+            ^true;
+        };
+        ^(this.startOffset < timespan.startOffset);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • asCompileString
+
+    Formats timespan.
+    
+    Returns string.
+
+    FoscTimespan(1, 3).cs;
+    -------------------------------------------------------------------------------------------------------- */
+    asCompileString {
+        ^"FoscTimespan(%, %)".format(startOffset.str, stopOffset.str);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • format
+    
+    Formats timespan.
+    
+    Returns string.
+
+    FoscTimespan(0, 10).format;
+    -------------------------------------------------------------------------------------------------------- */
+    format {
+        ^this.asCompileString;
     }
     /* --------------------------------------------------------------------------------------------------------
     • hash
@@ -176,34 +239,14 @@ FoscTimespan : FoscObject {
         ^timespans.illustrate(range: range, scale: scale);
     }
     /* --------------------------------------------------------------------------------------------------------
-    • <= (abjad: __le__)
-    
-    Is true when 'argument' start offset is less than or equal to timespan start offset. Otherwise false:
-
-    Returns true or false.
-    -------------------------------------------------------------------------------------------------------- */
-    <= {
-        ^this.notYetImplemented(thisMethod);
-    }
-    /* --------------------------------------------------------------------------------------------------------
     • size
     
-   Defined equal to 1 for all timespans.
+    Defined equal to 1 for all timespans.
     
     Returns positive integer.
     -------------------------------------------------------------------------------------------------------- */
     size {
         ^1;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • < (abjad: __lt__ )
-    
-    Is true when 'argument' start offset is less than timespan start offset. Otherwise false:
-    
-    Returns true or false.
-    -------------------------------------------------------------------------------------------------------- */
-    < {
-        ^this.notYetImplemented(thisMethod);
     }
     /* --------------------------------------------------------------------------------------------------------
     • || (abjad: __or__)
@@ -226,6 +269,31 @@ FoscTimespan : FoscObject {
         ^this.notYetImplemented(thisMethod);
     }
     /* --------------------------------------------------------------------------------------------------------
+    • sect (abjad: __and__) (Logical AND of two timespans.) 
+    
+    Intersection of two timespans.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 12);
+    c = FoscTimespan(-2, 2);
+    d = FoscTimespan(10, 20);
+
+    a.sect(b)[0].offsets.do { |e| e.cs.postln };
+    a.sect(c)[0].offsets.do { |e| e.cs.postln };
+    a.sect(d).items;
+    b.sect(c).items;
+    b.sect(d)[0].offsets.do { |e| e.cs.postln };
+    c.sect(d).items;
+    -------------------------------------------------------------------------------------------------------- */
+    sect { |timespan|
+        var newStartOffset, newStopOffset, newTimespan;
+        if (this.intersectsTimespan(timespan).not) { ^FoscTimespanList() };
+        newStartOffset = [this.startOffset, timespan.startOffset].maxItem;
+        newStopOffset = [this.stopOffset, timespan.stopOffset].minItem;
+        newTimespan = this.species.new(newStartOffset, newStopOffset);
+        ^FoscTimespanList([newTimespan]);
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • xor (abjad: __xor__)
     
     Logical XOR of two timespans.
@@ -240,38 +308,31 @@ FoscTimespan : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • prAsPostscript
+
+    a = FoscTimespan(0, 3);
+    p = a.prAsPostscript(-1, 0.5, 15);
+    p.format;
     -------------------------------------------------------------------------------------------------------- */
     prAsPostscript { |postscriptXOffset, postscriptYOffset, postscriptScale|
         var start, stop, ps;
-        // start = (float(self._start_offset) * postscript_scale)
-        // start -= postscript_x_offset
-        // stop = (float(self._stop_offset) * postscript_scale)
-        // stop -= postscript_x_offset
-        start = startOffset.asFloat * postscriptScale;
-        start = start - postscriptYOffset;
-        stop = stopOffset.asFloat * postscriptScale;
+
+        start = this.startOffset.asFloat * postscriptScale;
+        start = start - postscriptXOffset;
+        
+        stop = this.stopOffset.asFloat * postscriptScale;
         stop = stop - postscriptXOffset;  
-        // ps = abjad.Postscript()
-        // ps = ps.moveto(start, postscript_y_offset)
-        // ps = ps.lineto(stop, postscript_y_offset)
-        // ps = ps.stroke()
+
         ps = FoscPostscript();
         ps = ps.moveto(start, postscriptYOffset);
         ps = ps.lineto(stop, postscriptYOffset);
         ps = ps.stroke;
-        // ps = ps.moveto(start, postscript_y_offset + 0.75)
-        // ps = ps.lineto(start, postscript_y_offset - 0.75)
-        // ps = ps.stroke()
         ps = ps.moveto(start, postscriptYOffset + 0.75);
-        ps = ps.moveto(start, postscriptYOffset - 0.75);
+        ps = ps.lineto(start, postscriptYOffset - 0.75);
         ps = ps.stroke;
-        // ps = ps.moveto(stop, postscript_y_offset + 0.75)
-        // ps = ps.lineto(stop, postscript_y_offset - 0.75)
-        // ps = ps.stroke()
-        // return ps
-        ps = ps.moveto(start, postscriptYOffset + 0.75);
-        ps = ps.moveto(start, postscriptYOffset - 0.75);
+        ps = ps.moveto(stop, postscriptYOffset + 0.75);
+        ps = ps.lineto(stop, postscriptYOffset - 0.75);
         ps = ps.stroke;
+        
         ^ps;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -279,32 +340,12 @@ FoscTimespan : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     prCanFuse { |argument|
         ^this.notYetImplemented(thisMethod);
-        // if isinstance(argument, type(self)):
-        //     return self.intersects_timespan(argument) or \
-        //         self.stops_when_timespan_starts(argument)
-        // return False
     }
     /* --------------------------------------------------------------------------------------------------------
     • prGetTimespan
     -------------------------------------------------------------------------------------------------------- */
     prGetTimespan { |argument|
         ^this.notYetImplemented(thisMethod);
-        // if isinstance(argument, Timespan):
-        //     start_offset, stop_offset = argument.offsets
-        // elif hasattr(argument, 'timespan'):
-        //     start_offset, stop_offset = argument.timespan.offsets
-        // elif hasattr(argument, '_get_timespan'):
-        //     start_offset, stop_offset = argument._get_timespan().offsets
-        // # TODO: remove this branch in favor of the _get_timespan above
-        // #elif hasattr(argument, 'timespan'):
-        // #    start_offset, stop_offset = argument.timespan().offsets
-        // else:
-        //     raise ValueError(argument)
-        // return abjad.new(
-        //     self,
-        //     start_offset=start_offset,
-        //     stop_offset=stop_offset,
-        //     )
     }
     /* --------------------------------------------------------------------------------------------------------
     • prInitializeOffset
@@ -321,51 +362,17 @@ FoscTimespan : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     *prGetOffsets { |argument|
         ^this.notYetImplemented(thisMethod);
-        // if isinstance(argument, Timespan):
-        //     pass
-        // elif hasattr(argument, 'timespan'):
-        //     argument = argument.timespan
-        // elif hasattr(argument, '_get_timespan'):
-        //     argument = argument._get_timespan()
-        // else:
-        //     raise ValueError(argument)
-        // return argument._start_offset, argument._stop_offset
     }
     /* --------------------------------------------------------------------------------------------------------
     • *prGetStartOffsetAndMaybeStopOffset
     -------------------------------------------------------------------------------------------------------- */
     *prGetStartOffsetAndMaybeStopOffset { |argument|
         ^this.notYetImplemented(thisMethod);
-        // if isinstance(argument, Timespan):
-        //     pass
-        // elif hasattr(argument, 'timespan'):
-        //     argument = argument.timespan
-        // elif hasattr(argument, '_get_timespan'):
-        //     argument = argument._get_timespan()
-        // start_offset = getattr(argument, 'start_offset', None)
-        // if start_offset is None:
-        //     raise ValueError(argument)
-        // stop_offset = getattr(argument, 'stop_offset', None)
-        // return start_offset, stop_offset
     }
     /* --------------------------------------------------------------------------------------------------------
     • *prImplementsTimespanInterface
     -------------------------------------------------------------------------------------------------------- */
     *prImplementsTimespanInterface { |timespan|
-        // if (
-        //     getattr(timespan, 'start_offset', 'foo') != 'foo' and
-        //     getattr(timespan, 'stop_offset', 'foo') != 'foo'
-        //     ):
-        //     return True
-        // if hasattr(timespan, '_get_timespan'):
-        //     return True
-        // # TODO: remove this branch in favor of the _get_timespan above
-        // if hasattr(timespan, 'timespan'):
-        //     return True
-        // if getattr(timespan, 'timespan', 'foo') != 'foo':
-        //     return True
-        // return False
-
         if (
             timespan.respondsTo('startOffset')
             && { timespan.respondsTo('stopOffset') }
@@ -385,596 +392,1026 @@ FoscTimespan : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • containsTimespanImproperly
+
+    Is true when timespan contains 'timespan' improperly.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 10);
+
+    a.containsTimespanImproperly(a);
+    a.containsTimespanImproperly(b);
+    b.containsTimespanImproperly(a);
+    b.containsTimespanImproperly(b);
     -------------------------------------------------------------------------------------------------------- */
     containsTimespanImproperly { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     self_start_offset <= expr_start_offset and
-        //     expr_stop_offset <= self_stop_offset
-        //     )
+        ^(
+            this.startOffset <= timespan.startOffset
+            && (timespan.stopOffset <= this.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • curtailsTimespan
+
+    Is true when timespan curtails 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 10);
+
+    a.curtailsTimespan(a);
+    a.curtailsTimespan(b);
+    b.curtailsTimespan(a);
+    b.curtailsTimespan(b);
     -------------------------------------------------------------------------------------------------------- */
     curtailsTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     expr_start_offset < self_start_offset and
-        //     self_start_offset <= expr_stop_offset and
-        //     expr_stop_offset <= self_stop_offset
-        //     )
+        ^(
+            timespan.startOffset < this.startOffset
+            && (this.startOffset <= timespan.stopOffset)
+            && (timespan.stopOffset <= this.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • delaysTimespan
+
+    Is true when timespan delays 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 15);
+    c = FoscTimespan(10, 20);
+
+    a.delaysTimespan(b);
+    b.delaysTimespan(c);
+    b.delaysTimespan(a);
     -------------------------------------------------------------------------------------------------------- */
-    delaysTimespan {
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     self_start_offset <= expr_start_offset and
-        //     expr_start_offset < self_stop_offset
-        //     )
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • divideByRatio
-    -------------------------------------------------------------------------------------------------------- */
-    divideByRatio { |ratio|
-        ^this.notYetImplemented(thisMethod);
-        // if isinstance(ratio, int):
-        //     ratio = ratio * (1, )
-        // ratio = abjad.Ratio(ratio)
-        // unit_duration = self.duration / sum(ratio.numbers)
-        // part_durations = [
-        //     numerator * unit_duration for numerator in ratio.numbers
-        //     ]
-        // start_offsets = abjad.mathtools.cumulative_sums(
-        //     [self._start_offset] + part_durations,
-        //     start=None,
-        //     )
-        // offset_pairs = abjad.sequence(start_offsets).nwise()
-        // result = [type(self)(*offset_pair) for offset_pair in offset_pairs]
-        // return tuple(result)
+    delaysTimespan { |timespan|
+        ^(
+            this.startOffset <= timespan.startOffset
+            && (timespan.startOffset <= this.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • getOverlapWithTimespan
+
+    Gets duration of overlap with 'timespan'.
+
+    a = FoscTimespan(0, 15);
+    b = FoscTimespan(5, 10);
+    c = FoscTimespan(6, 6);
+    d = FoscTimespan(12, 22);
+
+    a.getOverlapWithTimespan(a).cs;
+    a.getOverlapWithTimespan(b).cs;
+    a.getOverlapWithTimespan(c).cs;
+    a.getOverlapWithTimespan(d).cs;
+    b.getOverlapWithTimespan(b).cs;
+    b.getOverlapWithTimespan(c).cs;
+    b.getOverlapWithTimespan(d).cs;
+    c.getOverlapWithTimespan(c).cs;
+    c.getOverlapWithTimespan(d).cs;
+    d.getOverlapWithTimespan(d).cs;
     -------------------------------------------------------------------------------------------------------- */
     getOverlapWithTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // if self._implements_timespan_interface(timespan):
-        //     result = abjad.Duration(
-        //         sum(x.duration for x in self & timespan)
-        //         )
-        //     return result
+        var result;
+        result = this.sect(timespan).items.collect { |each| each.duration }.sum;
+        result = FoscDuration(result);
+        ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • happensDuringTimespan
+
+    Is true when timespan happens during 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 10);
+
+    a.happensDuringTimespan(a);
+    a.happensDuringTimespan(b);
+    b.happensDuringTimespan(a);
+    b.happensDuringTimespan(b);
     -------------------------------------------------------------------------------------------------------- */
     happensDuringTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     expr_start_offset <= self_start_offset and
-        //     self_stop_offset <= expr_stop_offset
-        //     )
+        ^(
+            timespan.startOffset <= this.startOffset
+            && (this.stopOffset <= timespan.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • intersectsTimespan
+
+    Is true when timespan intersects 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 15);
+    c = FoscTimespan(10, 15);
+
+    a.intersectsTimespan(a);
+    a.intersectsTimespan(b);
+    a.intersectsTimespan(c);
     -------------------------------------------------------------------------------------------------------- */
     intersectsTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     (
-        //         expr_start_offset <= self_start_offset and
-        //         self_start_offset < expr_stop_offset
-        //     ) or (
-        //         self_start_offset <= expr_start_offset and
-        //         expr_start_offset < self_stop_offset
-        //         )
-        //     )
+        ^(
+            timespan.startOffset <= this.startOffset
+            && { this.startOffset < timespan.stopOffset };
+        ) || {
+            this.startOffset <= timespan.startOffset
+            && { timespan.startOffset < this.stopOffset }
+        };
     }
     /* --------------------------------------------------------------------------------------------------------
     • isCongruentToTimespan
+
+    Is true when timespan is congruent to 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 15);
+
+    a.isCongruentToTimespan(a);
+    a.isCongruentToTimespan(b);
+    b.isCongruentToTimespan(a);
+    b.isCongruentToTimespan(b);
     -------------------------------------------------------------------------------------------------------- */
     isCongruentToTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     expr_start_offset == self_start_offset and
-        //     expr_stop_offset == self_stop_offset
-        //     )
+        ^(
+            timespan.startOffset == this.startOffset
+            && (timespan.stopOffset == this.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • isTangentToTimespan
+
+    Is true when timespan is tangent to 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(10, 20);
+
+    a.isTangentToTimespan(a);
+    a.isTangentToTimespan(b);
+    b.isTangentToTimespan(a);
+    b.isTangentToTimespan(b);
     -------------------------------------------------------------------------------------------------------- */
     isTangentToTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     self_stop_offset == expr_start_offset or
-        //     expr_stop_offset == self_start_offset
-        //     )
+        ^(
+            this.stopOffset == timespan.startOffset
+            || { timespan.stopOffset == this.startOffset }
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • overlapsAllOfTimespan
+
+    Is true when timespan overlaps all of 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 6);
+    c = FoscTimespan(5, 10);
+
+    a.overlapsAllOfTimespan(a);
+    a.overlapsAllOfTimespan(b);
+    b.overlapsAllOfTimespan(c);
     -------------------------------------------------------------------------------------------------------- */
     overlapsAllOfTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     self_start_offset < expr_start_offset and
-        //     expr_stop_offset < self_stop_offset
-        //     )
+        ^(
+            this.startOffset < timespan.startOffset
+            && (timespan.stopOffset < this.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • overlapsOnlyStartOfTimespan
+
+    Is true when timespan overlaps only start of 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(-5, 5);
+    c = FoscTimespan(4, 6);
+    d = FoscTimespan(5, 15);
+
+    a.overlapsOnlyStartOfTimespan(a);
+    a.overlapsOnlyStartOfTimespan(b);
+    a.overlapsOnlyStartOfTimespan(c);
+    a.overlapsOnlyStartOfTimespan(d);
     -------------------------------------------------------------------------------------------------------- */
     overlapsOnlyStartOfTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     self_start_offset < expr_start_offset and
-        //     expr_start_offset < self_stop_offset and
-        //     self_stop_offset <= expr_stop_offset
-        //     )
+        ^(
+            this.startOffset < timespan.startOffset
+            && (timespan.startOffset < this.stopOffset)
+            && (this.stopOffset <= timespan.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • overlapsOnlyStopOfTimespan
+
+    Is true when timespan overlaps only stop of 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(-5, 5);
+    c = FoscTimespan(4, 6);
+    d = FoscTimespan(5, 15);
+
+    a.overlapsOnlyStopOfTimespan(a);
+    a.overlapsOnlyStopOfTimespan(b);
+    a.overlapsOnlyStopOfTimespan(c);
+    a.overlapsOnlyStopOfTimespan(d);
     -------------------------------------------------------------------------------------------------------- */
     overlapsOnlyStopOfTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     expr_start_offset <= self_start_offset and
-        //     self_start_offset < expr_stop_offset and
-        //     expr_stop_offset < self_stop_offset
-        //     )
+        ^(
+            timespan.startOffset <= this.startOffset
+            && (this.startOffset < timespan.stopOffset)
+            && (timespan.stopOffset < this.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • overlapsStartOfTimespan
+
+    Is true when timespan overlaps start of 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(-5, 5);
+    c = FoscTimespan(4, 6);
+    d = FoscTimespan(5, 15);
+
+    a.overlapsStartOfTimespan(a);
+    a.overlapsStartOfTimespan(b);
+    a.overlapsStartOfTimespan(c);
+    a.overlapsStartOfTimespan(d);
     -------------------------------------------------------------------------------------------------------- */
     overlapsStartOfTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     self_start_offset < expr_start_offset and
-        //     expr_start_offset < self_stop_offset
-        //     )
+        ^(
+            this.startOffset < timespan.startOffset
+            && (timespan.startOffset < this.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • overlapsStopOfTimespan
+
+    Is true when timespan overlaps stop of 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(-5, 5);
+    c = FoscTimespan(4, 6);
+    d = FoscTimespan(5, 15);
+
+    a.overlapsStopOfTimespan(a);
+    a.overlapsStopOfTimespan(b);
+    a.overlapsStopOfTimespan(c);
+    a.overlapsStopOfTimespan(d);
     -------------------------------------------------------------------------------------------------------- */
     overlapsStopOfTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     self_start_offset < expr_stop_offset and
-        //     expr_stop_offset < self_stop_offset
-        //     )
+        ^(
+            this.startOffset < timespan.stopOffset
+            && (timespan.stopOffset < this.stopOffset)
+        );
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • partitionByRatio (abjad: divide_by_ratio)
+
+    Partitions timespan by 'ratio'.
+
+    Returns array of timespans.
+
+    a = FoscTimespan(1/2, 3/2);
+    b = a.partitionByRatio(#[1,2,1]);
+    b.do { |each| each.cs.postln };
+    -------------------------------------------------------------------------------------------------------- */
+    partitionByRatio { |ratio|
+        var unitDuration, partDurations, startOffsets, offsetPairs, result;
+        result = [];
+        unitDuration = this.duration / ratio.sum;
+        partDurations = ratio.collect { |each| each * unitDuration };
+        startOffsets = [this.startOffset] ++ (partDurations.integrate + this.startOffset.asFloat);    
+        startOffsets.doAdjacentPairs { |a, b| result = result.add(this.species.new(a, b)) };
+        ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • reflect
+
+    Reflects timespan about 'axis'.
+
+    Returns a new FoscTimespan.
+
+
+    Reverse timespan about timespan axis.
+
+    a = FoscTimespan(3, 6).reflect;
+    a.cs;
+
+    Reverse timespan about arbitrary axis.
+
+    a = FoscTimespan(3, 6).reflect(10);
+    a.cs;
     -------------------------------------------------------------------------------------------------------- */
     reflect { |axis|
-        ^this.notYetImplemented(thisMethod);
-        // if axis is None:
-        //     axis = self.axis
-        // start_distance = self._start_offset - axis
-        // stop_distance = self._stop_offset - axis
-        // new_start_offset = axis - stop_distance
-        // new_stop_offset = axis - start_distance
-        // return self.set_offsets(new_start_offset, new_stop_offset)
+        var startDistance, stopDistance;
+        axis = axis ?? { this.axis };
+        startDistance = this.startOffset - axis;
+        stopDistance = this.stopOffset - axis;
+        ^this.setOffsets(axis - stopDistance, axis - startDistance);
     }
     /* --------------------------------------------------------------------------------------------------------
     • roundOffsets
+
+    Rounds timespan offsets to multiple of 'multiplier'.
+
+    Returns a new FoscTimespan.
+
+
+    a = FoscTimespan(1/5, 4/5);
+    b = a.roundOffsets(1);
+    b.cs;
+
+    a = FoscTimespan(1/5, 4/5);
+    b = a.roundOffsets(2);
+    b.cs;
+
+    a = FoscTimespan(1/5, 4/5);
+    b = a.roundOffsets(2, anchor: 'right');
+    b.cs;
+
+    a = FoscTimespan(1/5, 4/5);
+    b = a.roundOffsets(2, anchor: 'right', mustBeWellFormed: false);
+    b.cs;
     -------------------------------------------------------------------------------------------------------- */
-    roundOffsets { |multiplier, anchor='left', mustBeWellformed=true|
-        ^this.notYetImplemented(thisMethod);
-        // multiplier = abs(abjad.Multiplier(multiplier))
-        // assert 0 < multiplier
-        // new_start_offset = abjad.Offset(
-        //     int(round(self._start_offset / multiplier)) * multiplier)
-        // new_stop_offset = abjad.Offset(
-        //     int(round(self._stop_offset / multiplier)) * multiplier)
-        // if (new_start_offset == new_stop_offset) and must_be_wellformed:
-        //     if anchor is enums.Left:
-        //         new_stop_offset = new_stop_offset + multiplier
-        //     else:
-        //         new_start_offset = new_start_offset - multiplier
-        // result = abjad.new(
-        //     self,
-        //     start_offset=new_start_offset,
-        //     stop_offset=new_stop_offset,
-        //     )
-        // return result
+    roundOffsets { |multiplier, anchor='left', mustBeWellFormed=true|
+        var newStartOffset, newStopOffset, result;
+
+        multiplier = FoscMultiplier(multiplier).abs;
+
+        newStartOffset = FoscOffset((this.startOffset / multiplier).asFloat.round * multiplier);
+        newStopOffset = FoscOffset((this.stopOffset / multiplier).asFloat.round * multiplier);
+        
+        if (newStartOffset == newStopOffset && mustBeWellFormed) {
+            if (anchor == 'left') {
+                newStopOffset = newStopOffset + multiplier;
+            } {
+                newStartOffset = newStartOffset - multiplier;
+            };
+        };
+
+        result = this.species.new(newStartOffset, newStopOffset);
+        ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • scale
+
+    Scales timespan by 'multiplier'.
+
+    Returns a new FoscTimespan.
+
+    
+    Scale timespan relative to timespan start offset.
+
+    a = FoscTimespan(3, 6);
+    b = a.scale(2);
+    b.cs;
+
+    Scale timespan relative to timespan stop offset.
+
+    a = FoscTimespan(3, 6);
+    b = a.scale(2, anchor: 'right');
+    b.cs;
     -------------------------------------------------------------------------------------------------------- */
     scale { |multiplier, anchor='left'|
-        ^this.notYetImplemented(thisMethod);
-        // multiplier = abjad.Multiplier(multiplier)
-        // assert 0 < multiplier
-        // new_duration = multiplier * self.duration
-        // if anchor == enums.Left:
-        //     new_start_offset = self._start_offset
-        //     new_stop_offset = self._start_offset + new_duration
-        // elif anchor == enums.Right:
-        //     new_stop_offset = self._stop_offset
-        //     new_start_offset = self._stop_offset - new_duration
-        // else:
-        //     message = 'unknown anchor direction: {!r}.'
-        //     message = message.format(anchor)
-        //     raise ValueError(message)
-        // result = abjad.new(
-        //     self,
-        //     start_offset=new_start_offset,
-        //     stop_offset=new_stop_offset,
-        //     )
-        // return result
+        var newDuration, newStartOffset, newStopOffset, result;
+
+        multiplier = FoscMultiplier(multiplier);
+
+        if (multiplier <= 0) {
+            ^throw("%:roundOffsets: multiplier must be greater than 0: %."
+                .format(this.species, multiplier.cs));
+        };
+
+        newDuration = this.duration * multiplier;
+        
+        case
+        { anchor == 'left' } {
+            newStartOffset = this.startOffset;
+            newStopOffset = this.startOffset + newDuration;
+        }
+        { anchor == 'right' } {
+            newStopOffset = this.stopOffset;
+            newStartOffset = this.stopOffset - newDuration;
+        } {
+            ^throw("%:scale: unknown anchor direction: %.".format(this.species, anchor));
+        };
+
+        result = this.species.new(newStartOffset, newStopOffset);
+        ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • setDuration
+
+    Sets timespan duration to 'duration'.
+
+    Returns a new FoscTimespan.
+
+    a = FoscTimespan(1/2, 3/2);
+    b = a.setDuration(3/5);
+    b.cs;
     -------------------------------------------------------------------------------------------------------- */
     setDuration { |duration|
-        ^this.notYetImplemented(thisMethod);
-        // duration = abjad.Duration(duration)
-        // new_stop_offset = self._start_offset + duration
-        // return abjad.new(
-        //     self,
-        //     stop_offset=new_stop_offset,
-        //     )
+        var newStopOffset;
+        duration = FoscDuration(duration);
+        newStopOffset = this.startOffset + duration;
+        ^this.species.new(this.startOffset, newStopOffset)
     }
     /* --------------------------------------------------------------------------------------------------------
     • setOffsets
+
+    Sets timespan start offset to 'startOffset' and stop offset to 'stopOffset'.
+
+    Returns a new FoscTimespan.
+
+    a = FoscTimespan(1/2, 3/2);
+    b = a.setOffsets(stopOffset: 7/8);
+    b.cs;
+
+    Subtract negative 'startOffset' from existing stop offset.
+
+    a = FoscTimespan(1/2, 3/2);
+    b = a.setOffsets(startOffset: -1/2);
+    b.cs;
+
+    Subtract negative 'stopOffset' from existing stop offset.
+
+    a = FoscTimespan(1/2, 3/2);
+    b = a.setOffsets(stopOffset: -1/2);
+    b.cs;
     -------------------------------------------------------------------------------------------------------- */
     setOffsets { |startOffset, stopOffset|
-        ^this.notYetImplemented(thisMethod);
-        // if start_offset is not None:
-        //     start_offset = abjad.Offset(start_offset)
+        var newStartOffset, newStopOffset, result;
 
-        // if stop_offset is not None:
-        //     stop_offset = abjad.Offset(stop_offset)
-        // if start_offset is not None and 0 <= start_offset:
-        //     new_start_offset = start_offset
-        // elif start_offset is not None and start_offset < 0:
-        //     new_start_offset = \
-        //         self._stop_offset + abjad.Offset(start_offset)
-        // else:
-        //     new_start_offset = self._start_offset
-        // if stop_offset is not None and 0 <= stop_offset:
-        //     new_stop_offset = stop_offset
-        // elif stop_offset is not None and stop_offset < 0:
-        //     new_stop_offset = \
-        //         self._stop_offset + abjad.Offset(stop_offset)
-        // else:
-        //     new_stop_offset = self._stop_offset
-        // result = abjad.new(
-        //     self,
-        //     start_offset=new_start_offset,
-        //     stop_offset=new_stop_offset,
-        //     )
-        // return result
+        if (startOffset.notNil) { startOffset = FoscOffset(startOffset) };
+        if (stopOffset.notNil) { stopOffset = FoscOffset(stopOffset) };
+
+        case
+        { startOffset.notNil && { 0 <= startOffset } } {
+            newStartOffset = startOffset;
+        }
+        { startOffset.notNil && { startOffset < 0 } } {
+            newStartOffset = this.stopOffset + FoscOffset(startOffset);
+        }
+        {
+            newStartOffset = this.startOffset;
+        };
+        
+        case
+        { stopOffset.notNil && { 0 <= stopOffset } } {
+            newStopOffset = stopOffset;
+        }
+        { stopOffset.notNil && { stopOffset < 0 } } {
+            newStopOffset = this.stopOffset + FoscOffset(stopOffset);
+        }
+        {
+            newStopOffset = this.stopOffset;
+        };
+
+        result = this.species.new(newStartOffset, newStopOffset);
+        ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • splitAtOffset
+
+    Split into two parts when 'offset' happens during timespan.
+
+    Returns a FoscTimespanList.
+
+    a = FoscTimespan(0, 5);
+    b = a.splitAtOffset(2);
+    b.do { |each| each.cs.postln };
+
+    Returns a FoscTimespanList with a copy of receiver when 'offset' does not happen during timespan.
+
+    a = FoscTimespan(0, 5);
+    b = a.splitAtOffset(12);
+    b.do { |each| each.cs.postln };
     -------------------------------------------------------------------------------------------------------- */
     splitAtOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // result = abjad.TimespanList()
-        // if self._start_offset < offset < self._stop_offset:
-        //     left = abjad.new(
-        //         self,
-        //         start_offset=self._start_offset,
-        //         stop_offset=offset,
-        //         )
-        //     right = abjad.new(
-        //         self,
-        //         start_offset=offset,
-        //         stop_offset=self._stop_offset,
-        //         )
-        //     result.append(left)
-        //     result.append(right)
-        // else:
-        //     result.append(abjad.new(self))
-        // return result
+        var result, left, right;
+
+        offset = FoscOffset(offset);
+        result = FoscTimespanList();
+
+        if (this.startOffset < offset && { offset < this.stopOffset }) {
+            left = this.species.new(this.startOffset, offset);
+            right = this.species.new(offset, this.stopOffset);
+            result = result.addAll([left, right]);
+        } {
+            result = result.add(this.copy);
+        };
+
+        ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • splitAtOffsets
+
+    Split into one or more parts when 'offsets' happens during timespan.
+
+    Returns a FoscTimespanList.
+
+    a = FoscTimespan(0, 10);
+    b = a.splitAtOffsets(#[1,3,7]);
+    b.do { |each| each.cs.postln };
+
+    Returns a FoscTimespanList with a copy of receiver when 'offset' does not happen during timespan.
+
+    a = FoscTimespan(0, 10);
+    b = a.splitAtOffsets(#[-100]);
+    b.do { |each| each.cs.postln };
     -------------------------------------------------------------------------------------------------------- */
     splitAtOffsets { |offsets|
-        ^this.notYetImplemented(thisMethod);
-        // offsets = [abjad.Offset(offset) for offset in offsets]
-        // offsets = [offset for offset in offsets
-        //     if self._start_offset < offset < self._stop_offset]
-        // offsets = sorted(set(offsets))
-        // result = abjad.TimespanList()
-        // right = abjad.new(self)
-        // for offset in offsets:
-        //     left, right = right.split_at_offset(offset)
-        //     result.append(left)
-        // result.append(right)
-        // return result
+        var result, left, right;
+
+        offsets = offsets.collect { |offset| FoscOffset(offset) };
+        offsets = offsets.select { |offset| this.startOffset < offset && { offset < this.stopOffset } };
+        offsets = offsets.as(Set).asArray.sort;
+        result = FoscTimespanList();
+        right = this.copy;
+        
+        offsets.do { |offset|
+            # left, right = right.splitAtOffset(offset);
+            result = result.add(left);
+        };
+        
+        result = result.add(right);
+        ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsAfterOffset
+
+    Is true when timespan overlaps start of 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.startsAfterOffset(-5);
+    a.startsAfterOffset(0);
+    a.startsAfterOffset(5);
     -------------------------------------------------------------------------------------------------------- */
     startsAfterOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return offset < self._start_offset
+        offset = FoscOffset(offset);
+        ^(offset < this.startOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsAfterTimespanStarts
+
+    Is true when timespan starts after 'timespan' starts.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 15);
+
+    a.startsAfterTimespanStarts(a);
+    a.startsAfterTimespanStarts(b);
+    b.startsAfterTimespanStarts(a);
+    b.startsAfterTimespanStarts(b);
     -------------------------------------------------------------------------------------------------------- */
     startsAfterTimespanStarts { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return expr_start_offset < self_start_offset
+        ^(timespan.startOffset < this.startOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsAfterTimespanStops
+
+    Is true when timespan stops after 'timespan' stops.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 15);
+    c = FoscTimespan(10, 20);
+    d = FoscTimespan(15, 25);
+
+    a.startsAfterTimespanStops(a);
+    b.startsAfterTimespanStops(a);
+    c.startsAfterTimespanStops(a);
+    d.startsAfterTimespanStops(a);
     -------------------------------------------------------------------------------------------------------- */
     startsAfterTimespanStops { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return expr_stop_offset <= self_start_offset
+        ^(timespan.stopOffset <= this.startOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsAtOffset
+
+    Is true when timespan starts at 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.startsAtOffset(-5);
+    a.startsAtOffset(0);
+    a.startsAtOffset(5);
     -------------------------------------------------------------------------------------------------------- */
     startsAtOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return self._start_offset == offset
+        ^(this.startOffset == offset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsAtOrAfterOffset
+
+    Is true when timespan starts at or after 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.startsAtOrAfterOffset(-5);
+    a.startsAtOrAfterOffset(0);
+    a.startsAtOrAfterOffset(5);
     -------------------------------------------------------------------------------------------------------- */
     startsAtOrAfterOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return offset <= self._start_offset
+        ^(this.startOffset >= offset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsBeforeOffset
+
+    Is true when timespan starts before 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.startsBeforeOffset(-5);
+    a.startsBeforeOffset(0);
+    a.startsBeforeOffset(5);
     -------------------------------------------------------------------------------------------------------- */
     startsBeforeOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return self._start_offset < offset
+        ^(this.startOffset < offset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsBeforeOrAtOffset
+
+    Is true when timespan starts before or at 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.startsBeforeOrAtOffset(-5);
+    a.startsBeforeOrAtOffset(0);
+    a.startsBeforeOrAtOffset(5);
     -------------------------------------------------------------------------------------------------------- */
     startsBeforeOrAtOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return self._start_offset <= offset
+        ^(this.startOffset <= offset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsBeforeTimespanStarts
+
+    Is true when timespan starts before 'timespan' starts.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 15);
+
+    a.startsBeforeTimespanStarts(a);
+    a.startsBeforeTimespanStarts(b);
+    b.startsBeforeTimespanStarts(a);
+    b.startsBeforeTimespanStarts(b);
     -------------------------------------------------------------------------------------------------------- */
     startsBeforeTimespanStarts { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return self_start_offset < expr_start_offset
+        ^(this.startOffset < timespan.startOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsBeforeTimespanStops
+
+    Is true when timespan starts before 'timespan' stops.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 15);
+
+    a.startsBeforeTimespanStops(a);
+    a.startsBeforeTimespanStops(b);
+    b.startsBeforeTimespanStops(a);
+    b.startsBeforeTimespanStops(b);
     -------------------------------------------------------------------------------------------------------- */
     startsBeforeTimespanStops { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return self_start_offset < expr_stop_offset
+        ^(this.startOffset < timespan.stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsDuringTimespan
+
+    Is true when timespan starts during 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 15);
+
+    a.startsDuringTimespan(a);
+    a.startsDuringTimespan(b);
+    b.startsDuringTimespan(a);
+    b.startsDuringTimespan(b);
     -------------------------------------------------------------------------------------------------------- */
     startsDuringTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     expr_start_offset <= self_start_offset and
-        //     self_start_offset < expr_stop_offset
-        //     )
+        ^(
+            timespan.startOffset <= this.startOffset
+            && (this.startOffset < timespan.stopOffset)
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsWhenTimespanStarts
+
+    Is true when timespan starts when 'timespan' starts.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 15);
+
+    a.startsWhenTimespanStarts(a);
+    a.startsWhenTimespanStarts(b);
+    b.startsWhenTimespanStarts(a);
+    b.startsWhenTimespanStarts(b);
     -------------------------------------------------------------------------------------------------------- */
     startsWhenTimespanStarts { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return expr_start_offset == self_start_offset
+        ^(this.startOffset == timespan.startOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • startsWhenTimespanStops
+
+    Is true when timespan starts when 'timespan' stops.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(10, 20);
+
+    a.startsWhenTimespanStops(a);
+    a.startsWhenTimespanStops(b);
+    b.startsWhenTimespanStops(a);
+    b.startsWhenTimespanStops(b);
     -------------------------------------------------------------------------------------------------------- */
     startsWhenTimespanStops { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return self_start_offset == expr_stop_offset
+        ^(this.startOffset == timespan.stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsAfterOffset
+
+    Is true when timespan stops after 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.stopsAfterOffset(0);
+    a.stopsAfterOffset(5);
+    a.stopsAfterOffset(10);
     -------------------------------------------------------------------------------------------------------- */
     stopsAfterOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return offset < self._stop_offset
+        offset = FoscOffset(offset);
+        ^(offset < this.stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsAfterTimespanStarts
+
+    Is true when timespan stops after 'timespan' starts.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(10, 20);
+
+    a.stopsAfterTimespanStarts(a);
+    a.stopsAfterTimespanStarts(b);
+    b.stopsAfterTimespanStarts(a);
+    b.stopsAfterTimespanStarts(b);
     -------------------------------------------------------------------------------------------------------- */
     stopsAfterTimespanStarts { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return expr_start_offset < self_stop_offset
+        ^(timespan.startOffset < this.stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsAfterTimespanStops
+
+    Is true when timespan stops after 'timespan' stops.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(10, 20);
+
+    a.stopsAfterTimespanStops(a);
+    a.stopsAfterTimespanStops(b);
+    b.stopsAfterTimespanStops(a);
+    b.stopsAfterTimespanStops(b);
     -------------------------------------------------------------------------------------------------------- */
     stopsAfterTimespanStops { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return expr_stop_offset < self_stop_offset
+        ^(timespan.stopOffset < this.stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsAtOffset
+
+    Is true when timespan stops at 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.stopsAtOffset(0);
+    a.stopsAtOffset(10);
+    a.stopsAtOffset(20);
     -------------------------------------------------------------------------------------------------------- */
     stopsAtOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return self._stop_offset == offset
+        offset = FoscOffset(offset);
+        ^(this.stopOffset == offset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsAtOrAfterOffset
+
+    Is true when timespan stops at or after 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.stopsAtOrAfterOffset(0);
+    a.stopsAtOrAfterOffset(10);
+    a.stopsAtOrAfterOffset(20);
     -------------------------------------------------------------------------------------------------------- */
     stopsAtOrAfterOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return offset <= self._stop_offset
+        offset = FoscOffset(offset);
+        ^(offset <= this.stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsBeforeOffset
+
+    Is true when timespan stops before 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.stopsBeforeOffset(0);
+    a.stopsBeforeOffset(10);
+    a.stopsBeforeOffset(20);
     -------------------------------------------------------------------------------------------------------- */
     stopsBeforeOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return self._stop_offset < offset
+        offset = FoscOffset(offset);
+        ^(this.stopOffset < offset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsBeforeOrAtOffset
+
+    Is true when timespan stops before or at 'offset'.
+
+    a = FoscTimespan(0, 10);
+
+    a.stopsBeforeOrAtOffset(0);
+    a.stopsBeforeOrAtOffset(10);
+    a.stopsBeforeOrAtOffset(20);
     -------------------------------------------------------------------------------------------------------- */
     stopsBeforeOrAtOffset { |offset|
-        ^this.notYetImplemented(thisMethod);
-        // offset = abjad.Offset(offset)
-        // return self._stop_offset <= offset
+        offset = FoscOffset(offset);
+        ^(this.stopOffset <= offset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsBeforeTimespanStarts
+
+    Is true when timespan stops before 'timespan' starts.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(15, 20);
+
+    a.stopsBeforeTimespanStarts(a);
+    a.stopsBeforeTimespanStarts(b);
+    b.stopsBeforeTimespanStarts(a);
     -------------------------------------------------------------------------------------------------------- */
     stopsBeforeTimespanStarts { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return self_stop_offset < expr_start_offset
+        ^(this.stopOffset < timespan.startOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsBeforeTimespanStops
+
+    Is true when timespan stops before 'timespan' stops.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(15, 20);
+
+    a.stopsBeforeTimespanStops(a);
+    a.stopsBeforeTimespanStops(b);
+    b.stopsBeforeTimespanStops(a);
     -------------------------------------------------------------------------------------------------------- */
     stopsBeforeTimespanStops { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return self_stop_offset < expr_stop_offset
+        ^(this.stopOffset < timespan.stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsDuringTimespan
+
+    Is true when timespan stops during 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(10, 20);
+
+    a.stopsDuringTimespan(a);
+    a.stopsDuringTimespan(b);
+    b.stopsDuringTimespan(a);
+    b.stopsDuringTimespan(b);
     -------------------------------------------------------------------------------------------------------- */
     stopsDuringTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     expr_start_offset < self_stop_offset and
-        //     self_stop_offset <= expr_stop_offset
-        //     )
+        ^(
+            timespan.startOffset < this.stopOffset
+            && { this.stopOffset <= timespan.stopOffset }
+        );
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsWhenTimespanStarts
+
+    Is true when timespan stops when 'timespan' starts.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(10, 20);
+
+    a.stopsWhenTimespanStarts(a);
+    a.stopsWhenTimespanStarts(b);
+    b.stopsWhenTimespanStarts(a);
+    b.stopsWhenTimespanStarts(b);
     -------------------------------------------------------------------------------------------------------- */
     stopsWhenTimespanStarts { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return self_stop_offset == expr_start_offset
+        ^(this.stopOffset == timespan.startOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stopsWhenTimespanStops
+
+    Is true when timespan stops when 'timespan' stops.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(10, 20);
+
+    a.stopsWhenTimespanStops(a);
+    a.stopsWhenTimespanStops(b);
+    b.stopsWhenTimespanStops(a);
+    b.stopsWhenTimespanStops(b);
     -------------------------------------------------------------------------------------------------------- */
     stopsWhenTimespanStops { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return self_stop_offset == expr_stop_offset
+        ^(this.stopOffset == timespan.stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • stretch
+
+    Stretches timespan by 'multiplier' relative to 'anchor'.
+
+    Returns a new FoscTimespan.
+
+
+    Stretch relative to timespan start offset.
+
+    a = FoscTimespan(3, 10);
+    b = a.stretch(2);
+    b.cs;
+
+    Stretch relative to timespan stop offset.
+
+    a = FoscTimespan(3, 10);
+    b = a.stretch(2, anchor: a.stopOffset);
+    b.cs;
+
+    Stretch relative to offset prior to timespan.
+
+    a = FoscTimespan(3, 10);
+    b = a.stretch(2, anchor: 0);
+    b.cs;
+
+    Stretch relative to offset after timespan.
+
+    a = FoscTimespan(3, 10);
+    b = a.stretch(3, anchor: 12);
+    b.cs;
+
+    Stretch relative to offset that happens during timespan.
+
+    a = FoscTimespan(3, 10);
+    b = a.stretch(2, anchor: 4);
+    b.cs;
     -------------------------------------------------------------------------------------------------------- */
     stretch { |multiplier, anchor|
-        ^this.notYetImplemented(thisMethod);
-        // multiplier = abjad.Multiplier(multiplier)
-        // assert 0 < multiplier
-        // if anchor is None:
-        //     anchor = self._start_offset
-        // new_start_offset = (multiplier * (self._start_offset - anchor)) + anchor
-        // new_stop_offset = (multiplier * (self._stop_offset - anchor)) + anchor
-        // result = abjad.new(
-        //     self,
-        //     start_offset=new_start_offset,
-        //     stop_offset=new_stop_offset,
-        //     )
-        // return result
+        var newStartOffset, newStopOffset;
+
+        multiplier = FoscMultiplier(multiplier);
+
+        if (multiplier <= 0) {
+            ^throw("%:roundOffsets: multiplier must be greater than 0: %."
+                .format(this.species, multiplier.cs));
+        };
+
+        anchor = anchor ?? { this.startOffset };
+
+        newStartOffset = (multiplier * (this.startOffset - anchor)) + anchor;
+        newStopOffset = (multiplier * (this.stopOffset - anchor)) + anchor;
+        ^this.species.new(newStartOffset, newStopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • translate
+
+    Translates timespan by 'translation'.
+
+    Returns a new FoscTimespan.
+
+    a = FoscTimespan(5, 10);
+    b = a.translate(2);
+    b.cs;
     -------------------------------------------------------------------------------------------------------- */
     translate { |translation|
-        ^this.notYetImplemented(thisMethod);
-        // return self.translate_offsets(translation, translation)
+        ^this.translateOffsets(translation, translation);
     }
     /* --------------------------------------------------------------------------------------------------------
     • translateOffsets
+
+    Translates timespan start offset by 'start_offset_translation' and stop offset by 'stop_offset_translation'.
+
+    Returns a new FoscTimespan.
+
+    a = FoscTimespan(1/2, 3/2);
+    b = a.translateOffsets(startOffsetTranslation: -1/8);
+    b.cs;
     -------------------------------------------------------------------------------------------------------- */
     translateOffsets { |startOffsetTranslation, stopOffsetTranslation|
-        ^this.notYetImplemented(thisMethod);
-        // start_offset_translation = start_offset_translation or 0
-        // stop_offset_translation = stop_offset_translation or 0
-        // start_offset_translation = abjad.Duration(start_offset_translation)
-        // stop_offset_translation = abjad.Duration(stop_offset_translation)
-        // new_start_offset = self._start_offset + start_offset_translation
-        // new_stop_offset = self._stop_offset + stop_offset_translation
-        // return abjad.new(
-        //     self,
-        //     start_offset=new_start_offset,
-        //     stop_offset=new_stop_offset,
-        //     )
+        var newStartOffset, newStopOffset;
+        startOffsetTranslation = FoscDuration(startOffsetTranslation ? 0);
+        stopOffsetTranslation = FoscDuration(stopOffsetTranslation ? 0);
+        newStartOffset = this.startOffset + startOffsetTranslation;
+        newStopOffset = this.stopOffset + stopOffsetTranslation;
+        ^this.species.new(newStartOffset, newStopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • trisectsTimespan
+
+    Is true when timespan trisects 'timespan'.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 6);
+
+    a.trisectsTimespan(a);
+    a.trisectsTimespan(b);
+    b.trisectsTimespan(a);
+    b.trisectsTimespan(b);
     -------------------------------------------------------------------------------------------------------- */
     trisectsTimespan { |timespan|
-        ^this.notYetImplemented(thisMethod);
-        // self_start_offset, self_stop_offset = self.offsets
-        // expr_start_offset, expr_stop_offset = self._get_offsets(timespan)
-        // return (
-        //     expr_start_offset < self_start_offset and
-        //     self_stop_offset < expr_stop_offset
-        //     )
+        ^(
+            timespan.startOffset < this.startOffset
+            && (this.stopOffset < timespan.stopOffset)
+        );
     }
 }
