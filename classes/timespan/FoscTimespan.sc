@@ -48,13 +48,13 @@ FoscTimespan : FoscObject {
         ^(stopOffset - startOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
-    • isWellformed
+    • isWellFormed
 
     Is true when timespan start offset preceeds timespan stop offset.
 
-    FoscTimespan(0, 10).isWellformed;
+    FoscTimespan(0, 10).isWellFormed;
     -------------------------------------------------------------------------------------------------------- */
-    isWellformed {
+    isWellFormed {
         ^(startOffset < stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -223,9 +223,9 @@ FoscTimespan : FoscObject {
     
     Hashes timespan.
     -------------------------------------------------------------------------------------------------------- */
-    hash {
-        ^this.notYetImplemented(thisMethod);
-    }
+    // hash {
+    //     ^this.notYetImplemented(thisMethod);
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • illustrate
 
@@ -248,60 +248,263 @@ FoscTimespan : FoscObject {
     size {
         ^1;
     }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC INSTANCE METHODS: SET OPERATIONS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • || (abjad: __or__)
+    • - (abjad: __sub__, -)
     
-    Logical OR of two timespans.
+    Subtract 'timespan' from receiver.
     
     Returns timespan list.
-    -------------------------------------------------------------------------------------------------------- */
-    || {
-        ^this.notYetImplemented(thisMethod);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • - (abjad: __sub__)
-    
-    Subtract 'argument' from timespan.
-    
-    Returns timespan list.
-    -------------------------------------------------------------------------------------------------------- */
-    - {
-        ^this.notYetImplemented(thisMethod);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • sect (abjad: __and__) (Logical AND of two timespans.) 
-    
-    Intersection of two timespans.
 
     a = FoscTimespan(0, 10);
     b = FoscTimespan(5, 12);
     c = FoscTimespan(-2, 2);
     d = FoscTimespan(10, 20);
 
-    a.sect(b)[0].offsets.do { |e| e.cs.postln };
-    a.sect(c)[0].offsets.do { |e| e.cs.postln };
-    a.sect(d).items;
-    b.sect(c).items;
-    b.sect(d)[0].offsets.do { |e| e.cs.postln };
-    c.sect(d).items;
+    x = a - a;
+    x.do { |each| each.cs.postln };
+
+    x = a - b;
+    x.do { |each| each.cs.postln };
+
+    x = a - c;
+    x.do { |each| each.cs.postln };
+
+    x = a - d;
+    x.do { |each| each.cs.postln };
+
+    x = b - a;
+    x.do { |each| each.cs.postln };
+
+    x = b - b;
+    x.do { |each| each.cs.postln };
+
+    x = b - c;
+    x.do { |each| each.cs.postln };
+
+    x = b - d;
+    x.do { |each| each.cs.postln };
+
+    x = c - a;
+    x.do { |each| each.cs.postln };
+
+    x = c - b;
+    x.do { |each| each.cs.postln };
+
+    x = c - c;
+    x.do { |each| each.cs.postln };
+
+    x = c - d;
+    x.do { |each| each.cs.postln };
+
+    x = d - a;
+    x.do { |each| each.cs.postln };
+
+    x = d - b;
+    x.do { |each| each.cs.postln };
+
+    x = d - c;
+    x.do { |each| each.cs.postln };
+
+    x = d - d;
+    x.do { |each| each.cs.postln };
+    -------------------------------------------------------------------------------------------------------- */
+    - { |timespan|
+        var result, newStartOffset, newStopOffset, newTimespan;
+
+        result = FoscTimespanList();
+
+        case { this.intersectsTimespan(timespan).not } {
+            result.add(this.deepCopy);
+        } 
+        { timespan.trisectsTimespan(this) } {
+            newStartOffset = this.startOffset;
+            newStopOffset = timespan.startOffset;
+            newTimespan = this.species.new(newStartOffset, newStopOffset);
+            result.add(newTimespan);
+
+            newStartOffset = timespan.stopOffset;
+            newStopOffset = this.stopOffset;
+            newTimespan = this.species.new(newStartOffset, newStopOffset);
+            result.add(newTimespan);
+        }
+        { timespan.containsTimespanImproperly(this) } {
+            // pass
+        }
+        { timespan.overlapsOnlyStartOfTimespan(this) } {
+            newStartOffset = timespan.stopOffset;
+            newStopOffset = this.stopOffset;
+            newTimespan = this.species.new(newStartOffset, newStopOffset);
+            result.add(newTimespan); 
+        }
+        { timespan.overlapsOnlyStopOfTimespan(this) } {
+            newStartOffset = this.startOffset;
+            newStopOffset = timespan.startOffset;
+            newTimespan = this.species.new(newStartOffset, newStopOffset);
+            result.add(newTimespan);
+        }
+        { timespan.stopsBeforeTimespanStops(this) } {
+            newStartOffset = timespan.stopOffset;
+            newStopOffset = this.stopOffset;
+            newTimespan = this.species.new(newStartOffset, newStopOffset);
+            result.add(newTimespan);
+        }
+        { timespan.stopsWhenTimespanStops(this) } {
+            newStartOffset = this.startOffset;
+            newStopOffset = timespan.startOffset;
+            newTimespan = this.species.new(newStartOffset, newStopOffset);
+            result.add(newTimespan);   
+        }
+        {
+            ^throw("%:%: value error: *".format(this.species, thisMethod.name, timespan));
+        };
+
+        ^result;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • sect (abjad: __and__, &)
+    
+    Intersection of receiver and 'timespan' (Logical AND).
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 12);
+    c = FoscTimespan(-2, 2);
+    d = FoscTimespan(10, 20);
+
+    x = a.sect(b);
+    x.do { |e| e.cs.postln };
+    
+    x = a.sect(c);
+    x.do { |e| e.cs.postln };
+    
+    x = a.sect(d);
+    x.do { |e| e.cs.postln };
+    
+    x = b.sect(c);
+    x.do { |e| e.cs.postln };
+    
+    x = b.sect(d);
+    x.do { |e| e.cs.postln };
+    
+    x = c.sect(d);
+    x.do { |e| e.cs.postln };
     -------------------------------------------------------------------------------------------------------- */
     sect { |timespan|
         var newStartOffset, newStopOffset, newTimespan;
+        
         if (this.intersectsTimespan(timespan).not) { ^FoscTimespanList() };
         newStartOffset = [this.startOffset, timespan.startOffset].maxItem;
         newStopOffset = [this.stopOffset, timespan.stopOffset].minItem;
         newTimespan = this.species.new(newStartOffset, newStopOffset);
+        
         ^FoscTimespanList([newTimespan]);
     }
     /* --------------------------------------------------------------------------------------------------------
-    • xor (abjad: __xor__)
-    
-    Logical XOR of two timespans.
+    • symmetricDifference (abjad: __xor__, ^)
+
+    Symmetric difference of receiver and 'timespan' (Logical XOR).
     
     Returns timespan list.
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 12);
+    c = FoscTimespan(-2, 2);
+    d = FoscTimespan(10, 20);
+
+    x = a.symmetricDifference(b);
+    x.do { |e| e.cs.postln };
+    
+    x = a.symmetricDifference(c);
+    x.do { |e| e.cs.postln };
+    
+    x = a.symmetricDifference(d);
+    x.do { |e| e.cs.postln };
+    
+    x = b.symmetricDifference(c);
+    x.do { |e| e.cs.postln };
+    
+    x = b.symmetricDifference(d);
+    x.do { |e| e.cs.postln };
+    
+    x = c.symmetricDifference(d);
+    x.do { |e| e.cs.postln };
     -------------------------------------------------------------------------------------------------------- */
-    xor {
-        ^this.notYetImplemented(thisMethod);
+    symmetricDifference { |timespan|
+        var result, startOffsets, stopOffsets, timespan1, timespan2;
+
+        result = FoscTimespanList();
+
+        if (
+            this.intersectsTimespan(timespan).not
+            || { this.isTangentToTimespan(timespan) }
+        ) {
+            result.add(this.deepCopy);
+            result.add(timespan.deepCopy);
+            result.sort;
+            ^result;
+        };
+
+        startOffsets = [this.startOffset, timespan.startOffset].sort;
+        stopOffsets = [this.stopOffset, timespan.stopOffset].sort;
+        timespan1 = this.species.new(startOffsets[0], startOffsets[1]);
+        timespan2 = this.species.new(stopOffsets[0], stopOffsets[1]);
+        if (timespan1.isWellFormed) { result.add(timespan1) };
+        if (timespan2.isWellFormed) { result.add(timespan2) };
+        
+        result.sort;
+
+        ^result;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • union (abjad: __or__, |)
+    
+    Union of receiver and 'timespan' (Logical OR).
+    
+    Returns timespan list.
+
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 12);
+    c = FoscTimespan(-2, 2);
+    d = FoscTimespan(10, 20);
+
+    x = a.union(b);
+    x.do { |each| each.cs.postln };
+
+    x = a.union(c);
+    x.do { |each| each.cs.postln };
+
+    x = a.union(d);
+    x.do { |each| each.cs.postln };
+
+    x = b.union(c);
+    x.do { |each| each.cs.postln };
+
+    x = b.union(d);
+    x.do { |each| each.cs.postln };
+
+    x = c.union(d);
+    x.do { |each| each.cs.postln };
+    -------------------------------------------------------------------------------------------------------- */
+    union { |timespan|
+        var result, newStartOffset, newStopOffset, newTimespan;
+
+        if (
+            this.intersectsTimespan(timespan).not
+            && { this.isTangentToTimespan(timespan).not }
+        ) {
+            result = FoscTimespanList([this, timespan]);
+            result = result.sort;
+            ^result;
+        };
+
+        newStartOffset = [this.startOffset, timespan.startOffset].minItem;
+        newStopOffset = [this.stopOffset, timespan.stopOffset].maxItem;
+        newTimespan = this.species.new(newStartOffset, newStopOffset);
+
+        ^FoscTimespanList([newTimespan]);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS
@@ -337,15 +540,42 @@ FoscTimespan : FoscObject {
     }
     /* --------------------------------------------------------------------------------------------------------
     • prCanFuse
+
+    a = FoscTimespan(0, 10);
+    b = FoscTimespan(5, 12);
+    c = FoscTimespan(-2, 2);
+
+    a.prCanFuse(b);
+    a.prCanFuse(c);
+    b.prCanFuse(c);
     -------------------------------------------------------------------------------------------------------- */
-    prCanFuse { |argument|
-        ^this.notYetImplemented(thisMethod);
+    prCanFuse { |timespan|
+        if (timespan.isKindOf(this.species)) {
+            ^(this.intersectsTimespan(timespan) || { this.stopsWhenTimespanStarts(timespan) })
+        };
+        ^false;
     }
     /* --------------------------------------------------------------------------------------------------------
     • prGetTimespan
     -------------------------------------------------------------------------------------------------------- */
-    prGetTimespan { |argument|
-        ^this.notYetImplemented(thisMethod);
+    prGetTimespan { |object|
+        var startOffset, stopOffset;
+
+        case
+        { object.isKindOf(FoscTimespan) } {
+            # startOffset, stopOffset = object.offsets;
+        }
+        { object.respondsTo('timespan') } {
+            # startOffset, stopOffset = object.timespan.offsets;
+        }
+        { object.respondsTo('prGetTimespan') } {
+            # startOffset, stopOffset = object.prGetTimespan.offsets;
+        }
+        {
+            ^throw("%:%: value error: *".format(this.species, thisMethod.name, object));   
+        };
+
+        ^this.species.new(startOffset, stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
     • prInitializeOffset
@@ -360,14 +590,49 @@ FoscTimespan : FoscObject {
     /* --------------------------------------------------------------------------------------------------------
     • *prGetOffsets
     -------------------------------------------------------------------------------------------------------- */
-    *prGetOffsets { |argument|
-        ^this.notYetImplemented(thisMethod);
+    *prGetOffsets { |object|
+        case
+        { object.isKindOf(FoscTimespan) } {
+           // pass
+        }
+        { object.respondsTo('timespan') } {
+            object = object.timespan;
+        }
+        { object.respondsTo('prGetTimespan') } {
+            object = object.prGetTimespan;
+        }
+        {
+            ^throw("%:%: value error: *".format(this.species, thisMethod.name, object));   
+        };
+
+        ^[object.startOffset, object.stopOffset];
     }
     /* --------------------------------------------------------------------------------------------------------
     • *prGetStartOffsetAndMaybeStopOffset
     -------------------------------------------------------------------------------------------------------- */
-    *prGetStartOffsetAndMaybeStopOffset { |argument|
-        ^this.notYetImplemented(thisMethod);
+    *prGetStartOffsetAndMaybeStopOffset { |object|
+        var startOffset, stopOffset;
+
+        case
+        { object.isKindOf(FoscTimespan) } {
+           // pass
+        }
+        { object.respondsTo('timespan') } {
+            object = object.timespan;
+        }
+        { object.respondsTo('prGetTimespan') } {
+            object = object.prGetTimespan;
+        };
+
+        if (object.respondsTo('startOffset')) {
+            startOffset = object.startOffset;
+        } {
+            ^throw("%:%: value error: *".format(this.species, thisMethod.name, object)); 
+        };
+
+        stopOffset = object.stopOffset;
+
+        ^[startOffset, stopOffset];
     }
     /* --------------------------------------------------------------------------------------------------------
     • *prImplementsTimespanInterface

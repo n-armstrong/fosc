@@ -20,6 +20,7 @@ p.grestore();
 p.setrgbcolor(1, 0, 0);
 p.setlinewidth(1);
 p.stroke();
+p.format;
 
 p.show;
 ------------------------------------------------------------------------------------------------------------ */ 
@@ -325,6 +326,19 @@ FoscPostscript : FoscObject {
     rlineto { |dx, dy|
     	// • TODO: convert dx, dy to float ?
     	^this.prWithOperator(FoscPostscriptOperator('rlineto', dx, dy));
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • rmoveto
+
+    p = FoscPostscript();
+    p.rmoveto(1.2, 2.0);
+    p.stroke;
+
+    p.format;
+    -------------------------------------------------------------------------------------------------------- */
+    rmoveto { |dx, dy|
+        // • TODO: convert dx, dy to float ?
+        ^this.prWithOperator(FoscPostscriptOperator('rmoveto', dx, dy));
     }
     /* --------------------------------------------------------------------------------------------------------
     • rotate

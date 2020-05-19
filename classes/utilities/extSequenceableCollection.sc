@@ -128,6 +128,8 @@
     /* --------------------------------------------------------------------------------------------------------
     • *smootherStep
 
+    • TODO: rename 'smoothStep2' for consistency
+
     Create a S-shaped curve using the smoother step function.
 
 
