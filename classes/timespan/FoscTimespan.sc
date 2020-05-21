@@ -204,7 +204,7 @@ FoscTimespan : FoscObject {
     FoscTimespan(1, 3).cs;
     -------------------------------------------------------------------------------------------------------- */
     asCompileString {
-        ^"FoscTimespan(%, %)".format(startOffset.str, stopOffset.str);
+        ^"%(%, %)".format(this.species, this.startOffset.str, this.stopOffset.str);
     }
     /* --------------------------------------------------------------------------------------------------------
     • format

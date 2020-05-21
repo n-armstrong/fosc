@@ -55,6 +55,24 @@ FoscTypedCollection : FoscObject {
         ^(this == expr).not;
     }
     /* --------------------------------------------------------------------------------------------------------
+    • asCompileString
+
+    t = FoscTimespanList([
+        FoscTimespan(0, 10),
+        FoscTimespan(10, 20),
+        FoscTimespan(30, 40)
+    ]);
+
+    t.cs;
+    -------------------------------------------------------------------------------------------------------- */
+    asCompileString {
+        if (this.isEmpty) {
+            ^"%([])".format(this.species);
+        } {
+            ^"%([\n\t%\n])".format(this.species, this.items.collect { |each| each.cs }.join(",\n\t"));
+        };
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • difference
 
     Set-theoretic difference of receiver and expr.

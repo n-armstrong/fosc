@@ -3,7 +3,7 @@
 
 FoscFraction(3).cs;
 FoscFraction(3.14159).cs;
-FoscFraction([3,2]).cs;
+FoscFraction(#[3,2]).cs;
 FoscFraction(6,2).cs;
 FoscNonreducedFraction(6,2).cs;
 FoscFraction().cs;

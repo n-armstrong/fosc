@@ -1,11 +1,11 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscNonreducedFraction
 
-FoscNonreducedFraction(3).pair;
-FoscNonreducedFraction(3.14159).pair;
-FoscNonreducedFraction([3, 2]).pair;
-FoscNonreducedFraction(6, 2).pair;
-FoscNonreducedFraction().pair;
+FoscNonreducedFraction(3).cs;
+FoscNonreducedFraction(3.14159).cs;
+FoscNonreducedFraction(#[3,2]).cs;
+FoscNonreducedFraction(6, 2).cs;
+FoscNonreducedFraction().cs;
 ------------------------------------------------------------------------------------------------------------ */
 FoscNonreducedFraction : FoscFraction {
     init { |argPair|
