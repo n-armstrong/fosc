@@ -3,15 +3,45 @@
 
 Timespan list.
 
+
+Nonverlapping timespan list.
+
+t = FoscTimespanList([
+    FoscTimespan(0, 3),
+    FoscTimespan(3, 6),
+    FoscTimespan(6, 10)
+]);
+
+t.show(scale: 0.5); 
+
+
+Nonverlapping timespan list.
+
 t = FoscTimespanList([
     FoscTimespan(0, 10),
     FoscTimespan(10, 20),
     FoscTimespan(30, 40)
 ]);
 
-t.show(scale: 0.7); 
+t.show(scale: 0.5); 
 
 
+Overlapping timespan list.
+
+t = FoscTimespanList([
+    FoscTimespan(0, 6),
+    FoscTimespan(5, 12),
+    FoscTimespan(-2, 8),
+    FoscTimespan(15, 20),
+    FoscTimespan(24, 30)
+]);
+
+t.sort;
+t.show(scale: 0.5); 
+
+
+
+Overlapping timespan list. (• TODO: cross-check with abjad result)
 
 t = FoscTimespanList([
     FoscTimespan(0, 3),
@@ -28,7 +58,7 @@ t = FoscTimespanList([
     FoscTimespan(34, 37),
 ]);
 
-t.show(scale: 0.7); 
+t.show(scale: 0.5); 
 ------------------------------------------------------------------------------------------------------------ */
 FoscTimespanList : FoscTypedList {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -907,11 +937,22 @@ FoscTimespanList : FoscTypedList {
     ]);
 
     m = l.explode;
+    m.do { |timespanList|  timespanList.cs.postln; Post.nl }; "";
 
-    m.do { |timespanList|
-        Post.nl;
-        timespanList.do { |ts| [ts.startOffset.cs, ts.stopOffset.cs].postln };
-    }; "";
+
+    • TEST
+
+    l = FoscTimespanList([
+        FoscTimespan(0, 6),
+        FoscTimespan(5, 12),
+        FoscTimespan(-2, 8),
+        FoscTimespan(15, 20),
+        FoscTimespan(24, 30)
+    ]);
+
+    m = l.explode;
+    m.do { |timespanList|  timespanList.cs.postln; Post.nl }; "";
+
     -------------------------------------------------------------------------------------------------------- */
     explode { |inventoryCount|
         var boundingTimespan, globalOverlapFactors, emptyTimespanPairs, resultTimespanLists, resultTimespans;
@@ -947,11 +988,10 @@ FoscTimespanList : FoscTypedList {
                 overlappingTimespanLists = List[];  
 
                 resultTimespanLists.do { |resultTimespans, i|
-
                     localOverlapFactor = resultTimespans.computeOverlapFactor(currentTimespan);
                     globalOverlapFactor = globalOverlapFactors[i];
 
-                    if (localOverlapFactor < 1) {
+                    if (localOverlapFactor <= 0) {
                         nonOverlappingTimespanLists.add([i, globalOverlapFactor]);
                     } {
                         overlappingTimespanLists.add([i, localOverlapFactor, globalOverlapFactor]);
@@ -966,7 +1006,6 @@ FoscTimespanList : FoscTypedList {
                     globalOverlapFactors = globalOverlapFactors.add(currentOverlapFactor);
                     resultTimespanLists = resultTimespanLists.add(resultTimespans);
                 } {
-
                     if (nonOverlappingTimespanLists.notEmpty) {
                         i = nonOverlappingTimespanLists[0][0];
                     } {
@@ -1509,6 +1548,7 @@ FoscTimespanList : FoscTypedList {
         
 
         explodedTimespanLists = [];
+
         if (sortkey.isNil) {
             explodedTimespanLists = explodedTimespanLists.addAll(timespans.explode); 
         } {
