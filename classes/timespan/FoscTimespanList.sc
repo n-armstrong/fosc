@@ -313,6 +313,7 @@ FoscTimespanList : FoscTypedList {
         if (this.size <= 1) { ^true };
         timespans = collection.sort;
         lastStopOffset = timespans[0].stopOffset;
+        
         timespans[1..].do { |timespan|
             if (timespan.startOffset != lastStopOffset) { ^false };
             lastStopOffset = timespan.stopOffset;
@@ -991,7 +992,7 @@ FoscTimespanList : FoscTypedList {
                     localOverlapFactor = resultTimespans.computeOverlapFactor(currentTimespan);
                     globalOverlapFactor = globalOverlapFactors[i];
 
-                    if (localOverlapFactor <= 0) {
+                    if (localOverlapFactor == 0) {
                         nonOverlappingTimespanLists.add([i, globalOverlapFactor]);
                     } {
                         overlappingTimespanLists.add([i, localOverlapFactor, globalOverlapFactor]);
