@@ -36,12 +36,11 @@ t = FoscTimespanList([
     FoscTimespan(24, 30)
 ]);
 
-t.sort;
 t.show(scale: 0.5); 
 
 
 
-Overlapping timespan list. (• TODO: cross-check with abjad result)
+Overlapping timespan list.
 
 t = FoscTimespanList([
     FoscTimespan(0, 3),
@@ -183,11 +182,14 @@ FoscTimespanList : FoscTypedList {
     -------------------------------------------------------------------------------------------------------- */
     invert {
         var result;
+        
         result = this.species.new();
         result.append(this.timespan);
+        
         this.do { |timespan|
             result = result - timespan;
         };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -842,10 +844,12 @@ FoscTimespanList : FoscTypedList {
     -------------------------------------------------------------------------------------------------------- */
     computeOverlapFactor { |timespan|
         var timeRelation, timespans, totalOverlap, overlapFactor;
+        
         if (timespan.isNil) { timespan = this.timespan };
         timespans = this.select { |each| each.intersectsTimespan(timespan) };
         totalOverlap = timespans.items.collect { |each| each.getOverlapWithTimespan(timespan) }.sum;
         overlapFactor = totalOverlap / timespan.duration;
+        
         ^overlapFactor;
     }
     /* --------------------------------------------------------------------------------------------------------
