@@ -4,6 +4,7 @@
 FoscDuration(1, 4).str;
 FoscDuration(0.25).str;
 FoscDuration(pi).str;
+FoscDuration(inf).str;
 
 FoscDuration(4, 4).str;
 FoscDuration(3, 8).str;
@@ -698,11 +699,20 @@ FoscDuration : FoscFraction {
 
     FoscDuration(1, 4).str;
 
-    FoscDuration(1, 4).prGetFormattedDuration;
+    FoscDuration(inf).str;
     -------------------------------------------------------------------------------------------------------- */
     str {
         //^this.lilypondDurationString;
-        ^"%/%".format(this.numerator, this.denominator)
+        case
+        { this.numerator == inf } {
+            ^"inf"
+        }
+        { this.numerator == -inf } {
+            ^"-inf"
+        }
+        {
+            ^"%/%".format(this.numerator, this.denominator);
+        };
     }
     /* --------------------------------------------------------------------------------------------------------
     • pair

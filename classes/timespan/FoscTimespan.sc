@@ -202,6 +202,8 @@ FoscTimespan : FoscObject {
     Returns string.
 
     FoscTimespan(1, 3).cs;
+
+    FoscOffset(inf).str;
     -------------------------------------------------------------------------------------------------------- */
     asCompileString {
         ^"%(%, %)".format(this.species, this.startOffset.str, this.stopOffset.str);
@@ -559,7 +561,7 @@ FoscTimespan : FoscObject {
     • prGetTimespan
     -------------------------------------------------------------------------------------------------------- */
     prGetTimespan { |object|
-        var startOffset, stopOffset;
+        var startOffset, stopOffset, newTimespan;
 
         case
         { object.isKindOf(FoscTimespan) } {
@@ -575,13 +577,17 @@ FoscTimespan : FoscObject {
             ^throw("%:%: value error: *".format(this.species, thisMethod.name, object));   
         };
 
-        ^this.species.new(startOffset, stopOffset);
+        newTimespan = this.copy;
+        newTimespan.instVarPut('startOffset', startOffset);
+        newTimespan.instVarPut('stopOffset', stopOffset);
+        
+        ^newTimespan;
     }
     /* --------------------------------------------------------------------------------------------------------
     • prInitializeOffset
     -------------------------------------------------------------------------------------------------------- */
     prInitializeOffset { |offset|
-        if ([-inf, inf].includes(offset)) { ^offset };
+        //if ([-inf, inf].includes(offset)) { ^offset };
         ^FoscOffset(offset);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -736,8 +742,10 @@ FoscTimespan : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     getOverlapWithTimespan { |timespan|
         var result;
+        
         result = this.sect(timespan).items.collect { |each| each.duration }.sum;
         result = FoscDuration(result);
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -937,11 +945,13 @@ FoscTimespan : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     partitionByRatio { |ratio|
         var unitDuration, partDurations, startOffsets, offsetPairs, result;
+        
         result = [];
         unitDuration = this.duration / ratio.sum;
         partDurations = ratio.collect { |each| each * unitDuration };
         startOffsets = [this.startOffset] ++ (partDurations.integrate + this.startOffset.asFloat);    
         startOffsets.doAdjacentPairs { |a, b| result = result.add(this.species.new(a, b)) };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -964,9 +974,11 @@ FoscTimespan : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     reflect { |axis|
         var startDistance, stopDistance;
+        
         axis = axis ?? { this.axis };
         startDistance = this.startOffset - axis;
         stopDistance = this.stopOffset - axis;
+        
         ^this.setOffsets(axis - stopDistance, axis - startDistance);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -994,7 +1006,7 @@ FoscTimespan : FoscObject {
     b.cs;
     -------------------------------------------------------------------------------------------------------- */
     roundOffsets { |multiplier, anchor='left', mustBeWellFormed=true|
-        var newStartOffset, newStopOffset, result;
+        var newStartOffset, newStopOffset, newTimespan;
 
         multiplier = FoscMultiplier(multiplier).abs;
 
@@ -1009,8 +1021,11 @@ FoscTimespan : FoscObject {
             };
         };
 
-        result = this.species.new(newStartOffset, newStopOffset);
-        ^result;
+        newTimespan = this.copy;
+        newTimespan.instVarPut('startOffset', newStartOffset);
+        newTimespan.instVarPut('stopOffset', newStopOffset);
+        
+        ^newTimespan;
     }
     /* --------------------------------------------------------------------------------------------------------
     • scale
@@ -1033,7 +1048,7 @@ FoscTimespan : FoscObject {
     b.cs;
     -------------------------------------------------------------------------------------------------------- */
     scale { |multiplier, anchor='left'|
-        var newDuration, newStartOffset, newStopOffset, result;
+        var newDuration, newStartOffset, newStopOffset, newTimespan;
 
         multiplier = FoscMultiplier(multiplier);
 
@@ -1056,8 +1071,11 @@ FoscTimespan : FoscObject {
             ^throw("%:scale: unknown anchor direction: %.".format(this.species, anchor));
         };
 
-        result = this.species.new(newStartOffset, newStopOffset);
-        ^result;
+        newTimespan = this.copy;
+        newTimespan.instVarPut('startOffset', newStartOffset);
+        newTimespan.instVarPut('stopOffset', newStopOffset);
+        
+        ^newTimespan;
     }
     /* --------------------------------------------------------------------------------------------------------
     • setDuration
@@ -1071,10 +1089,15 @@ FoscTimespan : FoscObject {
     b.cs;
     -------------------------------------------------------------------------------------------------------- */
     setDuration { |duration|
-        var newStopOffset;
+        var newStopOffset, newTimespan;
+        
         duration = FoscDuration(duration);
         newStopOffset = this.startOffset + duration;
-        ^this.species.new(this.startOffset, newStopOffset)
+        
+        newTimespan = this.copy;
+        newTimespan.instVarPut('stopOffset', newStopOffset);
+        
+        ^newTimespan;
     }
     /* --------------------------------------------------------------------------------------------------------
     • setOffsets
@@ -1100,7 +1123,7 @@ FoscTimespan : FoscObject {
     b.cs;
     -------------------------------------------------------------------------------------------------------- */
     setOffsets { |startOffset, stopOffset|
-        var newStartOffset, newStopOffset, result;
+        var newStartOffset, newStopOffset, newTimespan;
 
         if (startOffset.notNil) { startOffset = FoscOffset(startOffset) };
         if (stopOffset.notNil) { stopOffset = FoscOffset(stopOffset) };
@@ -1127,8 +1150,11 @@ FoscTimespan : FoscObject {
             newStopOffset = this.stopOffset;
         };
 
-        result = this.species.new(newStartOffset, newStopOffset);
-        ^result;
+        newTimespan = this.copy;
+        newTimespan.instVarPut('startOffset', newStartOffset);
+        newTimespan.instVarPut('stopOffset', newStopOffset);
+        
+        ^newTimespan;
     }
     /* --------------------------------------------------------------------------------------------------------
     • splitAtOffset
@@ -1195,6 +1221,7 @@ FoscTimespan : FoscObject {
         };
         
         result = result.add(right);
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1612,7 +1639,7 @@ FoscTimespan : FoscObject {
     b.cs;
     -------------------------------------------------------------------------------------------------------- */
     stretch { |multiplier, anchor|
-        var newStartOffset, newStopOffset;
+        var newStartOffset, newStopOffset, newTimespan;
 
         multiplier = FoscMultiplier(multiplier);
 
@@ -1625,7 +1652,12 @@ FoscTimespan : FoscObject {
 
         newStartOffset = (multiplier * (this.startOffset - anchor)) + anchor;
         newStopOffset = (multiplier * (this.stopOffset - anchor)) + anchor;
-        ^this.species.new(newStartOffset, newStopOffset);
+        
+        newTimespan = this.copy;
+        newTimespan.instVarPut('startOffset', newStartOffset);
+        newTimespan.instVarPut('stopOffset', newStopOffset);
+        
+        ^newTimespan;
     }
     /* --------------------------------------------------------------------------------------------------------
     • translate
@@ -1653,12 +1685,18 @@ FoscTimespan : FoscObject {
     b.cs;
     -------------------------------------------------------------------------------------------------------- */
     translateOffsets { |startOffsetTranslation, stopOffsetTranslation|
-        var newStartOffset, newStopOffset;
+        var newStartOffset, newStopOffset, newTimespan;
+        
         startOffsetTranslation = FoscDuration(startOffsetTranslation ? 0);
         stopOffsetTranslation = FoscDuration(stopOffsetTranslation ? 0);
         newStartOffset = this.startOffset + startOffsetTranslation;
         newStopOffset = this.stopOffset + stopOffsetTranslation;
-        ^this.species.new(newStartOffset, newStopOffset);
+
+        newTimespan = this.copy;
+        newTimespan.instVarPut('startOffset', newStartOffset);
+        newTimespan.instVarPut('stopOffset', newStopOffset);
+        
+        ^newTimespan;
     }
     /* --------------------------------------------------------------------------------------------------------
     • trisectsTimespan

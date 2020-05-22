@@ -12,16 +12,15 @@ FoscTypedCollection : FoscObject {
     var <collection, <itemClass;
 	*new { |items, itemClass|
         if (items.isKindOf(this.species)) {
-            //^this.species.new(items);
             items = items.items;
         } {
             if (itemClass.isNil) { ^throw("%: itemClass cannot be nil.".format(this.name)) };
-            //### TODO
-            // assert(
-            //     items.every { |item| item.isKindOf(itemClass) },
-            //     "% contains item not of itemClass: %.".format(this.name, itemClass);
-            // );
-            //^super.new.init(items, itemClass);
+
+            items.do { |item| 
+                if (item.isKindOf(itemClass).not) {
+                    ^throw("%:new: item % is the wrong type: %.".format(this.species, item, item.species));  
+                };  
+            };
         };
         ^super.new.init(items, itemClass);
 	}
@@ -372,6 +371,7 @@ FoscTypedCollection : FoscObject {
     Override to operate on item after insertion into collection.
     -------------------------------------------------------------------------------------------------------- */
     prOnInsertion { |item|
+        // pass
     }
     /* --------------------------------------------------------------------------------------------------------
     • prOnRemoval
@@ -379,6 +379,7 @@ FoscTypedCollection : FoscObject {
     Override to operate on item after removal from collection.
     -------------------------------------------------------------------------------------------------------- */
     prOnRemoval { |item|
+        // pass
     }
     /* --------------------------------------------------------------------------------------------------------
     def _get_format_specification(self):

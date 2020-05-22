@@ -39,7 +39,6 @@ t = FoscTimespanList([
 t.show(scale: 0.5); 
 
 
-
 Overlapping timespan list.
 
 t = FoscTimespanList([
@@ -89,17 +88,16 @@ FoscTimespanList : FoscTypedList {
 
 
     • Example 1
-
-    a = FoscTimespan(0, 3);
-    b = FoscTimespan(3, 6);
-    c = FoscTimespan(6, 10);
-    t = FoscTimespanList([a, b, c]);
+    
+    t = FoscTimespanList([
+        FoscTimespan(0, 3),
+        FoscTimespan(4, 6),
+        FoscTimespan(6, 10),
+    ]);
 
     f = t.illustrate(scale: 0.5);
     f.format;
     f.show;
-    
-    t.show;
     -------------------------------------------------------------------------------------------------------- */
     illustrate { |key, range, sortkey, scale=1|
         var minimum, maximum, postscriptScale, postscriptXOffset, timespanLists, markup, val, markups;
@@ -130,14 +128,19 @@ FoscTimespanList : FoscTypedList {
         } {
             timespanLists = ();
             this.do { |timespan|
-                val = if (timespan.respondsTo(key)) { timespan.perform(key) };
+                if (timespan.respondsTo(key)) {
+                    val = timespan.perform(key);
+                } {
+                    // 'throw' not caught here
+                    error("%:illustrate: timespan does not respond to: '%'".format(this.species, key));
+                    ^nil;
+                };
                 if (timespanLists[val].isNil) {
                     timespanLists[val] = this.species.new;
                 };
                 timespanLists[val].add(timespan);
             };
             markups = [];
-
             timespanLists.asSortedArray.do { |pair, i|
                 timespans = pair[1];
                 timespans = timespans.sort;
@@ -147,7 +150,7 @@ FoscTimespanList : FoscTypedList {
                 };
                 valueMarkup = FoscMarkup("%:".format(val));
                 valueMarkup = FoscMarkup.line([valueMarkup]);
-                valueMarkup = valueMarkup.sans.fontsize(-1);
+                valueMarkup = valueMarkup.sans.fontSize(-1);
                 markups = markups.add(valueMarkup);
                 vspaceMarkup = FoscMarkup.vspace(0.5);
                 markups = markups.add(vspaceMarkup);
@@ -155,7 +158,6 @@ FoscTimespanList : FoscTypedList {
                     timespans, postscriptXOffset, postscriptScale, sortkey: sortkey);
                 markups = markups.add(timespanMarkup);
             };
-
             markup = FoscMarkup.leftColumn(markups);
         };
 
