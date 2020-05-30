@@ -345,6 +345,7 @@ FoscLilypondFile : FoscObject {
 
         score.doComponents({ |staff, i|
             duration = staff.prGetContentsDuration;
+            if (#[1,2].includes(duration.denominator)) { duration = duration.withDenominator(4) };
             staff.leafAt(0).attach(FoscTimeSignature(duration.pair));
         }, prototype: FoscStaff);
         

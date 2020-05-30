@@ -117,67 +117,38 @@ FoscMutation : FoscObject {
     Returns fused mutation client.
 
 
-    p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
-    p.booleanVector(12);
-
-
     • Example 1
 
-    a = FoscTupletMaker();
-    b = a.(divisions: [1/4], tupletRatios: #[[2,1],[3,2],[4,3]]);
+    a = FoscRhythmMaker();
+    b = a.(divisions: [1/4], ratios: #[[2,1],[3,2],[4,3]]);
     a.show;
 
     
-    a = FoscTupletMaker();
-    b = a.(divisions: [1/4], tupletRatios: #[[2,1],[3,2],[4,3]]);
-    c = FoscSelection(b).leaves.partitionBySizes(#[3,3]);
-    c.do { |each| mutate(each).fuse };
-    a.show;
+    • TODO: BROKEN - removing tuplet leaves from parent
 
-    FoscFuseMask(sizes, rewriteTuplets: true).();
+    a = FoscRhythmMaker();
+    b = a.(divisions: [1/4], ratios: #[1,1,1,1,1] ! 2);    
+    c = FoscSelection(b).leaves.partitionBySizes(#[3,1,4,2]);
+    c.items;
+    c.do { |each| mutate(each).fuseLeaves };
+    c.show;
     -------------------------------------------------------------------------------------------------------- */
-    fuse {
-        var newSelections, container, selections, fusedSelection, nextLeaf, tupletSpecifier;
 
-        if (
-            not(
-                client.isKindOf(FoscComponent)
-                || { client.isKindOf(FoscSelection) && client.areContiguousLogicalVoice }
-            )
-        )
-        {
-            throw("%:%: client must be a container or selection of contiguous components: %."
-                .format(this.species, thisMethod.name, client));
+    /* --------------------------------------------------------------------------------------------------------
+    • fuseLeaves
+    -------------------------------------------------------------------------------------------------------- */
+    fuseLeaves {
+        var container, selection, newSelection;
+
+        case 
+        { client.isKindOf(FoscSelection) && { client.areContiguousLogicalVoice } } {
+            selection = client;
+            ^selection.prFuseLeaves;
+        }
+        { client.isKindOf(FoscComponent) } {
+            selection = FoscSelection(client);
+            ^selection.prFuseLeaves;
         };
-
-        newSelections = [];
-        //containers = [];
-        //rests = [];
-
-        selections = FoscSelection(client).leaves;
-        selections = selections.groupBy { |a, b| a.parent != b.parent };
-        
-        container = FoscContainer();
-
-        selections.do { |each, i|
-            fusedSelection = each.prFuse;
-            nextLeaf = try { selections[i + 1][0] };   
-            if (nextLeaf.notNil) { fusedSelection.last.attach(FoscTie()) };
-
-
-            tupletSpecifier = FoscTupletSpecifier(extractTrivial: true, rewriteRestFilled: true, rewriteSustained: true);
-            
-            
-            container.add(fusedSelection);
-            fusedSelection = tupletSpecifier.([fusedSelection]);
-            //newSelections = newSelections.add(fusedSelection[0]);
-            fusedSelection = mutate(container).ejectContents;
-            "fusedSelection: ".post; fusedSelection.items.collect { |e| e.str }.postln;
-            newSelections = newSelections.add(fusedSelection);
-        };
-
-        newSelections = newSelections.flat;
-        ^newSelections;
     }
     // fuse {
     //     var selection;
@@ -232,24 +203,37 @@ FoscMutation : FoscObject {
     Set 'wrappers' to true to copy all wrappers from one leaf to another leaf (and avoid full-score update). Only works from one leaf to another leaf.
 
     a = FoscStaff(FoscLeafMaker().(#[60,65,67], [1/2,1/4,1/4]));
-    a.leafAt(0).attach(FoscClef('alto'));
     a.show;
 
-    mutate(a[0]).replace(FoscChord(#[62,64], 1/2), wrappers: true);
+    a.leafAt(0).attach(FoscClef('alto'));
+    mutate(a[0]).replace(FoscRest(1/2), wrappers: true);
     a.show;
+
+
+    a = FoscRhythmMaker().([1/4], #[2,1,3] ! 4);
+    FoscMeterSpecifier(#[[1,4],[2,4],[1,4]], attachTimeSignatures: true).(a);
+    a = FoscSustainMask(FoscPattern.first(3) | FoscPattern.last(3)).(a);
+    a = FoscTupletSpecifier(extractTrivial: true, rewriteRestFilled: true).(a);
+    FoscStaff(a).show;
     -------------------------------------------------------------------------------------------------------- */
     // abjad 3.0
     replace { |newContents, wrappers=false|
-        var donors, donor, localWrappers, recipient, context, parent, start, stop;
+        var donors, donor, localWrappers, recipient, context, timeSignature, parent, start, stop;
+        
         if (client.isKindOf(FoscSelection)) {
             donors = client;
         } {
             donors = FoscSelection(client);
         };
+        
         assert(donors.areContiguousSameParent);
+        
         if (newContents.isKindOf(FoscSelection).not) { newContents = FoscSelection(newContents) };
+        
         assert(newContents.areContiguousSameParent);
+        
         if (donors.isNil) { ^this };
+        
         if (wrappers) {
             if (1 < donors.size || { donors[0].isKindOf(FoscLeaf).not }) {
                 throw("%:%: set wrappers only with single leaf: %."
@@ -263,13 +247,26 @@ FoscMutation : FoscObject {
             localWrappers = donor.wrappers;
             recipient = newContents[0];
         };
+
+        // always preserve time signatures
+        donors.doLeaves { |leaf, i|
+            if (FoscInspection(leaf).hasIndicator(FoscTimeSignature)) {
+                timeSignature = leaf.prGetIndicator(FoscTimeSignature);
+                newContents.leafAt(i).attach(timeSignature);
+            };
+        };
+        
         # parent, start, stop = donors.prGetParentAndStartStopIndices;
+        
         if (parent.isNil) {
             throw("%:%: can't replace component/s without a parent: %."
                 .format(this.species, thisMethod.name, donors));
         };
+        
         parent.prSetItem((start..(stop + 1)), newContents);
+        
         if (localWrappers.isNil) { ^this };
+        
         localWrappers.do { |wrapper|
             donor.wrappers.remove(wrapper);
             wrapper.instVarPut('component', recipient);
@@ -483,6 +480,7 @@ FoscMutation : FoscObject {
     }
     /* --------------------------------------------------------------------------------------------------------
     • rewritePitches
+
 
     • Example 1 
 
@@ -754,16 +752,20 @@ FoscMutation : FoscObject {
 
         components = client;
         singleComponentInput = false;
+        
         if (components.isKindOf(FoscComponent)) {
             singleComponentInput = true;
             components = FoscSelection(components);
         };
-        assert(components.every { |each| each.isKindOf(FoscComponent) });
+        
+        //assert(components.every { |each| each.isKindOf(FoscComponent) });
         if (components.isKindOf(FoscSelection).not) { components = FoscSelection(components) };
         durations = durations.collect { |each| FoscDuration(each) };
+        
         if (durations.isEmpty) {
             if (singleComponentInput) { ^components } { ^[[], components] };
         };
+        
         totalComponentDuration = components.duration;
         totalSplitDuration = durations.sum;
 
@@ -1024,6 +1026,8 @@ FoscMutation : FoscObject {
         };
 
         pitches = FoscPitchParser(pitches);
+
+        // • TODO: detach and re-attach indicators for any replaced leaves
 
         block { |break|
             pitches.do { |writtenPitch, i|

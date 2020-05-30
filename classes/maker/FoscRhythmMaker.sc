@@ -134,30 +134,25 @@ FoscRhythmMaker : FoscObject {
     var <beamSpecifier, <durationSpecifier, <meterSpecifier, <tupletSpecifier;
     var selections, previousState;
     *new { |beamSpecifier, durationSpecifier, meterSpecifier, tupletSpecifier|  
+
         if (beamSpecifier.notNil) {
-            assert(
-                beamSpecifier.isKindOf(FoscBeamSpecifier),
-                "%:new: bad value for beamSpecifier: %.".format(this.species, beamSpecifier)
-            );
+            assert(beamSpecifier.isKindOf(FoscBeamSpecifier), thisMethod, 'beamSpecifier', beamSpecifier);
         };
+
         if (durationSpecifier.notNil) {
-            assert(
-                durationSpecifier.isKindOf(FoscDurationSpecifier),
-                "%:new: bad value for durationSpecifier: %.".format(this.species, durationSpecifier)
-            );
+            assert(durationSpecifier.isKindOf(FoscDurationSpecifier), thisMethod, 'durationSpecifier',
+                durationSpecifier);
         };
+        
         if (meterSpecifier.notNil) {
-            assert(
-                meterSpecifier.isKindOf(FoscMeterSpecifier),
-                "%:new: bad value for meterSpecifier: %.".format(this.species, meterSpecifier)
-            );
+            assert(meterSpecifier.isKindOf(FoscMeterSpecifier), thisMethod, 'meterSpecifier', meterSpecifier);
         };
+        
         if (tupletSpecifier.notNil) {
-            assert(
-                tupletSpecifier.isKindOf(FoscTupletSpecifier),
-                "%:new: bad value for tupletSpecifier: %.".format(this.species, tupletSpecifier)
-            );
+            assert(tupletSpecifier.isKindOf(FoscTupletSpecifier), thisMethod, 'tupletSpecifier',
+                tupletSpecifier);
         };
+
         ^super.new.init(beamSpecifier, durationSpecifier, meterSpecifier, tupletSpecifier);
     }
     init { |argBeamSpecifier, argDurationSpecifier, argMeterSpecifier, argTupletSpecifier|
@@ -187,6 +182,10 @@ FoscRhythmMaker : FoscObject {
     }
     /* --------------------------------------------------------------------------------------------------------
     • show
+
+    a = FoscRhythmMaker();
+    a.(divisions: [1/4], ratios: #[1,1,1,1,1] ! 4);
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
     show { |timeSignatures|
         var lilypondFile;

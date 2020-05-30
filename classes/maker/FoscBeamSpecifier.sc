@@ -82,20 +82,13 @@ FoscBeamSpecifier : FoscObject {
 
         var beamSpanArgs, msg;
         
-        assert(beamEachDivision.isKindOf(Boolean));
-        assert(beamEachRun.isKindOf(Boolean));
-        assert(beamDivisionsTogether.isKindOf(Boolean));
-        assert(beamRests.isKindOf(Boolean));
-        assert(hideNibs.isKindOf(Boolean));
-
-        if (stemletLength.notNil) {
-            assert(
-                stemletLength.isNumber,
-                "%:new: stemletLength must be a Number: %.".format(this.species, stemletLength.cs)
-            );
-        };
-
-        assert(useFeatherBeams.isKindOf(Boolean));
+        assert(beamEachDivision.isBoolean, thisMethod, 'beamEachDivision', beamEachDivision);
+        assert(beamEachRun.isBoolean, thisMethod, 'beamEachRun', beamEachRun);
+        assert(beamDivisionsTogether.isBoolean, thisMethod, 'beamDivisionsTogether', beamDivisionsTogether);
+        assert(beamRests.isBoolean, thisMethod, 'beamRests', beamRests);
+        assert(hideNibs.isBoolean, thisMethod, 'hideNibs', hideNibs);
+        assert(stemletLength.isNumber || stemletLength.isNil, thisMethod, 'stemletLength', stemletLength);
+        assert(useFeatherBeams.isBoolean, thisMethod, 'useFeatherBeams', useFeatherBeams);
 
         beamSpanArgs = [beamEachDivision, beamEachRun, beamDivisionsTogether];
 
@@ -104,7 +97,7 @@ FoscBeamSpecifier : FoscObject {
             msg = msg ++ "\nbeamEachDivision: %".format(beamEachDivision);
             msg = msg ++ "\nbeamEachRun: %".format(beamEachRun);
             msg = msg ++ "\nbeamDivisionsTogether: %".format(beamDivisionsTogether);
-            warn(msg);
+            ^throw(msg);
         };
         
         ^super.new.init(beamEachDivision, beamEachRun, beamDivisionsTogether, beamRests, hideNibs,
@@ -227,8 +220,8 @@ FoscBeamSpecifier : FoscObject {
     /* --------------------------------------------------------------------------------------------------------
     • prDetachAllBeams
     -------------------------------------------------------------------------------------------------------- */
-    prDetachAllBeams { |divisions, graceNotes=false|
-        FoscIteration(divisions).leaves(graceNotes: graceNotes).do { |leaf|
+    prDetachAllBeams { |selections, graceNotes=false|
+        FoscIteration(selections).leaves(graceNotes: graceNotes).do { |leaf|
             leaf.detach(FoscStartBeam);
             leaf.detach(FoscStopBeam);
         };

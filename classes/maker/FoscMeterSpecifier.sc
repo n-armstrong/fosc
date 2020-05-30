@@ -62,24 +62,45 @@ FoscMeterSpecifier : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    var <meters, <boundaryDepth, <maximumDotCount, <rewriteTuplets, <multimeasureRests;
+    var <meters, <attachTimeSignatures, <boundaryDepth, <maximumDotCount, <rewriteTuplets, <multimeasureRests;
     //var <publishStorageFormat=true;
-    *new { |meters, boundaryDepth, maximumDotCount, rewriteTuplets=false,
+    *new { |meters, attachTimeSignatures=false, boundaryDepth, maximumDotCount, rewriteTuplets=false,
         multimeasureRests=true|
         meters = meters.collect { |each| FoscMeter(each) };
+        assert(attachTimeSignatures.isKindOf(Boolean));  
         assert(rewriteTuplets.isKindOf(Boolean));  
         assert(multimeasureRests.isKindOf(Boolean));  
-        ^super.new.init(meters, boundaryDepth, maximumDotCount, rewriteTuplets,
+        ^super.new.init(meters, attachTimeSignatures, boundaryDepth, maximumDotCount, rewriteTuplets,
             multimeasureRests);
     }
-    init { |argMeters, argBoundaryDepth, argMaximumDotCount, argRewriteTuplets, argMultimeasureRests|    
+    init { |argMeters, argAttachTimeSignatures, argBoundaryDepth, argMaximumDotCount, argRewriteTuplets,
+        argMultimeasureRests|    
         
         meters = argMeters;
+        attachTimeSignatures = argAttachTimeSignatures;
         boundaryDepth = argBoundaryDepth;
         maximumDotCount = argMaximumDotCount;
         rewriteTuplets = argRewriteTuplets;
         multimeasureRests = argMultimeasureRests;
     }
+    // var <meters, <boundaryDepth, <maximumDotCount, <rewriteTuplets, <multimeasureRests;
+    // //var <publishStorageFormat=true;
+    // *new { |meters, boundaryDepth, maximumDotCount, rewriteTuplets=false,
+    //     multimeasureRests=true|
+    //     meters = meters.collect { |each| FoscMeter(each) };
+    //     assert(rewriteTuplets.isKindOf(Boolean));  
+    //     assert(multimeasureRests.isKindOf(Boolean));  
+    //     ^super.new.init(meters, boundaryDepth, maximumDotCount, rewriteTuplets,
+    //         multimeasureRests);
+    // }
+    // init { |argMeters, argBoundaryDepth, argMaximumDotCount, argRewriteTuplets, argMultimeasureRests|    
+        
+    //     meters = argMeters;
+    //     boundaryDepth = argBoundaryDepth;
+    //     maximumDotCount = argMaximumDotCount;
+    //     rewriteTuplets = argRewriteTuplets;
+    //     multimeasureRests = argMultimeasureRests;
+    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,10 +126,13 @@ FoscMeterSpecifier : FoscObject {
     • value
     -------------------------------------------------------------------------------------------------------- */
     value { |selections|
+        //if (selections.isKindOf(FoscSelection)) { selections = selections.items };
+        if (selections.isKindOf(FoscSelection)) { selections = [selections] };
         selections = this.prRewriteMeter(selections);
         if (multimeasureRests) {
             selections = FoscMeterSpecifier.prRewriteRestFilled(selections, multimeasureRests: true);
         };
+        //selections = FoscSelection(selections);
         ^selections;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,13 +141,14 @@ FoscMeterSpecifier : FoscObject {
     /* --------------------------------------------------------------------------------------------------------
     • prRewriteMeter
 
-    m = #[[2,4],[2,4],[2,4],[2,4]];
+    m = #[[2,4],[4,4],[2,4]];
     a = FoscLeafMaker().(#[60,62,64,65], [3/8,6/8,2/8,5/8]);
     a = FoscMeterSpecifier(m, attachTimeSignatures: true).([a]);
     FoscStaff(a).show;
     -------------------------------------------------------------------------------------------------------- */
     prRewriteMeter { |selections|
         var durations, meterDuration, musicDuration, newSelections, staff, container, contents;
+        var timeSignature, prevTimeSignature;
 
         durations = meters.collect { |each| FoscDuration(each) };
         meterDuration = durations.sum;
@@ -156,6 +181,14 @@ FoscMeterSpecifier : FoscObject {
             contents = container[0..];
             contents.do { |component| component.prSetParent(nil) };
             newSelections = newSelections.add(contents);
+        };
+
+        if (this.attachTimeSignatures) {
+            newSelections.do { |selection, i|
+                timeSignature = FoscTimeSignature(meters[i]);
+                if (timeSignature != prevTimeSignature) { selection.leafAt(0).attach(timeSignature) };
+                prevTimeSignature = timeSignature;
+            };
         };
 
         ^newSelections;

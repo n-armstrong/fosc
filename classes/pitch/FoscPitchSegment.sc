@@ -13,7 +13,7 @@ FoscPitchSegment(n).cs;
 n = "Bb4 F#5 <C4 Cb4> E+4 G4 D+5";
 FoscPitchSegment(n).cs;
 ------------------------------------------------------------------------------------------------------------ */
-FoscPitchSegment : FoscSegment {
+FoscPitchSegment : FoscTypedList {
     var <player;
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
@@ -36,6 +36,23 @@ FoscPitchSegment : FoscSegment {
     //     ^"%([\n\t%\n])".format(this.species, pitchesStr);
     // }
     /* --------------------------------------------------------------------------------------------------------
+    • ==
+    -------------------------------------------------------------------------------------------------------- */
+    == { |expr|
+        var exprItems;
+        if (expr.isKindOf(this.species).not) { ^false };
+        if (this.size != expr.size) { ^false };
+        exprItems = expr.items;
+        this.items.do { |each, i| if (each != exprItems[i]) { ^false } };
+        ^true;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • !=
+    -------------------------------------------------------------------------------------------------------- */
+    != { |expr|
+        ^(this == expr).not
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • storeArgs
     -------------------------------------------------------------------------------------------------------- */
     storeArgs {
@@ -50,7 +67,7 @@ FoscPitchSegment : FoscSegment {
         ^"<%>".format("".scatList(this.pitches.collect { |each| each.str })[1..]);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC METHODS
+	// PUBLIC INSTANCE METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
     • pitches
@@ -120,68 +137,6 @@ FoscPitchSegment : FoscSegment {
     }
 	/* --------------------------------------------------------------------------------------------------------
     • makeNotes
-    def make_notes(self, n=None, written_duration=None):
-        r'''Makes first `n` notes in pitch segment.
-
-        Set `n` equal to `n` or length of segment.
-
-        Set `written_duration` equal to `written_duration` or ``1/8``:
-
-        ::
-
-            >>> notes = named_pitch_segment.make_notes()
-            >>> staff = Staff(notes)
-            >>> show(staff) # doctest: +SKIP
-
-        ..  doctest::
-
-            >>> f(staff)
-            \new Staff {
-                bf,8
-                aqs8
-                fs'8
-                g'8
-                bqf8
-                g'8
-            }
-
-        Allows nonassignable `written_duration`:
-
-        ::
-
-            >>> notes = named_pitch_segment.make_notes(4, Duration(5, 16))
-            >>> staff = Staff(notes)
-            >>> time_signature = TimeSignature((5, 4))
-            >>> attach(time_signature, staff)
-            >>> show(staff) # doctest: +SKIP
-
-        ..  doctest::
-
-            >>> f(staff)
-            \new Staff {
-                \time 5/4
-                bf,4 ~
-                bf,16
-                aqs4 ~
-                aqs16
-                fs'4 ~
-                fs'16
-                g'4 ~
-                g'16
-            }
-
-        Returns list of notes.
-        '''
-        from abjad.tools import durationtools
-        from abjad.tools import scoretools
-        n = n or len(self)
-        written_duration = written_duration or durationtools.Duration(1, 8)
-        result = scoretools.make_notes([0] * n, [written_duration])
-        for i, logical_tie in enumerate(iterate(result).by_logical_tie()):
-            pitch = self[i % len(self)]
-            for note in logical_tie:
-                note.written_pitch = pitch
-        return result
 	-------------------------------------------------------------------------------------------------------- */
 	makeNotes {
 		^this.notYetImplemented;

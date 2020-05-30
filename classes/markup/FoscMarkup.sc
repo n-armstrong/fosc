@@ -1247,6 +1247,9 @@ FoscMarkup : FoscObject {
     • padToBox
 
     LilyPond pad-to-box markup command.
+
+    m = padToBox(FoscMarkup("Allegro assai"), #[1,1], #[1,1]);
+    m.format;
     -------------------------------------------------------------------------------------------------------- */
     padToBox { |xExtent, yExtent|
     	var contents, command;

@@ -81,6 +81,9 @@ FoscLilypondFormatManager : FoscObject {
     // abjad 3.0
     *formatLilypondAttribute { |attribute|
         var result, coordinateChars;
+        
+        if (attribute.isKindOf(FoscLilypondLiteral)) { ^attribute.format };
+
         result = attribute.asString;
         result = result.replace("__", ".");
         result = result.replace("_", ".");
@@ -90,6 +93,7 @@ FoscLilypondFormatManager : FoscObject {
             if ((each.size == 1) && { coordinateChars.includes(each[0]) }) { each.toUpper } { each.toLower };
         };
         result = result.join("-");
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -236,11 +240,13 @@ FoscLilypondFormatManager : FoscObject {
     // abjad 3.0
     *makeLilypondTweakString { |attribute, value, isDirected=true, grob|
         var grobString, result;
+
         if (grob.notNil) {
             grob = grob.asString.toUpperCamelCase ++ ".";
         } {
             grob = "";
         };
+
         attribute = FoscLilypondFormatManager.formatLilypondAttribute(attribute);
         value = FoscLilypondFormatManager.formatLilypondValue(value);
         result = "\\tweak %% %".format(grob, attribute, value);

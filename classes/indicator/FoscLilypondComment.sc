@@ -31,7 +31,8 @@ FoscLilypondComment : FoscObject {
         assert(string.isString);
         assert(
             allowableFormatSlots.includes(formatSlot.asSymbol),
-            "FoscLilypondComment:new: formatSlot argument: '%'. Valid formatSlots are: %."
+            thisMethod,
+            "'formatSlot' must be one of: %."
                 .format(formatSlot, "".ccatList(allowableFormatSlots)[1..]);
         );
         ^super.new.init(string, formatSlot);

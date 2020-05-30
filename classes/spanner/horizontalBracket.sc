@@ -3,6 +3,9 @@
 
 Attaches group indicators.
 
+textAlign: [lilypond: parent-alignment-X]: Specify on which point of the parent the object is aligned. The value -1 means aligned on parent’s left edge, 0 on center, and 1 right edge, in X direction. Other numerical values may also be specified - the unit is half the parent’s width. If unset, the value from self-alignment-X property will be used.
+
+
 
 • Example 1
 
@@ -26,31 +29,46 @@ a.show;
 
 • Example 3
 
-Partition selection by sizes, bracket each new selection, add annotations.
+Partition selection by sizes, bracket each new selection, add text annotation.
 
 a = FoscStaff(FoscLeafMaker().((60..75), [1/32]));
-a.consistsCommands.add('Horizontal_bracket_engraver');
-t = #[['bracket-flare', [0,0]], ['direction', 'up'], ['staff-padding', 3]];
+t = #[['bracket-flare', [0,0]], ['direction', 'up'], ['staff-padding', 0]];
+
 a[0..].partitionBySizes(#[3,4,6,3]).do { |sel, i|
-    sel.horizontalBracket(tweaks: t);
-    sel[0].attach(FoscMarkup((i + 1).asString, 'up', tweaks: #['font-size', -1, 'color', 'blue']));
+    sel.horizontalBracket(text: FoscMarkup(sel.size.asString).fontSize(-2), textAlign: -0.8, tweaks: t);
 };
-a[0..].beam(startBeam: FoscStartBeam(direction: 'down'));
+
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
 + FoscSelection {
-    horizontalBracket { |startGroup, stopGroup, tag, tweaks|
-        var leaves, startLeaf, stopLeaf;
+    horizontalBracket { |startGroup, stopGroup, text, textAlign=0, tweaks|
+        var leaves, startLeaf, stopLeaf, tweak;
+
         startGroup = startGroup ?? { FoscStartGroup() };
         stopGroup = stopGroup ?? { FoscStopGroup() };
         leaves = this.leaves;
         startLeaf = leaves.first;
         stopLeaf = leaves.last;
-        //!!! not in abjad
+
+        if (text.notNil) {
+            if (tweaks.isNil) {
+                tweaks = [];
+            } {
+                tweaks = tweaks.copy;
+            };
+
+            text = FoscMarkup(text);
+
+            tweaks = tweaks.addAll([
+                [FoscLilypondLiteral("HorizontalBracketText.text"), text],
+                [FoscLilypondLiteral("HorizontalBracketText.parent-alignment-X"), textAlign]
+            ]);
+        };
+
         if (startGroup.tweaks.notNil) { tweaks = startGroup.tweaks.addAll(tweaks) };
         FoscLilypondTweakManager.setTweaks(startGroup, tweaks);
-        //!!!
-        startLeaf.attach(startGroup, tag: tag);
-        stopLeaf.attach(stopGroup, tag: tag);
+        
+        startLeaf.attach(startGroup);
+        stopLeaf.attach(stopGroup);
     }
 }

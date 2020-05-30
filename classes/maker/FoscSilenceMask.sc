@@ -35,6 +35,7 @@ FoscSilenceMask : FoscObject {
     var <pattern;
     *new { |pattern|
         if (pattern.isKindOf(FoscSilenceMask)) { pattern = pattern.pattern };
+        if (pattern.isKindOf(FoscSegmentList)) { pattern = pattern.asFoscPattern };
         assert(pattern.isKindOf(FoscPattern),
             "%:new: pattern must be a FoscPattern: %".format(this.species, pattern));
         ^super.new.init(pattern);

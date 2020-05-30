@@ -439,10 +439,10 @@ FoscPostscript : FoscObject {
     p.show("This is text.");
     p.format;
     -------------------------------------------------------------------------------------------------------- */
-    // show { |text|
-    // 	text = text.asString;
-    // 	^this.prWithOperator(FoscPostscriptOperator('show', text));
-    // }
+    show { |text|
+    	text = text.asString;
+    	^this.prWithOperator(FoscPostscriptOperator('show', text));
+    }
     /* --------------------------------------------------------------------------------------------------------
     • stroke
     

@@ -5,32 +5,35 @@
     /* --------------------------------------------------------------------------------------------------------
     • assert
 
-    a = FoscNote(60, [1, 4]);
-    a.prGetTimespan_(200);
+    assert(false);
+    FoscSegmentMaker(annotateSegments: true);   // fine - correct type
+    FoscSegmentMaker(annotateSegments: 2);      // not fine - incorrect type
+    FoscSegmentMaker(meterSpecifier: 'foo');        // not fine - incorrect type
     -------------------------------------------------------------------------------------------------------- */
-    assert { |message, receiver, method|
-        var boolean;
-        boolean = try { this.asBoolean } { false };
-        if (boolean) { ^nil };
-        case 
-        { message.isNil } {
-            if (method.isNil) {
-                throw("%: assertion error".format(receiver.species));
-            } {
-                throw(
-                    "%:%: assertion error: %."
-                    .format(receiver.species, method.name, method.keyValuePairsFromArgs)
-                );
-            };
-        }
-        { message.notNil } {
-            throw(message);
+    assert { |method, argName, val|
+        var bool;
+        
+        bool = try { this.asBoolean } { false };
+        if (bool) { ^nil };
+
+        if (method.isNil) {
+            ^MethodError(thisMethod, this).throw;
+        } {
+            ^FoscValueError(method, argName, val).throw;
         };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • isBoolean
+    -------------------------------------------------------------------------------------------------------- */
+    isBoolean {
+        ^this.isKindOf(Boolean);
     }
     /* --------------------------------------------------------------------------------------------------------
     • ccs
 
-    compact compile string
+    Compact compile string.
+
+    [1, 2, 3, 4, 5].ccs;
     -------------------------------------------------------------------------------------------------------- */
     ccs {
         ^this.cs.removeWhiteSpace;

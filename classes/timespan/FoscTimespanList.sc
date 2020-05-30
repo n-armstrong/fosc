@@ -99,7 +99,7 @@ FoscTimespanList : FoscTypedList {
     f.format;
     f.show;
     -------------------------------------------------------------------------------------------------------- */
-    illustrate { |key, range, sortkey, scale=1|
+    illustrate { |key, range, sortkey, scale=1, drawOffsets=true|
         var minimum, maximum, postscriptScale, postscriptXOffset, timespanLists, markup, val, markups;
         var timespans, valueMarkup, vspaceMarkup, timespanMarkup;
 
@@ -124,7 +124,7 @@ FoscTimespanList : FoscTypedList {
         
         if (key.isNil) {
             markup = FoscTimespanList.prMakeTimespanListMarkup(
-                this, postscriptXOffset, postscriptScale, sortkey: sortkey);
+                this, postscriptXOffset, postscriptScale, sortkey: sortkey, drawOffsets: drawOffsets);
         } {
             timespanLists = ();
             this.do { |timespan|
@@ -142,7 +142,7 @@ FoscTimespanList : FoscTypedList {
             };
             markups = [];
             timespanLists.asSortedArray.do { |pair, i|
-                timespans = pair[1];
+                # val, timespans = pair;
                 timespans = timespans.sort;
                 if (0 < i) {
                     vspaceMarkup = FoscMarkup.vspace(0.5);
@@ -150,12 +150,12 @@ FoscTimespanList : FoscTypedList {
                 };
                 valueMarkup = FoscMarkup("%:".format(val));
                 valueMarkup = FoscMarkup.line([valueMarkup]);
-                valueMarkup = valueMarkup.sans.fontSize(-1);
+                valueMarkup = valueMarkup.sans.fontSize(-2);
                 markups = markups.add(valueMarkup);
                 vspaceMarkup = FoscMarkup.vspace(0.5);
                 markups = markups.add(vspaceMarkup);
                 timespanMarkup = FoscTimespanList.prMakeTimespanListMarkup(
-                    timespans, postscriptXOffset, postscriptScale, sortkey: sortkey);
+                    timespans, postscriptXOffset, postscriptScale, sortkey: sortkey, drawOffsets: drawOffsets);
                 markups = markups.add(timespanMarkup);
             };
             markup = FoscMarkup.leftColumn(markups);
@@ -1244,7 +1244,6 @@ FoscTimespanList : FoscTypedList {
         collection = timespans;
         
         ^this;
-
     }
     /* --------------------------------------------------------------------------------------------------------
     • scale
@@ -1587,7 +1586,7 @@ FoscTimespanList : FoscTypedList {
                 ps = ps ++ timespan.prAsPostscript(postscriptXOffset, postscriptYOffset, postscriptScale);
             };
         };
-        
+
         if (drawOffsets.not) {
             markup = FoscMarkup.postscript(ps);
             ^markup;

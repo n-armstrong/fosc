@@ -202,8 +202,6 @@ FoscTimespan : FoscObject {
     Returns string.
 
     FoscTimespan(1, 3).cs;
-
-    FoscOffset(inf).str;
     -------------------------------------------------------------------------------------------------------- */
     asCompileString {
         ^"%(%, %)".format(this.species, this.startOffset.str, this.stopOffset.str);
@@ -235,10 +233,16 @@ FoscTimespan : FoscObject {
     
     Returns Lilypond file.
     -------------------------------------------------------------------------------------------------------- */
-    illustrate { |range, scale|
+    illustrate { |range, scale=1|
         var timespans;
         timespans = FoscTimespanList([this]);
         ^timespans.illustrate(range: range, scale: scale);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • show
+    -------------------------------------------------------------------------------------------------------- */
+    show { |range, scale=1|
+        ^this.illustrate(range: range, scale: scale).show;
     }
     /* --------------------------------------------------------------------------------------------------------
     • size

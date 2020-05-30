@@ -693,7 +693,6 @@ FoscComponent : FoscObject {
     a = FoscTuplet(2/3, [FoscNote(60, 1/4)]);
     a[0].prGetParentage.components;
     -------------------------------------------------------------------------------------------------------- */
-    //!!!TODO: not in abjad - DEPRECATE ?
     prGetParentage { |graceNotes=false|
         ^FoscParentage(this, graceNotes);
     }

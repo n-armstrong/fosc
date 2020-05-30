@@ -4,15 +4,6 @@
 Sustain mask.
 
 
-!!!TODO:
-
-FoscSustainMask: 'pattern' arg may be a FoscPatternList
-
-mutate(music).sustain(pattern, fuse: false);
-mutate(music).silence(pattern);
-
-
-
 • Example 1
 
 Rhythm-maker.
@@ -20,27 +11,64 @@ Rhythm-maker.
 p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
 m = FoscSustainMask(p);
 a = FoscRhythmMaker();
-a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
+m = a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
 
 
 • Example 2
+
+Leaf-maker
+
+a = FoscLeafMaker().((60..75), [1/8]);
+p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
+m = FoscSustainMask(p).([a]);
+FoscSelection(m).show;
+
+
+• Example 3
+
+Fuse contiguous leaves when 'fuse' is true.
+
+a = FoscLeafMaker().((60..75), [1/8]);
+p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
+m = FoscSustainMask(p, fuse: true).([a]);
+FoscSelection(m).show;
+
+Rewrite meter for previous example.
+
+m = FoscMeterSpecifier(meters: #[[4,4],[4,4]], boundaryDepth: 1).(m);
+FoscSelection(m).show;
+
+
+• Example 4
 
 Fuse contiguous leaves when 'fuse' is true.
 
 p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
 m = FoscSustainMask(p, fuse: true);
 a = FoscRhythmMaker();
+m = a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
+FoscSelection(m).show;
+
+Apply tuplet specifier to previous example;
+
+m = FoscTupletSpecifier(extractTrivial: true, rewriteRestFilled: true, rewriteSustained: true).(m); FoscSelection(m).show;
+
+
+• Example 5
+
+Create a talea pattern.
+
+p = FoscPattern(#[0,1,3], period: 6);
+m = FoscSustainMask(p, fuse: true);
+a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
 
 
-• Example 3
+• Example 6
 
-Create a talea pattern.
-
-p = FoscPattern(#[0,1,3], period: 5);
-m = FoscSustainMask(p, fuse: true);
+m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), fuse: true);
 a = FoscRhythmMaker();
 a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
 a.show;
@@ -52,9 +80,11 @@ FoscSustainMask : FoscObject {
     var <pattern, <fuse;
     *new { |pattern, fuse=false|
         if (pattern.isKindOf(FoscSustainMask)) { pattern = pattern.pattern };
-        assert(pattern.isKindOf(FoscPattern),
-            "%:new: pattern must be a FoscPattern: %".format(this.species, pattern));
-        assert(fuse.isKindOf(Boolean));
+        if (pattern.isKindOf(FoscSegmentList)) { pattern = pattern.asFoscPattern };
+
+        assert(pattern.isKindOf(FoscPattern), thisMethod, 'pattern', pattern);
+        assert(fuse.isKindOf(Boolean), thisMethod, 'fuse', fuse);
+        
         ^super.new.init(pattern, fuse);
     }
     init { |argPattern, argFuse|
@@ -66,20 +96,13 @@ FoscSustainMask : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • value
-
-    m = FoscSustainMask(FoscPattern(indices: #[0,1,4,5,17,18,19]), fuse: true);
-    a = FoscRhythmMaker();
-    a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
-    a.show;
     -------------------------------------------------------------------------------------------------------- */
     value { |selections|
-        var newSelections, containers, rests, container, logicalTies, totalLogicalTies, matchingLogicalTies;
-        var localSizes, logicalTieGroups, logicalTieGroup, indices, logicalTieGroupSizes;
-        var leaves, rest, leavesGroupedByParent, fusedSelection, nextLeaf, newSelection;
+        var newSelections, containers, container, logicalTies, totalLogicalTies, matchingLogicalTies, indices;
+        var sizes, rest, newSelection;
 
         newSelections = [];
         containers = [];
-        rests = [];
 
         selections.do { |selection|
             container = FoscContainer();
@@ -93,28 +116,9 @@ FoscSustainMask : FoscObject {
 
         if (fuse) {
             indices = matchingLogicalTies.collect { |each| logicalTies.indexOf(each) };
-            if (indices.includes(0).not) { indices = [0] ++ indices };
-            if (indices.includes(totalLogicalTies).not) { indices = indices ++ [totalLogicalTies] };
-            logicalTieGroupSizes = indices.intervals;
-            logicalTieGroups = logicalTies.clumps(logicalTieGroupSizes);    
-            logicalTieGroups.do { |logicalTieGroup, i|
-                leaves = all(FoscIteration(logicalTieGroup).leaves);
-                // leaves.do { |leaf, j|
-                //     if (localSizes[i] < 0) { 
-                //         rest = FoscRest(leaf.writtenDuration);
-                //         if (leaf.multiplier.notNil) { rest.multiplier_(leaf.multiplier) };
-                //         mutate(leaf).replace([rest]);
-                //         rest.detach(FoscTie);
-                //         leaves[j] = rest;
-                //     };
-                // };
-                leavesGroupedByParent = leaves.separate { |a, b| a.parent != b.parent };
-                leavesGroupedByParent.do { |sel, j|
-                    fusedSelection = FoscSelection(sel).prFuseLeaves;
-                    nextLeaf = try { leavesGroupedByParent[j + 1][0] };
-                    if (nextLeaf.notNil) { fusedSelection.last.attach(FoscTie()) };
-                };
-            };
+            indices = indices.add(totalLogicalTies);
+            sizes = indices.intervals;
+            logicalTies.clumps(sizes).do { |each| FoscSelection(each).prFuseLeaves };
         } {
             pattern.copy.invert.getMatchingItems(logicalTies).do { |logicalTie|
                 if (logicalTie.head.isKindOf(FoscRest).not) {
@@ -123,11 +127,9 @@ FoscSustainMask : FoscObject {
                         if (leaf.multiplier.notNil) { rest.multiplier_(leaf.multiplier) };
                         mutate(leaf).replace([rest]);
                         rest.detach(FoscTie);
-                        rests = rests.add(rest);
                     };
                 };
             };
-
         };
 
         containers.do { |container|
@@ -138,4 +140,3 @@ FoscSustainMask : FoscObject {
         ^newSelections;
     }
 }
-

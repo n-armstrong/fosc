@@ -125,7 +125,7 @@ FoscLogicalTie : FoscSelection {
         var result, parts;
         result = [];
         parts = this.prGetLeavesGroupedByImmediateParents;
-        parts.do { |part| result = result.add(part.prFuse) };
+        parts.do { |part| result = result.add(part.prFuseLeaves) };
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -258,10 +258,35 @@ FoscLogicalTie : FoscSelection {
     Returns duration.
     
     a = FoscLogicalTie([FoscNote(60, 1/4), FoscNote(60, 2/4)]);
-    a.writtenDuration.str;
+    a.writtenDuration.cs;
     -------------------------------------------------------------------------------------------------------- */
     writtenDuration {
         ^items.collect { |each| each.writtenDuration }.sum;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • writtenPitch
+
+    Written pitch of logical tie if logical is pitched.
+
+    Returns pitch.
+    
+    a = FoscLogicalTie([FoscNote(60, 1/4), FoscNote(60, 2/4)]);
+    a.writtenPitch.cs;
+    -------------------------------------------------------------------------------------------------------- */
+    writtenPitch {
+        if (this.isPitched) { ^this.head.writtenPitch } { ^nil };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • writtenPitch_
+
+    Sets written pitch of logical tie if logical is pitched.
+    
+    a = FoscLogicalTie([FoscNote(60, 1/4), FoscNote(60, 2/4)]);
+    a.writtenPitch_(61);
+    a.writtenPitch.cs;
+    -------------------------------------------------------------------------------------------------------- */
+    writtenPitch_ { |pitch|
+        if (this.isPitched) { this.doLeaves { |leaf| leaf.writtenPitch_(pitch) } };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS

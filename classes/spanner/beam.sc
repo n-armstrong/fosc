@@ -40,6 +40,17 @@ a[0..].partitionBySizes(#[3,4,6,3]).do { |selection|
     selection.beam(startBeam: b);
 };
 a.show;
+
+
+• Example 5
+
+Specify spanning beams using 'durations' and 'spanBeamCount'.
+
+x = FoscLeafMaker().((60..83), [1/16]);
+d = [[1/4, 1/8],[1/8, 1/4],[1/4, 1/8],[1/8, 1/4]];
+m = x.partitionBySizes(#[6,6,6,6]);
+m.do { |sel, i| sel.beam(durations: d[i], spanBeamCount: 1) };
+x.show;
 ------------------------------------------------------------------------------------------------------------ */
 + FoscSelection {
     beam { |startBeam, stopBeam, beamLoneNotes=false, beamRests=true, durations, spanBeamCount, stemletLength,
@@ -51,7 +62,6 @@ a.show;
         
         originalLeaves = this.leaves;
 
-        //!!! not in abjad
         originalLeaves.do { |leaf|
             leaf.detach(FoscStartBeam);
             leaf.detach(FoscStopBeam);
@@ -161,14 +171,21 @@ a.show;
             isLastPart = false;
             if (i == (totalParts - 1)) { isLastPart = true };
             firstLeaf = part[0];
+            lastLeaf = part.last;
             flagCount = firstLeaf.writtenDuration.flagCount;
 
             if (part.size == 1) {
                 if (FoscStartBeam.prIsBeamable(firstLeaf, beamRests: false)) {
-                    left = flagCount;
-                    right = flagCount;
-                    beamCount = FoscBeamCount(left, right);
+                    left = if (isFirstPart) { 0 } { flagCount };
+                    beamCount = FoscBeamCount(left, flagCount);
                     firstLeaf.attach(beamCount, tag: tag);
+                };
+
+                if (FoscStartBeam.prIsBeamable(lastLeaf, beamRests: false)) {
+                    flagCount = lastLeaf.writtenDuration.flagCount;
+                    right = if (isLastPart) { 0 } { flagCount };
+                    beamCount = FoscBeamCount(flagCount, right);
+                    lastLeaf.attach(beamCount, tag: tag);
                 };
             } {
                 if (FoscStartBeam.prIsBeamable(firstLeaf, beamRests: false)) {
@@ -176,7 +193,6 @@ a.show;
                     beamCount = FoscBeamCount(left, flagCount);
                     firstLeaf.attach(beamCount, tag: tag);
                 };
-                lastLeaf = part.last;
 
                 if (FoscStartBeam.prIsBeamable(lastLeaf, beamRests: false)) {
                     flagCount = lastLeaf.writtenDuration.flagCount;

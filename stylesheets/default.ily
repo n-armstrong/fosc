@@ -49,7 +49,14 @@
 
         tupletFullLength = ##t
     }
-
+    \context {
+        \Staff
+        \consists Horizontal_bracket_engraver
+    }
+    \context {
+        \RhythmicStaff
+        \consists Horizontal_bracket_engraver
+    }
 }
 
 \paper {
