@@ -16,7 +16,9 @@ FoscSelection : FoscSequence {
     var <player;
     *new { |items|
         if (items.isKindOf(FoscComponent)) { items = [items] };
+        
         this.prCheck(items);
+        
         ^super.new(items);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +41,9 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     *prCheck { |items|
         var prototype;
+        
         prototype = [FoscComponent, FoscSelection];
+        
         items.do { |item|
             if (prototype.any { |type| item.isKindOf(type) }.not) {
                 throw("%:new: 'items' must contain components and/or selections: %"
@@ -157,9 +161,11 @@ FoscSelection : FoscSequence {
             currentLogicalVoice = currentParentage.logicalVoice;
             if (prototype.any { |type| current.isKindOf(type) }.not) { ^false };
             if (currentLogicalVoice != firstLogicalVoice) { ^false };
+            
             if (currentParentage.root == firstRoot) {
                 if (previous.prImmediatelyPrecedes(current).not) { ^false };
             };
+            
             previous = current;
         };
         ^true;
@@ -200,14 +206,17 @@ FoscSelection : FoscSequence {
             if (prototype.any { |type| current.isKindOf(type) }.not) { ^false };
             if (current.parent != firstParent) { sameParent = false };
             if (previous.prImmediatelyPrecedes(current).not) { strictlyContiguous = false };
+            
             if (
                 current.prGetParentage.isOrphan.not
                 && { sameParent.not || strictlyContiguous.not }
             ) {
                 ^false;
             };
+            
             previous = current;
         };
+        
         ^true;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -236,6 +245,7 @@ FoscSelection : FoscSequence {
         var sameLogicalVoice=true, first, parentage, firstLogicalVoice;
         
         prototype = prototype ?? [FoscComponent];
+        
         if (prototype.isSequenceableCollection.not) { prototype = [prototype] };   
         if (this.size == 0) { ^true };
 
@@ -255,13 +265,16 @@ FoscSelection : FoscSequence {
 
         this[1..].do { |current|
             parentage = current.prGetParentage(graceNotes: true);
+            
             if (parentage.logicalVoice != firstLogicalVoice) {
                 sameLogicalVoice = false;
             };
+            
             if (parentage.isOrphan.not && sameLogicalVoice.not) {
                 ^false;
             };
         };
+        
         ^true;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -297,7 +310,9 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     collect { |function|
         var newItems;
+        
         newItems = this.items.collect(function);
+        
         ^this.species.new(newItems);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -333,13 +348,16 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     components { |prototype, exclude, graceNotes=false, reverse=false|
         var components;
+        
         components = FoscIteration(this).components(
             prototype: prototype,
             exclude: exclude,
             graceNotes: graceNotes,
             reverse: reverse
         );
+        
         components = all(components);
+        
         ^FoscSelection(components);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -355,7 +373,9 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     copySeries { |size, start, step|
         var newItems;
+        
         newItems = super.copySeries(size, start, step);
+        
         ^FoscSelection(newItems);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -421,8 +441,10 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     flat {
         var prototype, result, recurse;
+        
         result = [];
         prototype = [FoscSelection, SequenceableCollection];
+        
         recurse = { |val|
             val.do { |each|
                 if (prototype.any { |type| each.isKindOf(type) }) {
@@ -432,7 +454,9 @@ FoscSelection : FoscSequence {
                 };
             };
         };
+        
         recurse.(this);
+        
         ^this.species.new(result);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -479,8 +503,10 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     groupByContiguity {
         var result, selection, timespanA, timespanB;
+        
         result = [];
         selection = [this[0]];
+        
         this[1..].do { |item|
             timespanA = selection.last.prGetTimespan;
             timespanB = item.prGetTimespan;
@@ -491,49 +517,11 @@ FoscSelection : FoscSequence {
                 selection = [item];
             };
         };
+        
         if (selection.notEmpty) { result = result.add(this.species.new(selection)) };
+        
         ^this.species.new(result);
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • groupByMeasure
-
-    • TODO: DEPRECATE
-
-    Group items in selection by measure.
-
-    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69,71,72], [1/8]));
-    set(a).autoBeaming = false;
-    a[0].attach(FoscTimeSignature(#[2,8]));
-    a[4].attach(FoscTimeSignature(#[3,8]));
-    a[7].attach(FoscTimeSignature(#[1,8]));
-    //a.show;
-    m = a.selectLeaves.groupByMeasure;
-    m.items.do { |each| each.items.collect { |item| item.str }.postln };
-    -------------------------------------------------------------------------------------------------------- */
-    // groupByMeasure {
-    //     var getFirstComponent, getMeasureNumber, component, selections, firstComponent, pairs, value, groups;
-
-    //     getFirstComponent = { |object|
-    //         if (object.isKindOf(FoscComponent)) {
-    //             object;
-    //         } {
-    //             component = object[0];
-    //             assert(component.isKindOf(FoscComponent));
-    //             component;
-    //         };
-    //     };
-
-    //     getMeasureNumber = { |object|
-    //         firstComponent = getFirstComponent.(object);
-    //         assert(firstComponent.measureNumber.notNil);
-    //         firstComponent.measureNumber;
-    //     };
-
-    //     selections = [];
-    //     firstComponent = getFirstComponent.(this);
-    //     firstComponent.prUpdateMeasureNumbers;
-    //     ^this.separate { |a, b| a.measureNumber != b.measureNumber };
-    // }
     /* --------------------------------------------------------------------------------------------------------
     • groupByPitch
 
@@ -600,9 +588,11 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     illustrate {
         var items, staff, foundDifferentPitch, score, lilypondFile;
+        
         items = this.deepCopy.flat;
         staff = FoscStaff(items);
         foundDifferentPitch = false;
+        
         FoscIteration(staff).pitches.do { |pitch|
             block { |break|
                 if (pitch != FoscPitch(60)) {
@@ -611,8 +601,11 @@ FoscSelection : FoscSequence {
                 };
             };
         };
+        
         if (foundDifferentPitch.not) { staff.lilypondType_('RhythmicStaff') };
+        
         score = FoscScore([staff]);
+        
         // lilypondFile = FoscLilypondFile(score);
         // lilypondFile.headerBlock.tagline = false;
         // ^lilypondFile;
@@ -716,6 +709,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     leaves { |prototype, exclude, graceNotes=false, pitched, reverse=false|
         prototype = prototype ? FoscLeaf;
+        
         case 
         { pitched == true } {
             prototype = [FoscChord, FoscNote];
@@ -723,6 +717,7 @@ FoscSelection : FoscSequence {
         { pitched == false } {
             prototype = [FoscMultimeasureRest, FoscRest, FoscSkip];
         };
+        
         ^this.components(
             prototype: prototype,
             exclude: exclude,
@@ -742,6 +737,7 @@ FoscSelection : FoscSequence {
     tie(m[0..1]);
     tie(m[4..]);
     a.show;
+
 
     • select all logicalTies
 
@@ -775,6 +771,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     logicalTies { |exclude, graceNotes=false, nontrivial, pitched, reverse=false|
         var components;
+        
         components = FoscIteration(this).logicalTies(
             exclude: exclude,
             graceNotes: graceNotes,
@@ -782,7 +779,9 @@ FoscSelection : FoscSequence {
             pitched: pitched,
             reverse: reverse
         );
+        
         components = all(components);
+        
         ^FoscSelection(components);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -920,9 +919,11 @@ FoscSelection : FoscSequence {
                 if (componentsCopy.isEmpty) { break.value };
                 component = componentsCopy.removeAt(0);
                 componentDuration = component.prGetDuration;
+                
                 if (inSeconds) {
                     componentDuration = component.prGetDuration(inSeconds: true);
                 };
+                
                 candidateDuration = cumulativeDuration + componentDuration;
 
                 case
@@ -950,6 +951,7 @@ FoscSelection : FoscSequence {
                         currentDurationIndex = currentDurationIndex + 1;
                         targetDuration = durations[currentDurationIndex];
                         if (targetDuration.isNil) { break.value };
+                        
                         if (targetDuration < cumulativeDuration) {
                             throw(
                                 "%:%: target duration % is less than cumulative duration %."
@@ -974,6 +976,7 @@ FoscSelection : FoscSequence {
         if (part.notEmpty && overhang) { result = result.add(part) };
         if (componentsCopy.notEmpty && overhang) { result = result.add(componentsCopy) };
         result = result.collect { |each| FoscSelection(each) };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -989,10 +992,12 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     partitionByRatio { |ratio|
         var sizes, parts, selections;
+        
         //• TODO: ratio = FoscRatio(ratio);
         sizes = this.size.partitionByRatio(ratio);
         parts = this.partitionBySizes(sizes);
         selections = parts.items.collect { |each| this.species.new(each) };
+        
         ^this.species.new(selections);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1012,12 +1017,15 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     partitionBySizes { |sizes, isCyclic=false|
         var selections;
+        
         if (isCyclic) {
             sizes = sizes.repeatToAbsSum(this.size);
         } {
             sizes = sizes.extendToAbsSum(this.size);
         };
+        
         selections = items.clumps(sizes).collect { |each| FoscSelection(each) };
+        
         ^this.species.new(selections);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1098,9 +1106,11 @@ FoscSelection : FoscSequence {
     // }
     runs { |exclude|
         var result;
+        
         result = this.leaves(exclude: exclude);
         result = result.groupBy { |a, b| a.isPitched != b.isPitched };
         result = result.items.select { |each| each[0].isPitched };
+        
         ^this.species.new(result);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1116,9 +1126,11 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     separate { |function|
         var newItems;
+        
         function = function ? false;
         newItems = items.separate(function);
         newItems = newItems.collect { |each| FoscSelection(each) };
+        
         ^this.species.new(newItems);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1168,15 +1180,19 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     timespan { |inSeconds=false|
         var timespan, startOffset, stopOffset;
+        
         if (inSeconds) { ^this.notYetImplemented(thisMethod) };
+        
         timespan = this[0].prGetTimespan; //• TODO: BROKEN if this[0] is a selection
         startOffset = timespan.startOffset;
         stopOffset = timespan.stopOffset;
+        
         this[1..].do { |each|
             timespan = each.prGetTimespan;
             if (timespan.startOffset < startOffset) { startOffset = timespan.startOffset };
             if (stopOffset < timespan.stopOffset) { stopOffset = timespan.stopOffset };
         };
+        
         ^FoscTimespan(startOffset, stopOffset);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1254,18 +1270,23 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     prAttachTieToLeaves { |repeatTies=false|
         var leaves;
+        
         leaves = [];
+        
         this.do { |leaf|
             assert(leaf.isKindOf(FoscLeaf));
             leaf.prGetLogicalTie.leaves.do { |each|
                 if (leaves.includes(each).not) { leaves = leaves.add(leaf) };
             };
         };
+        
         leaves = FoscSelection(leaves);
+        
         leaves.do { |leaf|
             leaf.detach(FoscTie);
             leaf.detach(FoscRepeatTie);
         };
+        
         leaves.tie(repeat: repeatTies);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1276,16 +1297,20 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     prCopy {
         var newComponents, newComponent;
+        
         assert(this.areContiguousLogicalVoice);
         newComponents = [];
+        
         this.do { |component|
             if (component.isKindOf(FoscContainer)) {
                 newComponent = component.prCopyWithChildren;
             } {
                 newComponent = component.copy;
             };
+            
             newComponents = newComponents.add(newComponent);
         };
+        
         ^this.species.new(newComponents);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1316,6 +1341,193 @@ FoscSelection : FoscSequence {
             leaf.detach(FoscStartBeam);
             leaf.detach(FoscStopBeam);
         };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prDetachTies
+
+    Detaches ties from leaves.
+    -------------------------------------------------------------------------------------------------------- */
+    prDetachTies {
+        this.selectLeaves.do { |leaf| leaf.detach(FoscTie) };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prFuseLeaves
+
+    • Example 1
+
+    a = FoscStaff(FoscLeafMaker().((60..67), [1/8]));
+    a.selectLeaves.prFuseLeaves;
+    a.show;
+
+
+    • Example 2
+
+    a = FoscStaff(FoscRhythmMaker().([1/4], #[[1,[4,[1,1,1,1,1]]],[1,1,1]]));
+    mutate(a).rewritePitches((60..72));
+    m = a.selectLeaves.partitionBySizes(#[1,6,2]);
+    m.do { |part| part.prFuseLeaves };
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    prFuseLeaves { |silence=false|
+        var leaves, groups, originallyTied, totalPreprolated, parent, index, result, lastLeaf;
+
+        leaves = this.leaves;
+
+        if (leaves.areContiguousLogicalVoice.not || { leaves.areLeaves.not }) {
+            ^FoscMethodError(thisMethod, "all components must be contiguous leaves.").throw;
+        };
+
+        leaves = this;
+        if (leaves.size <= 1) { ^leaves };
+        leaves.prDetachBeams;
+
+        groups = leaves.groupBy { |a, b| a.parent != b.parent };
+        groups.doAdjacentPairs { |a, b| b.first.writtenPitch_(a.first.writtenPitch) };
+        
+        groups.do { |leaves, i|
+            originallyTied = leaves.last.prHasIndicator(FoscTie);
+            totalPreprolated = leaves.prGetPreprolatedDuration;
+
+            leaves[1..].do { |leaf|
+                parent = leaf.parent;
+                if (parent.notNil) {
+                    index = parent.indexOf(leaf);
+                    parent.removeAt(index);
+                };
+            };
+
+            result = leaves[0].prSetDuration(totalPreprolated);
+            lastLeaf = result.last;
+
+            if ((i == groups.lastIndex) && { originallyTied.not }) {
+                lastLeaf.detach(FoscTie);
+            } {
+                lastLeaf.attach(FoscTie());
+            };
+        };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prFuseLeavesAndReplaceWithRests
+
+    • TODO: selective detachment of indicators ?
+
+    • Example 1
+
+    a = FoscStaff(FoscRhythmMaker().([1/4], #[[1,[4,[1,1,1,1,1]]],[1,1,1]]));
+    m = a.selectLeaves[1..6].prFuseLeavesAndReplaceWithRests;
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    prFuseLeavesAndReplaceWithRests {
+        var leaves, groups, totalPreprolated, parent, index, leaf;
+
+        leaves = this.leaves;
+
+        if (leaves.areContiguousLogicalVoice.not || { leaves.areLeaves.not }) {
+            ^FoscMethodError(thisMethod, "all components must be contiguous leaves.").throw;
+        };
+
+        leaves.prDetachBeams;
+        leaves.prDetachTies;
+        groups = leaves.groupBy { |a, b| a.parent != b.parent };
+        
+        groups.do { |leaves, i|
+            totalPreprolated = leaves.prGetPreprolatedDuration;
+
+            leaves.do { |leaf, i|
+                parent = leaf.parent;
+
+                if (parent.notNil) {
+                    index = parent.indexOf(leaf);
+                    if (i > 0) {
+                        parent.removeAt(index);
+                    } {
+                        leaf = FoscRest(leaf).prSetDuration(totalPreprolated);
+                        parent.prSetItem(index, leaf);
+                    };
+                };
+            };
+        };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prGetContentsDuration
+    
+    Gets summed duration of all leaves in selection.
+
+    Returns duration.
+    
+    
+    • Example 1
+
+    m = FoscSelection({ FoscNote(60, 1/4) } ! 4);
+    m.prGetContentsDuration.str;
+
+
+    • Example 2
+
+    a = FoscStaff(FoscLeafMaker().(60 ! 4, [1/4]));
+    a[0].attach(FoscMetronomeMark([1,4], 120));
+    b = FoscScore([a]);
+    b[0..].prGetContentsDuration(inSeconds: true).asFloat;
+    -------------------------------------------------------------------------------------------------------- */
+    prGetContentsDuration { |inSeconds=false|
+        var durations, result;
+        
+        durations = [];
+        
+        this.leaves.do { |leaf|
+            durations = durations.add(leaf.prGetDuration(inSeconds));
+        };
+        
+        result = durations.sum;
+        
+        ^result;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prGetParentAndStartStopIndices
+    -------------------------------------------------------------------------------------------------------- */
+    prGetParentAndStartStopIndices {
+        var first, last, parent, firstIndex, lastIndex;
+        
+        if (this.areContiguousSameParent.not) {
+            throw("%:%: components are not contiguous.".format(this.species, thisMethod.name));
+        };
+        
+        if (this.size > 0) {
+            # first, last = [items[0], items.last];
+            parent = first.parent;
+            
+            if (parent.notNil) {
+                firstIndex = parent.indexOf(first);
+                lastIndex = parent.indexOf(last);
+                ^[parent, firstIndex, lastIndex];
+            };
+        };
+        
+        ^[nil, nil, nil];
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prGetPreprolatedDuration
+    -------------------------------------------------------------------------------------------------------- */
+    prGetPreprolatedDuration {
+        ^items.collect { |component| component.prGetPreprolatedDuration }.sum;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prSetParents
+    -------------------------------------------------------------------------------------------------------- */
+    prSetParents { |newParent|
+        items.do { |component| component.prSetParent(newParent) };
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // • TODO: FOR DEPRECATION
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • byClass
+    • TODO: DEPRECATE ! - use selection:components
+    -------------------------------------------------------------------------------------------------------- */
+    byClass { |prototype, condition=true|
+        var iterator;
+        iterator = FoscIterationAgent(this).byClass(prototype, condition);
+        ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
     • prFuse
@@ -1356,215 +1568,8 @@ FoscSelection : FoscSequence {
         }; 
     }
     /* --------------------------------------------------------------------------------------------------------
-    • prFuseLeaves
-
-    • Example 1
-
-    a = FoscStaff(FoscLeafMaker().((60..67), [1/8]));
-    //a.show;
-    m = a.selectLeaves;
-    m.prFuseLeaves;
-    a.show;
-
-
-    • Example 2
-
-    a = FoscRhythmMaker().([1/4], #[[1,[4,[1,1,1,1,1]]],[1,1,1]]);
-    b = FoscContainer(a);
-    mutate(b).rewritePitches((60..72));
-    m = b.selectLeaves;
-    m[1..6].prFuseLeaves;
-    m[7..8].prFuseLeaves;
-    // • b.prEjectContents.items // return same tuplets from original FoscRhythmMaker
-    b.show;
-
-
-    • Example 3 - extract trivial tuplets
-
-    a = FoscRhythmMaker().([1/4], #[[2,3],[4,1,2]]);
-    m = FoscContainer(a);
-
-    m.selectComponents([FoscLeaf, FoscTuplet]).do { |tuplet|
-
-        if (tuplet.isKindOf(FoscTuplet)) {
-            "tuplet: ".post; tuplet.postln;
-
-            d = tuplet.prGetDuration;
-            
-            l = tuplet.leafAt(0);
-            l.detach(FoscStartBeam);
-            l.detach(FoscStopBeam);
-            l.prSetDuration(d);
-            
-            p = tuplet.parent;
-            
-            if (p.notNil) {
-                i = p.indexOf(tuplet);
-                p.prSetItem(i, l);
-            };
-            
-            tuplet.prSetParent(nil);
-            tuplet.prEjectContents;
-
-            Post.nl;
-            "l.parent: ".post; l.parent.postln;
-            "tuplet.parent: ".post; tuplet.parent.postln;
-            "tuplet.components: ".post; tuplet.components.postln;
-        };
-    };
-
-    m.show;
-    -------------------------------------------------------------------------------------------------------- */
-    prFuseLeaves {
-        var leaves, groups, isLastGroup, originallyTied, totalPreprolated, parent, index, result, lastLeaf;
-
-        leaves = this.leaves;
-
-        if (leaves.areContiguousLogicalVoice.not || { leaves.areLeaves.not }) {
-            ^FoscMethodError(thisMethod, "all components must be contiguous leaves.").throw;
-        };
-
-        //leaves = this;
-        if (leaves.size <= 1) { ^leaves };
-        leaves.prDetachBeams;
-
-        // • TODO: dummy FoscContainer ?
-
-        groups = leaves.groupBy { |a, b| a.parent != b.parent };
-        groups.doAdjacentPairs { |a, b| b.first.writtenPitch_(a.first.writtenPitch) };
-        
-        groups.do { |leaves, i|
-            isLastGroup = (i == groups.lastIndex);
-            originallyTied = leaves.last.prHasIndicator(FoscTie);
-            totalPreprolated = leaves.prGetPreprolatedDuration;
-
-            leaves[1..].do { |leaf|
-                parent = leaf.parent;
-                if (parent.notNil) {
-                    index = parent.indexOf(leaf);
-                    parent.removeAt(index);
-                };
-            };
-
-            result = leaves[0].prSetDuration(totalPreprolated);
-            lastLeaf = result.last;
-
-            if (isLastGroup && { originallyTied.not }) {
-                lastLeaf.detach(FoscTie);
-            } {
-                lastLeaf.attach(FoscTie());
-            };
-        };       
-        // • TODO: ^FoscContainer.prEjectContents.items // return same tuplets from original FoscRhythmMaker
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prFuseLeaves - abjad method
-    • TODO: DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    // prFuseLeaves {
-    //     var leaves, originallyTied, totalPreprolated, parent, index, result, lastLeaf;
-    //     //assert self._all_are_contiguous_components_in_same_logical_voice(self)
-    //     this.do { |component|
-    //         assert(
-    //             component.isKindOf(FoscLeaf),
-    //             "%:%: all components must be leaves: %.".format(this.species, thisMethod.name, component);
-    //         );
-    //     };
-    //     leaves = this;
-    //     if (leaves.size <= 1) { ^leaves };
-    //     originallyTied = this.last.prHasIndicator(FoscTie);
-    //     totalPreprolated = leaves.prGetPreprolatedDuration;
-    //     leaves[1..].do { |leaf|
-    //         parent = leaf.parent;
-    //         if (parent.notNil) {
-    //             index = parent.indexOf(leaf);
-    //             parent.removeAt(index);
-    //         };
-    //     };
-    //     result = leaves[0].prSetDuration(totalPreprolated);
-    //     if (originallyTied.not) {
-    //         lastLeaf = result.selectLeaves.last;
-    //         lastLeaf.detach(FoscTie);
-    //     };
-    //     ^result;
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • prGetContentsDuration
-    
-    Gets summerd duration of all leaves in selection.
-
-    Returns duration.
-    
-    
-    • Example 1
-
-    m = FoscSelection({ FoscNote(60, 1/4) } ! 4);
-    m.prGetContentsDuration.str;
-
-
-    • Example 2
-
-    a = FoscStaff(FoscLeafMaker().(60 ! 4, [1/4]));
-    a[0].attach(FoscMetronomeMark([1,4], 120));
-    b = FoscScore([a]);
-    b[0..].prGetContentsDuration(inSeconds: true).asFloat;
-    -------------------------------------------------------------------------------------------------------- */
-    prGetContentsDuration { |inSeconds=false|
-        var durations, result;
-        durations = [];
-        this.leaves.do { |leaf|
-            durations = durations.add(leaf.prGetDuration(inSeconds));
-        };
-        result = durations.sum;
-        ^result;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prGetParentAndStartStopIndices
-    -------------------------------------------------------------------------------------------------------- */
-    prGetParentAndStartStopIndices {
-        var first, last, parent, firstIndex, lastIndex;
-        if (this.areContiguousSameParent.not) {
-            throw("%:%: components are not contiguous.".format(this.species, thisMethod.name));
-        };
-        if (this.size > 0) {
-            # first, last = [items[0], items.last];
-            parent = first.parent;
-            if (parent.notNil) {
-                firstIndex = parent.indexOf(first);
-                lastIndex = parent.indexOf(last);
-                ^[parent, firstIndex, lastIndex];
-            };
-        };
-        ^[nil, nil, nil];
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prGetPreprolatedDuration
-    -------------------------------------------------------------------------------------------------------- */
-    prGetPreprolatedDuration {
-        ^items.collect { |component| component.prGetPreprolatedDuration }.sum;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prSetParents
-
-    Not composer-safe.
-    -------------------------------------------------------------------------------------------------------- */
-    prSetParents { |newParent|
-        items.do { |component| component.prSetParent(newParent) };
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // • TODO: FOR DEPRECATION
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* --------------------------------------------------------------------------------------------------------
-    • byClass
-    • TODO: DEPRECATE ! - use selection:components
-    -------------------------------------------------------------------------------------------------------- */
-    byClass { |prototype, condition=true|
-        var iterator;
-        iterator = FoscIterationAgent(this).byClass(prototype, condition);
-        ^FoscSelection(iterator.all);
-    }
-    /* --------------------------------------------------------------------------------------------------------
     • byLeaf
+
     • TODO: DEPRECATE ! - use selection:leaves
     -------------------------------------------------------------------------------------------------------- */
     byLeaf {
@@ -1574,6 +1579,7 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • byLogicalTie
+
     • TODO: DEPRECATE ! - use selection:logicalTies
     -------------------------------------------------------------------------------------------------------- */
     byLogicalTie { |condition=true, parentageMask|
@@ -1583,6 +1589,7 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • byPitchedLeaf
+
     • TODO: DEPRECATE ! - use selection:leaves(pitched: true)
     -------------------------------------------------------------------------------------------------------- */
     byPitchedLeaf { |condition=true|
@@ -1592,6 +1599,7 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • byPitchedLogicalTie
+
     • TODO: DEPRECATE ! - use selection:logicalTies(pitched: true)
     -------------------------------------------------------------------------------------------------------- */
     byPitchedLogicalTie { |condition=true|
@@ -1601,6 +1609,7 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • byPitchedRun
+
     • TODO: DEPRECATE ! - use selection:runs(pitched: true)
     -------------------------------------------------------------------------------------------------------- */
     byPitchedRun { |condition=true|
@@ -1610,6 +1619,7 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • byRun
+
     • TODO: DEPRECATE ! - use selection:runs
     -------------------------------------------------------------------------------------------------------- */
     byRun { |condition=true|
@@ -1619,6 +1629,7 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • byTimeline
+
     • TODO: DEPRECATE ! - use selection:timeline
     -------------------------------------------------------------------------------------------------------- */
     byTimeline { |prototype, condition=true|
@@ -1628,6 +1639,7 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • byTimelineAndLogicalTie
+
     • TODO: DEPRECATE !
     -------------------------------------------------------------------------------------------------------- */
     byTimelineAndLogicalTie { |prototype, condition=true|
@@ -1637,6 +1649,7 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • byTimelineAndPitchedLogicalTie
+
     • TODO: DEPRECATE !
     -------------------------------------------------------------------------------------------------------- */
     byTimelineAndPitchedLogicalTie { |prototype, condition=true|
@@ -1645,14 +1658,8 @@ FoscSelection : FoscSequence {
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
-    • clumps
-    !!! DEPRECATE ! - use selection:partitionBySizes
-    -------------------------------------------------------------------------------------------------------- */
-    clumps { |sizes, isCyclic=false|
-        ^this.partitionBySizes(sizes, isCyclic);
-    }
-    /* --------------------------------------------------------------------------------------------------------
     • duration
+
     • TODO: DEPRECATE ?
     -------------------------------------------------------------------------------------------------------- */
     duration {
@@ -1660,6 +1667,7 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • flattenSelections
+
     • TODO: DEPRECATE ! - use selection:flat
     -------------------------------------------------------------------------------------------------------- */
     flattenSelections {
@@ -1680,14 +1688,16 @@ FoscSelection : FoscSequence {
     }
     /* --------------------------------------------------------------------------------------------------------
     • music
-    //• TODO: DEPRECATE !
+
+    • TODO: DEPRECATE !
     -------------------------------------------------------------------------------------------------------- */
     music {
         ^items;
     }
     /* --------------------------------------------------------------------------------------------------------
     • prIterateTopDown
-    //• TODO: DEPRECATE !
+    
+    • TODO: DEPRECATE !
     -------------------------------------------------------------------------------------------------------- */
     prIterateTopDown {
         ^this.flat.items.prIterateTopDown;

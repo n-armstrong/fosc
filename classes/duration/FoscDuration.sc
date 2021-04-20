@@ -604,7 +604,7 @@ FoscDuration : FoscFraction {
     };
     -------------------------------------------------------------------------------------------------------- */
     flagCount {
-        ^max(floor(log2(numerator / denominator)).neg.asInt - 2, 0);
+        ^max(floor(log2(numerator / denominator)).neg.asInteger - 2, 0);
     }
     /* --------------------------------------------------------------------------------------------------------
     • hasPowerOfTwoDenominator

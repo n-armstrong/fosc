@@ -185,6 +185,16 @@
         };
     }
     /* --------------------------------------------------------------------------------------------------------
+    • incise
+
+    x = #[4,3,4,2];
+    x.incise(0)
+    -------------------------------------------------------------------------------------------------------- */
+    incise { |index=0, n=1|
+        var result;
+        result = [];
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • intervals
     -------------------------------------------------------------------------------------------------------- */
     intervals {
@@ -365,67 +375,6 @@
         ^parts;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • sortN
-
-    Sort an n-dimensional collection in ascending or descending order.
-
-
-    • Example 1
-
-    a = { [9.rand, 9.rand, 9.rand] } ! 10;
-    a.sortN.printAll;
-
-
-    • Example 2
-
-    a = { "abracadabra".scramble } ! 10;
-    a.sortN.printAll;
-
-
-    • Example 3
-
-    a = { [9.rand, 9.rand, 9.rand] } ! 10;
-    a.sortN(reverse: true).printAll;
-
-
-    • Example 4
-
-    Sort from 'startIndex'. If 'startIndex' is 1, then 0th element is ignored in search function.
-
-    a = { [9.rand, 9.rand, 9.rand] } ! 10;
-    a.sortN(startIndex: 1).printAll;
-    -------------------------------------------------------------------------------------------------------- */
-    sortN { |startIndex=0, reverse=false|
-        var func, i, result, minSize, operator;
-        
-        if (this.rank == 1) { ^this.sort };
-
-        operator = if (reverse) { '>' } { '<' };
-        
-        func = { |a, b|
-            i = startIndex;
-            result = true;
-            minSize = min(a.size, b.size);
-            
-            while { i <= (minSize - 1) } {
-                if (a[i].perform(operator, b[i])) {
-                    i = minSize;
-                } {
-                    if (b[i].perform(operator, a[i])) {
-                        i = minSize;
-                        result = false
-                    } {
-                        i = i + 1;
-                    };
-                };
-            };
-
-            result;
-        };
-
-        ^this.sort(func);
-    }
-    /* --------------------------------------------------------------------------------------------------------
 	• reduceFraction
 
 
@@ -543,6 +492,67 @@
 	  	});
 	  	^this.species.newFrom(items);
 	}
+    /* --------------------------------------------------------------------------------------------------------
+    • sortN
+
+    Sort an n-dimensional collection in ascending or descending order.
+
+
+    • Example 1
+
+    a = { [9.rand, 9.rand, 9.rand] } ! 10;
+    a.sortN.printAll;
+
+
+    • Example 2
+
+    a = { "abracadabra".scramble } ! 10;
+    a.sortN.printAll;
+
+
+    • Example 3
+
+    a = { [9.rand, 9.rand, 9.rand] } ! 10;
+    a.sortN(reverse: true).printAll;
+
+
+    • Example 4
+
+    Sort from 'startIndex'. If 'startIndex' is 1, then 0th element is ignored in search function.
+
+    a = { [9.rand, 9.rand, 9.rand] } ! 10;
+    a.sortN(startIndex: 1).printAll;
+    -------------------------------------------------------------------------------------------------------- */
+    sortN { |startIndex=0, reverse=false|
+        var func, i, result, minSize, operator;
+        
+        if (this.rank == 1) { ^this.sort };
+
+        operator = if (reverse) { '>' } { '<' };
+        
+        func = { |a, b|
+            i = startIndex;
+            result = true;
+            minSize = min(a.size, b.size);
+            
+            while { i <= (minSize - 1) } {
+                if (a[i].perform(operator, b[i])) {
+                    i = minSize;
+                } {
+                    if (b[i].perform(operator, a[i])) {
+                        i = minSize;
+                        result = false
+                    } {
+                        i = i + 1;
+                    };
+                };
+            };
+
+            result;
+        };
+
+        ^this.sort(func);
+    }
 	/* --------------------------------------------------------------------------------------------------------
 	• split
 
@@ -859,9 +869,9 @@
     /* --------------------------------------------------------------------------------------------------------
     • prSetItem
 
-    Replicates the python '__setitem__' special method. Returns a new list (unlike python)s.
+    Replicates the Python '__setitem__' special method. Returns a new list (Python version operates in place).
 
-    For porting code from python only. Not for public use.
+    For easy porting of code from Python only. Not for public use.
 
 
     (0..5).prSetItem((0..1), #[a, b, c]);       // YES

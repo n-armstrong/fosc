@@ -118,6 +118,41 @@
 		^this.delimitBy(string);
 	}
 	/* --------------------------------------------------------------------------------------------------------
+	• removeLeadingWhiteSpace
+
+	Removes any whitespace between a newline and the first alphanumeric character, including tabs.
+
+	a = "Gets forbidden note duration.\n\n    Returns duration or nil.";
+	b = a.removeLeadingWhiteSpace;
+	-------------------------------------------------------------------------------------------------------- */
+	removeLeadingWhiteSpace {
+		var result, regexBody, res;
+		
+		result = [];
+		regexBody = "\\s{2,}(.*)";
+
+		this.splitLines.do { |str|
+			res = str.findRegexp(regexBody);
+			if (res.notEmpty) { str = res[1][1] };
+			result = result.add(str);
+		};
+
+		result = result.join("\n");
+		
+		^result;
+	}
+	/* --------------------------------------------------------------------------------------------------------
+	• removeTabs
+
+	Strips amy whitespace that appear after newline and before alphanumeric characters.
+
+	a = "Gets forbidden note duration.\n\n\tReturns duration or nil.";
+	a.removeTabs;
+	-------------------------------------------------------------------------------------------------------- */
+	removeTabs {
+		^this.reject { |char| char == Char.tab };
+	}
+	/* --------------------------------------------------------------------------------------------------------
 	• removeWhiteSpace
 
 	!!! rename: stripWhiteSpace

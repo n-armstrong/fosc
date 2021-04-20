@@ -763,7 +763,7 @@ FoscObject {
     /* --------------------------------------------------------------------------------------------------------
     • writePNG
     -------------------------------------------------------------------------------------------------------- */
-    writePNG { |path, resolution=200|
+    writePNG { |path, resolution=100|
         ^FoscPersistenceManager(this).asPNG(path, resolution: resolution);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1183,8 +1183,16 @@ FoscObject {
     • play
     -------------------------------------------------------------------------------------------------------- */
     play {
+        var player;
+        
         if (this.respondsTo('player')) {
-            this.instVarPut('player', FoscPlayer(this).play);
+            player = this.player;
+            
+            if (player.isNil) {
+                this.instVarPut('player', FoscPlayer(this).play);
+            } {
+                player.play;
+            };
         };
     }
     /* --------------------------------------------------------------------------------------------------------

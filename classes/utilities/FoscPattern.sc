@@ -80,8 +80,12 @@ FoscPattern {
         );
     }
     *new { |indices, period, payload|
-        if (indices.notNil) { assert(indices.every { |each| each.isInteger }) };
-        if (period.notNil) { assert(period.isInteger && { period > 0 }) };
+        if (indices.notNil) {
+            assert(indices.every { |each| each.isInteger }, thisMethod, 'indices', indices);
+        };
+        if (period.notNil) {
+            assert(period.isInteger && { period > 0 }, thisMethod, 'period', period);
+        };
         // if (inverted.notNil) { assert(inverted.isKindOf(Boolean)) };
         // if (patterns.notNil) {
         //     assert(patterns.isSequenceableCollection);
@@ -132,7 +136,7 @@ FoscPattern {
     -------------------------------------------------------------------------------------------------------- */
     *first { |n=1|
         var indices;
-        assert(n.isInteger && { n >= 0 });
+        assert(n.isInteger && { n >= 0 }, thisMethod, 'n', n);
         if (0 < n) { indices = (0..(n - 1)) };
         ^FoscPattern(indices: indices);
     }
@@ -146,7 +150,7 @@ FoscPattern {
     -------------------------------------------------------------------------------------------------------- */
     *indices { |indices, period|
         indices = indices ? [];
-        assert(indices.every { |each| each.isInteger });
+        assert(indices.every { |each| each.isInteger }, thisMethod, 'indices', indices);
         ^FoscPattern(indices: indices, period: period);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -159,10 +163,23 @@ FoscPattern {
     -------------------------------------------------------------------------------------------------------- */
     *last { |n=1|
         var indices;
-        assert(n.isInteger && { n >= 0 });
+        assert(n.isInteger && { n >= 0 }, thisMethod, 'n', n);
         if (0 < n) { indices = (-1..n.neg).reverse };
         ^FoscPattern(indices: indices);
     }
+    /* --------------------------------------------------------------------------------------------------------
+    • *ratio
+
+    p = FoscPattern.ratio(#[1,3,2]);
+    p.booleanVector;
+    p.invert.booleanVector;
+    -------------------------------------------------------------------------------------------------------- */
+    // *ratio { |ratio, repeat=false|
+    //     var indices;
+    //     assert(ratio.isSequenceableCollection, thisMethod, 'ratio', ratio);
+    //     indices = ratio.deltas.drop(-1);
+    //     ^FoscPattern(indices: indices);
+    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -477,7 +494,7 @@ FoscPattern {
 
     a = "abcdefghijklmnopqrstuvwxyz";
     p = FoscPattern.first(1) | FoscPattern.last(2);
-    p.getMatchingItems(a);  
+    p.getMatchingItems(a);
 
 
     a = "abcdefghijklmnopqrstuvwxyz";

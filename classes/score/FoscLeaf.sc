@@ -515,15 +515,21 @@ FoscLeaf : FoscComponent {
     // abjad 3.0
     prLeafAt { |n|
         var sibling, components;
+        
         // assert n in (-1, 0, 1), repr(n)
+        
         if (n == 0) { ^this };
+        
         sibling = this.prSibling(n);
+        
         if (sibling.isNil) { ^nil };
+        
         if (n == 1) {
             components = sibling.prGetDescendantsStartingWith;
         } {
             components = sibling.prGetDescendantsStoppingWith;
         };
+        
         components.do { |component|
             if (component.isKindOf(FoscLeaf)) {
                 if (FoscSelection([this, component]).areLogicalVoice) {

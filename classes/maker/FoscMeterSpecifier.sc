@@ -65,7 +65,7 @@ FoscMeterSpecifier : FoscObject {
     var <meters, <attachTimeSignatures, <boundaryDepth, <maximumDotCount, <rewriteTuplets, <multimeasureRests;
     //var <publishStorageFormat=true;
     *new { |meters, attachTimeSignatures=false, boundaryDepth, maximumDotCount, rewriteTuplets=false,
-        multimeasureRests=true|
+        multimeasureRests=false|
         meters = meters.collect { |each| FoscMeter(each) };
         assert(attachTimeSignatures.isKindOf(Boolean));  
         assert(rewriteTuplets.isKindOf(Boolean));  
@@ -128,10 +128,13 @@ FoscMeterSpecifier : FoscObject {
     value { |selections|
         //if (selections.isKindOf(FoscSelection)) { selections = selections.items };
         if (selections.isKindOf(FoscSelection)) { selections = [selections] };
+
         selections = this.prRewriteMeter(selections);
+
         if (multimeasureRests) {
             selections = FoscMeterSpecifier.prRewriteRestFilled(selections, multimeasureRests: true);
         };
+
         //selections = FoscSelection(selections);
         ^selections;
     }
@@ -155,12 +158,13 @@ FoscMeterSpecifier : FoscObject {
         musicDuration = selections.collect { |each| each.duration }.sum;
         
         if (meterDuration != musicDuration) {
-            throw("%:%: duration of meters must be equal to duration of selections: meters: %, selections: %."
+            ^throw("%:%: duration of meters must be equal to duration of selections: meters: %, selections: %."
                 .format(this.species, thisMethod.name, meterDuration.str, musicDuration.str));
         };
-
+        
         newSelections = [];
         staff = FoscStaff();
+
         selections = FoscMeterSpecifier.prSplitAtMeasureBoundaries(selections, meters);
 
         selections.do { |selection|
@@ -202,9 +206,11 @@ FoscMeterSpecifier : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     *prRewriteRestFilled { |selections, multimeasureRests=false|
         var localSelections, maker, prototype, duration, multiplier, rest, rests;
+        
         localSelections = [];
         maker = FoscLeafMaker();
         prototype = [FoscMultimeasureRest, FoscRest];
+        
         selections.do { |selection|
             if (selection.every { |each| prototype.any { |type| each.isKindOf(type) }}.not) {
                 localSelections = localSelections.add(selection);
@@ -221,6 +227,7 @@ FoscMeterSpecifier : FoscObject {
                 localSelections = localSelections.add(rests);
             };
         };
+
         ^localSelections;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -232,7 +239,6 @@ FoscMeterSpecifier : FoscObject {
     a = FoscLeafMaker().(#[60,62,64,65], [3/8,6/8,2/8,5/8]);
     //a.show;
     b = FoscMeterSpecifier.prSplitAtMeasureBoundaries([a], #[[4,4],[4,4]]);
-    b.items;
     FoscStaff(b).show;
 
 
@@ -242,9 +248,19 @@ FoscMeterSpecifier : FoscObject {
     //a.show;
     b = FoscMeterSpecifier.prSplitAtMeasureBoundaries(a, #[[2,4],[2,4],[2,4],[2,4]]);
     FoscStaff(b).show;
+
+    FoscMutation
+
+    l = Layer(divisions: 1!10, subdivisions: #[[1,1,1,1,1],[1,1,1]], tempo: 72);
+    l.applySegmentation(#[9,11,11,9]);
+    l.applyMasks(#[[-1,2,3]]);
+    l.asFoscComponent;
+    l.format;
+    l.show;
     -------------------------------------------------------------------------------------------------------- */
     *prSplitAtMeasureBoundaries { |selections, meters|
         var durations, container, components, componentDurations, partSizes;
+        
         durations = meters.collect { |each| FoscDuration(each) };
         container = FoscContainer(selections);
         mutate(container[0..]).split(durations: durations, tieSplitNotes: true);
@@ -252,6 +268,7 @@ FoscMeterSpecifier : FoscObject {
         componentDurations = components.items.collect { |each| each.prGetDuration };
         partSizes = componentDurations.split(durations).collect { |each| each.size };
         selections = components.partitionBySizes(partSizes).items;
+        
         ^selections;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

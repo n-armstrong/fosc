@@ -169,6 +169,12 @@ FoscPlayer : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     play {
         var patterns, recurse, pattern, container;
+
+        // NEW
+        if (eventStreamPlayer.notNil) {
+            eventStreamPlayer.play;
+            ^this;
+        };
         
         patterns = [];
 
@@ -196,20 +202,59 @@ FoscPlayer : FoscObject {
                     container.prEjectContents;
                 };
             }
-            //!!! DEPRECATED
-            // { music.isKindOf(FoscEventSequence) } {
-            //     recurse.(music.asFoscSelection);
-            // }
+            { music.isKindOf(FoscScoreSegment) } {
+                recurse.(music.score);
+            }
             {
                 throw("%:new: bad argument for 'music': %.".format(this.species, music));
             };
         };
 
         Post << "Preparing to play..." << nl;
+
         recurse.(components);
-        Post << "Playing!" << nl;
-        { eventStreamPlayer = Ppar(patterns).play }.defer(0.001);
+        eventStreamPlayer = Ppar(patterns);
+        eventStreamPlayer.play;
     }
+    // play {
+    //     var patterns, recurse, pattern, container;
+        
+    //     patterns = [];
+
+    //     recurse = { |music|
+    //         case
+    //         { music.isKindOf(FoscLeaf) } {
+    //             pattern = FoscPlayer.prGetPattern(music);
+    //             patterns = patterns.add(pattern);
+    //         }
+    //         { music.isKindOf(FoscContainer) } {
+    //             if (music.isSimultaneous) {
+    //                 music.do { |each| recurse.(each) };
+    //             } {
+    //                 if (music.isEmpty.not) {
+    //                     pattern = FoscPlayer.prGetPattern(music);
+    //                     patterns = patterns.add(pattern);
+    //                 };
+    //             };
+    //         }
+    //         { music.isKindOf(FoscSelection) } {
+    //             if (music.isEmpty.not) {
+    //                 container = FoscVoice(music);
+    //                 pattern = FoscPlayer.prGetPattern(container);
+    //                 patterns = patterns.add(pattern);
+    //                 container.prEjectContents;
+    //             };
+    //         }
+    //         {
+    //             throw("%:new: bad argument for 'music': %.".format(this.species, music));
+    //         };
+    //     };
+
+    //     Post << "Preparing to play..." << nl;
+    //     recurse.(components);
+    //     Post << "Playing!" << nl;
+    //     { eventStreamPlayer = Ppar(patterns).play }.defer(0.001);
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • resume
     -------------------------------------------------------------------------------------------------------- */
@@ -342,84 +387,4 @@ FoscPlayer : FoscObject {
 
         ^Pbind(\proto, Pseq(events));
     }
-
-
-    ////// OLD
-    // *prGetPattern { |music|
-    //     var manager, protoEvent, playbackCommands, logicalTies, amps, durs, midinotes, commands;
-    //     var graceContainer, graceBundle, graceLogicalTies, graceAmps, localCommands, bundle, dur;
-
-    //     music.prGetDescendantsStartingWith.reverseDo { |component|
-    //         block { |break|
-    //             if (component.isKindOf(FoscContext) && { component.playbackManager.notNil }) {
-    //                 manager = component.playbackManager;
-    //                 break.value;
-    //             };
-    //         };
-    //     };
-
-    //     manager = manager ?? { FoscMIDIPlaybackManager() }; // midi as default
-
-    //     switch(manager.species,
-    //         FoscMIDIPlaybackManager, {
-    //             protoEvent = (
-    //                 type: 'midi',
-    //                 midiout: manager.midiOut,
-    //                 chan: manager.midiChan,
-    //                 midicmd: \noteOn
-    //             );
-    //         },
-    //         FoscSynthPlaybackManager, {
-    //             protoEvent = (
-    //                 instrument: manager.defName,
-    //                 server: manager.server
-    //             );
-    //         };
-    //     );
-
-    //     music.prUpdateNow(offsetsInSeconds: true, indicators: true);
-    //     playbackCommands = manager.commands;
-        
-    //     logicalTies = FoscSelection(music).byLogicalTie;
-    //     amps = this.prGetAmps(logicalTies);
-
-    //     durs = [];
-    //     midinotes = [];
-    //     commands = [];
-
-    //     logicalTies.do { |logicalTie, i|
-    //         graceContainer = logicalTie.head.graceContainer;
-
-    //         if (graceContainer.notNil) {
-    //             graceBundle = FoscGraceContainerPlaybackBundle(graceContainer);
-    //             durs = durs.addAll(graceBundle.durs);
-    //             midinotes = midinotes.addAll(graceBundle.midinotes);
-    //             graceLogicalTies = graceContainer.components.collect { |each| each.prGetLogicalTie };
-    //             graceAmps = this.prGetAmps(graceLogicalTies, amps[i]);
-    //             amps = amps.prSetItem((i..i), graceAmps);
-    //             commands = commands.addAll(graceBundle.commands);
-    //         };
-
-    //         bundle = FoscPlaybackBundle(logicalTie);
-    //         dur = if (graceContainer.notNil) { bundle.dur - graceBundle.duration } { bundle.dur };
-    //         durs = durs.add(dur);
-    //         midinotes = midinotes.add(bundle.midinotes);
-    //         commands = commands.add(bundle.commands);
-    //     };
-
-    //     ^Pbind(
-    //         \proto, protoEvent,
-    //         \dur, Pseq(durs),
-    //         \midinote, Pseq(midinotes),
-    //         \amp, Pseq(amps),
-    //         \commands, Pseq(commands.collect { |exprs|
-    //             if (exprs.isNil) {
-    //                 //'rest';
-    //                 'proxy';
-    //             } {
-    //                 Pfuncn({ |event| exprs.do { |key| playbackCommands[key].(event) } });
-    //             };
-    //         });
-    //     );
-    // }
 }

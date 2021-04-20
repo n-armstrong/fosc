@@ -62,7 +62,7 @@
 
     Returns array of one or more integers.
 
-3
+
     • Example 1
 
     (1..16).do { |n| n.post; Post.tab; n.partitionIntoCanonicParts.postln };
@@ -147,6 +147,7 @@
         pattern = pattern[index..] ++ pattern[..(index - 1)];
         result = pattern.separate { |a, b| b == 1 };
         result = result.collect { |each| each.size };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------

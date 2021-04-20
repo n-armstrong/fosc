@@ -245,6 +245,7 @@ FoscIteration : FoscStream {
     tie(m[4..]);
     a.show;
 
+
     • iterate all logicalTies
 
     b = FoscIteration(a).logicalTies;

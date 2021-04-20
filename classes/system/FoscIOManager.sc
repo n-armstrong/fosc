@@ -115,13 +115,6 @@ FoscIOManager : FoscObject {
         x = music.write.asPDF("%.ly".format(p), p, flags: "-dresolution 100");
         //if (show) { unixCmd("open %".format(x[0])) };
     };
-
-
-    a = FoscRhythmMaker();
-    a.(divisions: [2/16,3/16,5/16], ratios: #[[3,1],[3,2],[4,3]]);
-    a.show;
-
-    f.(a, "rhythm-maker-1", show: true);
     -------------------------------------------------------------------------------------------------------- */
     *runLilypond { |lyPath, flags, outputPath, executablePath|
         var lilypondBase, command, exitCode, success;

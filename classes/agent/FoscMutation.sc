@@ -800,12 +800,15 @@ FoscMutation : FoscObject {
                         break.value;
                     };
                 };
+                
                 advanceToNextOffset = true;
+                
                 if (remainingComponents.notEmpty) {
                     currentComponent = remainingComponents.removeAt(0);
                 } {
                     break.value;
                 };
+                
                 localDuration = FoscInspection(currentComponent).duration;
                 candidateShardDuration = currentShardDuration + localDuration;
 
@@ -819,34 +822,45 @@ FoscMutation : FoscObject {
                 }
                 { nextSplitPoint < candidateShardDuration } {
                     localSplitDuration = nextSplitPoint - currentShardDuration;
+                    
                     if (currentComponent.isKindOf(FoscLeaf)) {
                         leafSplitDurations = [localSplitDuration];
                         currentDuration = FoscInspection(currentComponent).duration;
                         additionalRequiredDuration = currentDuration - localSplitDuration;
+                        
                         splitDurations = durations.split(
                             [additionalRequiredDuration],
                             isCyclic: false,
                             overhang: true
                         );
+                        
                         additionalDurations = splitDurations[0];
                         leafSplitDurations = leafSplitDurations.addAll(additionalDurations);
                         durations = splitDurations.last;
+                        
                         leafShards = currentComponent.prSplitByDurations(
                             leafSplitDurations,
                             isCyclic: false,
                             tieSplitNotes: tieSplitNotes,
                             repeatTies: repeatTies
                         );
+                        
                         shard = shard.addAll(leafShards);
                         result = result.add(shard);
                         offsetIndex = offsetIndex + additionalDurations.size;
                     } {
                         assert(currentComponent.isKindOf(FoscContainer));
+
+                        if (currentComponent.isKindOf(FoscTuplet)) {
+                            ^throw("%:split: can't split FoscTuplet'.").format(this.species);
+                        };
+
                         # leftList, rightList = currentComponent.prSplitByDuration(
                             localSplitDuration,
                             tieSplitNotes: tieSplitNotes,
                             repeatTies: repeatTies
                         );
+
                         shard = shard.addAll(leftList);
                         result = result.add(shard);
                         remainingComponents.prSetItem((0..0), rightList);
@@ -862,17 +876,20 @@ FoscMutation : FoscObject {
                     advanceToNextOffset = false;
                 }
                 {
-                    throw("%:split: can not process candidate duration: %.")
+                    ^throw("%:split: can not process candidate duration: %.")
                         .format(this.species, candidateShardDuration);
                 };
             };
         };
+
         if (shard.notEmpty) { result = result.add(shard) };
         if (remainingComponents.notEmpty) { result = result.add(remainingComponents) };
+        
         result = result.flat;
         result = FoscSelection(result).flat;
         result = result.partitionByDurations(durationsCopy, fill: 'exact');
         assert(result.every { |each| each.isKindOf(FoscSelection) });
+
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
