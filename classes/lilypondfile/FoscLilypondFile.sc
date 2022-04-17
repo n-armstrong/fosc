@@ -28,26 +28,28 @@ FoscLilypondFile : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* --------------------------------------------------------------------------------------------------------
-    • !!!TODO: add 'tag' argument
-    -------------------------------------------------------------------------------------------------------- */
     var <comments, <dateTimeToken, <defaultPaperSize, <globalStaffSize, <includes, <items, <tag;
-    var <lilypondLanguageToken, <lilypondVersionToken, <useRelativeIncludes;
-    var <headerBlock, <layoutBlock, <paperBlock, <scoreBlock; //!!!TODO: REMOVE THESE ?
+    var <lilypondLanguageToken, <lilypondVersionToken, <useRelativeIncludes, <isStylesheet;
+    var <headerBlock, <layoutBlock, <paperBlock, <scoreBlock; //!!!TODO: REMOVE ?
     *new { |items, dateTimeToken, defaultPaperSize, comments, includes, globalStaffSize,
-        lilypondLanguageToken, lilypondVersionToken, useRelativeIncludes=false|     
+        lilypondLanguageToken, lilypondVersionToken, useRelativeIncludes=false, isStylesheet=false|     
+        
         ^super.new.init(items, dateTimeToken, defaultPaperSize, comments, includes, globalStaffSize,
-            lilypondLanguageToken, lilypondVersionToken, useRelativeIncludes);
+            lilypondLanguageToken, lilypondVersionToken, useRelativeIncludes, isStylesheet);
     }
     init { |argItems, argDateTimeToken, argDefaultPaperSize, argComments, argIncludes, argGlobalStaffSize,
-        argLilypondLanguageToken, argLilypondVersionToken, argUseRelativeIncludes=false|
+        argLilypondLanguageToken, argLilypondVersionToken, argUseRelativeIncludes, argIsStylesheet|
+        var tuning;
+
         items = List[
             FoscBlock(name: 'header'),
             FoscBlock(name: 'layout'),
             FoscBlock(name: 'paper'),
             FoscBlock(name: 'score')
         ];
+        
         # headerBlock, layoutBlock, paperBlock, scoreBlock = items;
+        
         if (argItems.notNil) { scoreBlock.items.add(argItems) };
         // items = List[argItems] ?? { List[] };
         if (dateTimeToken.isNil) { dateTimeToken = FoscDateTimeToken() };
@@ -55,6 +57,7 @@ FoscLilypondFile : FoscObject {
         if (comments.notEmpty) { comments = comments.collect { |each| each.asString } };
         defaultPaperSize = argDefaultPaperSize;
         includes = argIncludes ? [];
+        
         if (includes.notEmpty) { includes = includes.collect { |each| each.asString } };
         globalStaffSize = argGlobalStaffSize;
         lilypondLanguageToken = argLilypondLanguageToken;
@@ -64,421 +67,14 @@ FoscLilypondFile : FoscObject {
         lilypondVersionToken = lilypondVersionToken ?? { FoscLilypondVersionToken() };
         lilypondVersionToken = FoscLilypondVersionToken(lilypondVersionToken);
         useRelativeIncludes = argUseRelativeIncludes;
+        isStylesheet = argIsStylesheet;
+
+        // tuning = FoscPitchManager.tuning;
+        
+        // if (isStylesheet.not && { tuning.notNil }) {
+        //     includes = includes.add("%/%.ily".format(FoscConfiguration.stylesheetDirectory, tuning.name));
+        // };
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • *pitch
-
-    One staff per array in 'pitches'.
-
-    a = (60,60.25..71);
-    b = (60..53);
-    f = FoscLilypondFile.pitch([a, b]);
-    f.show;
-    -------------------------------------------------------------------------------------------------------- */
-    *pitch { |pitches, defaultPaperSize=#['a4', 'portrait'], globalStaffSize=16|
-        var staves, staff, score, lilypondFile, block, scheme, moment;
-        // if pitches.rank == 1 pitches = [[pitches]]
-        staves = [];
-        
-        pitches.do { |each|
-            // assert every in each isKindOf FoscPitch
-            //each.do { |p| p.str.postln };
-            staff = FoscStaff(FoscLeafMaker().(each, [1/4]));
-            staves = staves.add(staff);
-        };
-
-        score = FoscScore(staves);
-
-        //score.illustrate.format.postln;
-        
-        lilypondFile = this.new(
-            score,
-            defaultPaperSize: defaultPaperSize,
-            globalStaffSize: globalStaffSize,
-            includes: #[
-                "../stylesheets/default.ily",
-                "../stylesheets/microtonal-accidentals.ily"
-            ],
-            useRelativeIncludes: true
-        );
-        
-        //!!!TODO: isn't all the stuff below set in the stylesheet?
-        lilypondFile.headerBlock.tagline = false;
-        lilypondFile.paperBlock.leftMargin = 20;
-        lilypondFile.paperBlock.systemSystemSpacing = FoscSpacingVector(0, 0, 12, 0);
-        lilypondFile.layoutBlock.indent = 0;
-        lilypondFile.layoutBlock.raggedRight = true;
-        lilypondFile.layoutBlock.items.add(FoscLilypondLiteral("\\accidentalStyle dodecaphonic"));
-        
-        // voice
-        block = FoscContextBlock(sourceLilypondType: 'Voice');
-        lilypondFile.layoutBlock.items.add(block);
-        block.removeCommands.add('Stem_engraver');
-
-        // staff
-        block = FoscContextBlock(sourceLilypondType: 'Staff');
-        lilypondFile.layoutBlock.items.add(block);
-        block.removeCommands.add('Bar_engraver');
-        block.removeCommands.add('Bar_number_engraver');
-        block.removeCommands.add('Time_signature_engraver');
-        
-        // score
-        block = FoscContextBlock(sourceLilypondType: 'Score');
-        lilypondFile.layoutBlock.items.add(block);
-        override(block).spacingSpanner.strictGraceSpacing = true;
-        override(block).spacingSpanner.strictNoteSpacing = true;
-        override(block).spacingSpanner.uniformStretching = true;
-        moment = FoscSchemeMoment(1, 6);
-        set(block).proportionalNotationDuration = moment;
-
-        ^lilypondFile;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • *rhythm
-
-    Makes rhythm-maker-style LilyPond file.
-    
-    Used in rhythm-maker docs.
-    
-    Returns LilyPond file.
-    
-
-    • Example 1
-
-    Make a rhythmic staff.
-
-    d = #[[3,4],[4,8],[1,4]];
-    m = FoscLeafMaker();
-    
-    x = [m.(64 ! 6, 1/8), m.(64 ! 8, 1/16), m.(64 ! 2, 1/8)];
-    x.do { |each| each.beam };
-
-    f = FoscLilypondFile.rhythm(x, d);
-    f.show;
-    
-
-    !!!TODO: functionality removed - bring it back?
-    • Example 2
-
-    Set time signatures explicitly.
-
-    d = #[[3,4],[4,8],[1,4]];
-    m = FoscLeafMaker();
-    
-    x = [m.(64 ! 6, 1/8), m.(64 ! 8, 1/16), m.(64 ! 2, 1/8)];
-    x.do { |each| each.beam };
-
-    t = #[[6,8],[4,8],[2,8]];
-    f = FoscLilypondFile.rhythm(x, t);
-    f.show;
-
-
-    • Example 3
-
-    Make pitched staff.
-
-    d = #[[3,4],[4,8],[1,4]];
-    m = FoscLeafMaker();
-    
-    x = [m.(64 ! 6, 1/8), m.(64 ! 8, 1/16), m.(64 ! 2, 1/8)];
-    x.do { |each| each.beam };
-
-    f = FoscLilypondFile.rhythm(x, d, pitchedStaff: true);
-    f.show;
-
-
-    • Example 4
-
-    Adjust horizontal spacing with 'stretch'. Defaults to 1.
-
-
-    m = FoscRhythmMaker().(divisions: [1/4], ratios: #[[2,1],[3,2],[4,3]]);
-    f = FoscLilypondFile.rhythm(m, stretch: 4);
-    f.show;
-
-
-    • Example 5 !!!TODO: not yet working
-
-    Make simultaneous voices.
-
-    d = #[[3,4],[4,8],[1,4]];
-    m = FoscLeafMaker();
-
-    x = [m.(64 ! 6, 1/8), m.(64 ! 8, 1/16), m.(64 ! 2, 1/8)];
-    x.do { |each| each.beam };
-    x = FoscSelection(x).flat;
-
-    y = [m.(60 ! 12, 1/16), m.(60 ! 16, 1/32), m.(60 ! 4, 1/16)];
-    y.do { |each| each.beam };
-    y = FoscSelection(y).flat;
-
-    a = ('Voice_1': x, 'Voice_2': y);
-    f = FoscLilypondFile.rhythm(a, divisions: d, attachLilypondVoiceCommands: true);
-
-    f.show;
-
-
-    • Example 6
-
-    Use implicitly when displaying state of rhythm-makers.
-
-    a = FoscRhythmMaker();
-    a.(divisions: [1/4], ratios: #[[2,1],[3,2],[4,3]]);
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    *rhythm { |selections, divisions, attachLilypondVoiceCommands=false, pitchedStaff=false|
-        var score, multiplier, lilypondFile, selections_, staff, voices, voice, commandString;
-        var voiceNameToCommandString, command, duration, message, context, skips, skip, timeSignatures;
-
-        case
-        { selections.isSequenceableCollection } {
-            selections.do { |each| 
-                if (each.isKindOf(FoscSelection).not) {
-                    throw("%:%: must be a selection: %".format(this.species, thisMethod.name, each));
-                };
-            };
-        }
-        { selections.isKindOf(Dictionary) } {
-            selections.values.do { |each| 
-                if (each.isKindOf(FoscSelection).not) {
-                    throw("%:%: must be a selection: %".format(this.species, thisMethod.name, each));
-                };
-            };
-        }
-        { selections.isKindOf(FoscSelection) } {
-            ^this.rhythm([selections], divisions, attachLilypondVoiceCommands, pitchedStaff);
-        }
-        {
-            throw("%:%: must be a SequenceableCollection or Dictionary: %"
-                .format(this.species, thisMethod.name, selections)); 
-        };
-
-        score = FoscScore();
-        //multiplier = FoscMultiplier(#[1,32]) * stretch.reciprocal;
-        //set(score).proportionalNotationDuration = FoscSchemeMoment(multiplier.pair);
-
-        lilypondFile = FoscLilypondFile(
-            score,
-            includes: [
-                "default.ily",
-                "rhythm-maker-docs.ily"
-            ].collect { |each| "%/%".format(FoscConfiguration.foscStylesheetDirectory, each) },
-            useRelativeIncludes: true
-        );
-
-        if (pitchedStaff.isNil) {
-            case
-            { selections.isSequenceableCollection } {
-                selections_ = selections;
-            }
-            { selections.isKindOf(Dictionary) } {
-                selections_ = selections.values;
-            };
-            block { |break|
-                FoscIteration(selections_).leaves(FoscNote).do { |note|
-                    if (note.writtenPitch != FoscPitch(60)) {
-                        pitchedStaff = true;
-                        break.value;
-                    };
-                };
-            };
-        };
-
-        case
-        { selections.isSequenceableCollection } {
-            if (divisions.isNil) {
-                duration = selections.collect { |each| each.duration }.sum;
-                divisions = [duration];
-            };
-            if (pitchedStaff) {
-                staff = FoscStaff();
-            } {
-                staff = FoscStaff(lilypondType: 'RhythmicStaff');
-            };
-            staff.addAll(selections);
-        }
-        { selections.isKindOf(Dictionary) } {
-            voices = [];
-            selections.keys.as(Array).sort.do { |voiceName|
-                selections_ = selections[voiceName];
-                selections_ = selections_.flat;
-                selections_ = selections_.deepCopy;
-                voice = FoscVoice(selections_, name: voiceName);
-                if (attachLilypondVoiceCommands) {
-                    voiceNameToCommandString = (
-                        'Voice_1': "voiceOne",
-                        'Voice_2': "voiceTwo",
-                        'Voice_3': "voiceThree",
-                        'Voice_4': "voiceFour"
-                    );
-                    commandString = voiceNameToCommandString[voiceName];
-                    if (commandString.notNil) {
-                        command = FoscLilypondLiteral("\\" ++ commandString);
-                        voice.leafAt(0).attach(command);
-                    };
-                };
-                voices.add(voice);
-            };
-            staff = FoscStaff(voices, isSimultaneous: true);
-            if (divisions.isNil) {
-                duration = staff.prGetDuration;
-                divisions = [duration];
-            };
-        }
-        {
-            throw("%:%: must be SequenceableCollection or Dictionary of selections: %"
-                .format(this.species, thisMethod.name, selections));
-        };
-
-        score.add(staff);
-        assert(divisions.isSequenceableCollection);
-
-        if (timeSignatures.isNil) {
-            timeSignatures = divisions.collect { |fraction|
-                fraction = FoscNonreducedFraction(fraction);
-                if (#[1,2].includes(fraction.denominator)) { fraction = fraction.withDenominator(4) };
-                fraction;
-            };
-        };
-        
-        timeSignatures = timeSignatures.collect { |each| FoscTimeSignature(each) };
-
-        score.doComponents({ |staff, i|
-            duration = staff.prGetContentsDuration;
-            if (#[1,2].includes(duration.denominator)) { duration = duration.withDenominator(4) };
-            staff.leafAt(0).attach(FoscTimeSignature(duration.pair));
-        }, prototype: FoscStaff);
-        
-        ^lilypondFile;
-    }
-    // *rhythm { |selections, divisions, attachLilypondVoiceCommands=false, pitchedStaff=false, stretch=1|
-    //     var score, multiplier, lilypondFile, selections_, staff, voices, voice, commandString;
-    //     var voiceNameToCommandString, command, duration, message, context, skips, skip, timeSignatures;
-
-    //     case
-    //     { selections.isSequenceableCollection } {
-    //         selections.do { |each| 
-    //             if (each.isKindOf(FoscSelection).not) {
-    //                 throw("%:%: must be a selection: %".format(this.species, thisMethod.name, each));
-    //             };
-    //         };
-    //     }
-    //     { selections.isKindOf(Dictionary) } {
-    //         selections.values.do { |each| 
-    //             if (each.isKindOf(FoscSelection).not) {
-    //                 throw("%:%: must be a selection: %".format(this.species, thisMethod.name, each));
-    //             };
-    //         };
-    //     }
-    //     { selections.isKindOf(FoscSelection) } {
-    //         ^this.rhythm([selections], divisions, attachLilypondVoiceCommands, pitchedStaff, stretch);
-    //     }
-    //     {
-    //         throw("%:%: must be a SequenceableCollection or Dictionary: %"
-    //             .format(this.species, thisMethod.name, selections)); 
-    //     };
-
-    //     score = FoscScore();
-    //     multiplier = FoscMultiplier(#[1,32]) * stretch.reciprocal;
-    //     set(score).proportionalNotationDuration = FoscSchemeMoment(multiplier.pair);
-
-    //     lilypondFile = FoscLilypondFile(
-    //         score,
-    //         includes: [
-    //             "default.ily",
-    //             "rhythm-maker-docs.ily"
-    //         ].collect { |each| "%/%".format(FoscConfiguration.foscStylesheetDirectory, each) },
-    //         useRelativeIncludes: true
-    //     );
-
-    //     if (pitchedStaff.isNil) {
-    //         case
-    //         { selections.isSequenceableCollection } {
-    //             selections_ = selections;
-    //         }
-    //         { selections.isKindOf(Dictionary) } {
-    //             selections_ = selections.values;
-    //         };
-    //         block { |break|
-    //             FoscIteration(selections_).leaves(FoscNote).do { |note|
-    //                 if (note.writtenPitch != FoscPitch(60)) {
-    //                     pitchedStaff = true;
-    //                     break.value;
-    //                 };
-    //             };
-    //         };
-    //     };
-
-    //     case
-    //     { selections.isSequenceableCollection } {
-    //         if (divisions.isNil) {
-    //             duration = selections.collect { |each| each.duration }.sum;
-    //             divisions = [duration];
-    //         };
-    //         if (pitchedStaff) {
-    //             staff = FoscStaff();
-    //         } {
-    //             staff = FoscStaff(lilypondType: 'RhythmicStaff');
-    //         };
-    //         staff.addAll(selections);
-    //     }
-    //     { selections.isKindOf(Dictionary) } {
-    //         voices = [];
-    //         selections.keys.as(Array).sort.do { |voiceName|
-    //             selections_ = selections[voiceName];
-    //             selections_ = selections_.flat;
-    //             selections_ = selections_.deepCopy;
-    //             voice = FoscVoice(selections_, name: voiceName);
-    //             if (attachLilypondVoiceCommands) {
-    //                 voiceNameToCommandString = (
-    //                     'Voice_1': "voiceOne",
-    //                     'Voice_2': "voiceTwo",
-    //                     'Voice_3': "voiceThree",
-    //                     'Voice_4': "voiceFour"
-    //                 );
-    //                 commandString = voiceNameToCommandString[voiceName];
-    //                 if (commandString.notNil) {
-    //                     command = FoscLilypondLiteral("\\" ++ commandString);
-    //                     voice.leafAt(0).attach(command);
-    //                 };
-    //             };
-    //             voices.add(voice);
-    //         };
-    //         staff = FoscStaff(voices, isSimultaneous: true);
-    //         if (divisions.isNil) {
-    //             duration = staff.prGetDuration;
-    //             divisions = [duration];
-    //         };
-    //     }
-    //     {
-    //         throw("%:%: must be SequenceableCollection or Dictionary of selections: %"
-    //             .format(this.species, thisMethod.name, selections));
-    //     };
-
-    //     score.add(staff);
-    //     assert(divisions.isSequenceableCollection);
-
-    //     if (timeSignatures.isNil) {
-    //         timeSignatures = divisions.collect { |fraction|
-    //             fraction = FoscNonreducedFraction(fraction);
-    //             if (#[1,2].includes(fraction.denominator)) { fraction = fraction.withDenominator(4) };
-    //             fraction;
-    //         };
-    //     };
-        
-    //     timeSignatures = timeSignatures.collect { |each| FoscTimeSignature(each) };
-    //     context = FoscContext(lilypondType: 'GlobalContext');
-    //     skips = [];
-    //     timeSignatures.do { |timeSignature|
-    //         skip = FoscSkip(1);
-    //         skip.multiplier_(timeSignature);
-    //         skip.attach(timeSignature, context: 'Score');
-    //         skips = skips.addAll(skip);
-    //     };
-    //     context.addAll(skips);
-    //     score.insert(0, context);
-    //     ^lilypondFile;
-    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -679,41 +275,37 @@ FoscLilypondFile : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     prGetFormatPieces { |tag|
         var result, includes, string;
+
         result = [];
         includes = [];
-        //!!! DEPRECATED
-        // if (dateTimeToken.notNil) {
-        //     string = "\\% %".format(dateTimeToken.format);
-        //     result = result.add(string);
-        // };
+
         result = result.addAll(this.prGetFormattedComments);
+        
         if (lilypondVersionToken.notNil) {
             string = "%".format(lilypondVersionToken.format);
             includes = includes.add(string);
         };
+        
         if (lilypondLanguageToken.notNil) {
             string = "%".format(lilypondLanguageToken.format);
             includes = includes.add(string);
         };
-        // if self.tag is not None:
-        //     includes = LilyPondFormatManager.tag(
-        //         includes,
-        //         tag=self.tag,
-        //         )
+        
         includes = includes.join("\n");
+
         if (includes.notEmpty) {
             result = result.add(includes);
         };
-        // postincludes = []
+
         if (useRelativeIncludes) {
             string = "#(ly:set-option 'relative-includes #t)";
             result = result.add(string);
-            // postincludes.append(string)
         };
+        
         result = result.addAll(this.prGetFormattedIncludes);
         result = result.addAll(this.prGetFormattedSchemeSettings);
-        // result.extend(postincludes)
         result = result.addAll(this.prGetFormattedBlocks);
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -722,28 +314,38 @@ FoscLilypondFile : FoscObject {
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
     f = FoscLilypondFile(a);
     f.prGetFormattedBlocks;
+
+    a = FoscContext([FoscNote(60, 1/4)]);
+    f = a.illustrate;
+    f.format;
+
+    FoscBlock
     -------------------------------------------------------------------------------------------------------- */
     prGetFormattedBlocks {
         var result, string;
+       
         result = [];
+        
         items.do { |item|
             case 
             { item.isKindOf(FoscBlock) && { item.items.isEmpty } } {
                 // pass
             }
             { item.respondsTo('prGetLilypondFormat') && { item.isString.not } } {
+                
                 try {
                     string = item.prGetLilypondFormat;
-                    //!!!TODO: string = item.prGetLilypondFormat(tag: tag);
                 } {
                     string = item.prGetLilypondFormat;
                 };
+
                 if (string.notNil) { result = result.add(string) };
             }
             {
                 result = result.add(item.asString);
             };
         };
+
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------

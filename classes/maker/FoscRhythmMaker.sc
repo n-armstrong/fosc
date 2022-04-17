@@ -1,6 +1,14 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscRhythmMaker
 
+
+!!!TODO:
+- For consistency with FoscLeafMaker, return a selection rather than an Array of selections
+- Add a 'pitches' argument to value method
+- replace specifiers with FoscCommands (see Abjad:Command subclasses)
+
+
+
 Object model of a partially evaluated function that accepts a (possibly empty) list of divisions as input and returns a list of selections as output. Output structured one selection per division with each selection wrapping a single fixed-duration tuplet.
 
 Usage follows the two-step configure-once / call-repeatedly pattern shown here.
@@ -16,385 +24,229 @@ a.show;
 • Example 2
 
 a = FoscRhythmMaker();
-a.(divisions: [2/16, 3/16, 5/32], ratios: #[[2,1],[3,2],[4,3]]);
+a.(divisions: [2/16, 3/16, 5/32], ratios: #[[1,1,1,1]]);
 a.show;
 
 
-• Example 3 !!!TODO: DEPRECATE THIS BEHAVIOUR ??
+• Example 3
 
-Floating point-values specify the beginnings of ties.
+Negative values in 'ratios' specify rests.
 
 a = FoscRhythmMaker();
-a.(divisions: [2/16, 3/16, 5/32], ratios: #[[2,1.0],[3,2.0],[4,3]]);
+a.(divisions: [1/4], ratios: #[[-2,1],[3,2],[4,-3]]);
 a.show;
 
 
 • Example 4
 
-Negative values in tuplet ratio specify rests.
+Apply a mask to rhythms.
 
 a = FoscRhythmMaker();
-a.(divisions: [2/16, 3/16, 5/32], ratios: #[[-2,1],[3,2],[4,-3]]);
+a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[6,4,3,7]);
 a.show;
 
 
 • Example 5
 
-Patterns may be used as arguments.
+Mask patterns repeat cyclically.
 
 a = FoscRhythmMaker();
-a.(divisions: [1/8], ratios: Pseq(#[[-2,1],[3,2]], 7));
+a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[1,3]);
 a.show;
 
 
 • Example 6
 
-Patterns may be used as arguments.
+Negative values in a mask specify rests.
 
 a = FoscRhythmMaker();
-a.(divisions: Pseq([[1,8],[3,16]], 7), ratios: #[[-2,3]]);
+a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[-6,4,3,-7]);
 a.show;
 
 
 • Example 7
 
-Patterns may be used as arguments.
+!!!TODO: returns a beam error on lilypond compilation
 
-a = FoscRhythmMaker();
-a.(divisions: Pseq([[1,8],[3,16]], 7), ratios: Pseq(#[[-2,3], [3, -2]], 4));
-a.show;
+Override the defaults.
 
-
-• Example 8
-
-Apply sustain mask to tuplets.
-
-p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(3);
-m = FoscSustainMask(p, hold: true);
-a = FoscRhythmMaker();
-a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m]);
-a.show;
-
-a = FoscRhythmMaker();
-m = FoscSustainMask(FoscPattern.sizes(#[4,-3,5,-4,4]));
-a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: m);
-a.show;
-
-
-• Example 9
-
-With tuplet specifier and beam specifier.
-
-t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
-b = FoscBeamSpecifier(beamRests: false);
-a = FoscRhythmMaker(beamSpecifier: b, tupletSpecifier: t);
-m = FoscSustainMask(FoscPattern.sizes(#[4,-3,5,-4,4]));
-a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: m);
-a.show;
-
-
-• Example 10
-
-Beam rests and include stemlets.
-
-t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
-b = FoscBeamSpecifier(beamRests: true, stemletLength: 2);
-a = FoscRhythmMaker(beamSpecifier: b, tupletSpecifier: t);
-m = a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: FoscFuseMask(#[4,-3,5,-8]));
-a.show;
-
-
-• Example 11
-
-Extract trivial tuplets, rewrite sustained tuplets, and rewrite rest-filled tuplets.
-
-t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
-a = FoscRhythmMaker(tupletSpecifier: t);
-m = a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: FoscFuseMask(#[4,-3,5,-8]));
-m.selectRuns.do { |run| run.beam };
-a.show;
-
-
-• Example 12
-
-!!!TODO: BROKEN: tuplet specifier causes entire final tuplet selection to be extracted
-
-Bypass specifiers in factory stage. Apply them after further transformations on selections.
-
-a = FoscRhythmMaker();
-m = a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: FoscFuseMask(#[4,-3,5,-8]));
-m = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true).(m);
-m.selectRuns.do { |run| run.beam };
-a.show;
+a = FoscRhythmMaker(beamRests: true);
+b = a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[2,-1,4,2,3,-7]);
+b.show;
 ------------------------------------------------------------------------------------------------------------ */
 FoscRhythmMaker : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    var <beamSpecifier, <durationSpecifier, <meterSpecifier, <tupletSpecifier;
-    var selections, previousState;
-    *new { |beamSpecifier, durationSpecifier, meterSpecifier, tupletSpecifier|  
+    var <beamEachDivision, <beamRests, <extractTrivialTuplets, <rewriteRestFilledTuplets, <rewriteSustainedTuplets;
+    var beamSpecifier, durationSpecifier, meterSpecifier, tupletSpecifier, selections;
+    *new { |beamEachDivision=true, beamRests=false, extractTrivialTuplets=true, rewriteRestFilledTuplets=true, rewriteSustainedTuplets=true|
 
-        if (beamSpecifier.notNil) {
-            assert(beamSpecifier.isKindOf(FoscBeamSpecifier), thisMethod, 'beamSpecifier', beamSpecifier);
-        };
-
-        if (durationSpecifier.notNil) {
-            assert(durationSpecifier.isKindOf(FoscDurationSpecifier), thisMethod, 'durationSpecifier',
-                durationSpecifier);
-        };
-        
-        if (meterSpecifier.notNil) {
-            assert(meterSpecifier.isKindOf(FoscMeterSpecifier), thisMethod, 'meterSpecifier', meterSpecifier);
-        };
-        
-        if (tupletSpecifier.notNil) {
-            assert(tupletSpecifier.isKindOf(FoscTupletSpecifier), thisMethod, 'tupletSpecifier',
-                tupletSpecifier);
-        };
-
-        ^super.new.init(beamSpecifier, durationSpecifier, meterSpecifier, tupletSpecifier);
+        ^super.new.init(beamEachDivision, beamRests, extractTrivialTuplets, rewriteRestFilledTuplets, rewriteSustainedTuplets);
     }
-    init { |argBeamSpecifier, argDurationSpecifier, argMeterSpecifier, argTupletSpecifier|
-        beamSpecifier = argBeamSpecifier;
-        durationSpecifier = argDurationSpecifier;
-        meterSpecifier = argMeterSpecifier;
-        tupletSpecifier = argTupletSpecifier;
-        previousState = (
-            'divisionsConsumed': 0,
-            'incompleteLastNote': false,
-            'logicalTiesProduced': 0  
+    init { |argBeamEachDivision, argBeamRests, argExtractTrivialTuplets, argRewriteRestFilledTuplets, argRewriteSustainedTuplets|
+        
+        beamEachDivision = argBeamEachDivision;
+        beamRests = argBeamRests;
+        extractTrivialTuplets = argExtractTrivialTuplets;
+        rewriteRestFilledTuplets = argRewriteRestFilledTuplets;
+        rewriteSustainedTuplets = argRewriteSustainedTuplets;
+
+
+        beamSpecifier = FoscBeamSpecifier(
+            beamRests: beamRests,
+            beamEachDivision: beamEachDivision
+        );
+        
+        //durationSpecifier = argDurationSpecifier;
+        
+        //meterSpecifier = argMeterSpecifier;
+        
+        tupletSpecifier = FoscTupletSpecifier(
+            extractTrivial: extractTrivialTuplets,
+            rewriteRestFilled: rewriteRestFilledTuplets,
+            rewriteSustained: rewriteSustainedTuplets
         );
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
+    • defaultStylesheetPath
+    -------------------------------------------------------------------------------------------------------- */
+    defaultStylesheetPath {
+        ^"%/rhythm-sketch.ily".format(FoscConfiguration.stylesheetDirectory);
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • illustrate
 
-    Illustrates rhythm-maker.
-    
-    Returns LilyPond file.
+    a = FoscRhythmMaker();
+    a.(divisions: [1/4], ratios: #[[1,1],[3,2],[4,3]]);
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
-    illustrate { |timeSignatures|
-        if (selections.isNil) { throw("%:illustrate: no music to show.".format(this.species)) };
-        ^FoscLilypondFile.rhythm(selections, timeSignatures);
+    illustrate { |defaultPaperSize, globalStaffSize, includes|
+        var template, score, includesPath, lilypondFile;
+
+        template = FoscGroupedRhythmicStavesScoreTemplate(staffCount: 1);
+        score = template.value;
+        score['v1'].add(selections.deepCopy);
+
+        if (includes.notNil) {
+            if (includes.isSequenceableCollection.not) { includes = [includes] };
+            includes = includes ++ [this.defaultStylesheetPath];
+        } {
+            includes = [this.defaultStylesheetPath];
+        };
+
+        lilypondFile = score.illustrate(defaultPaperSize, globalStaffSize, includes);
+        
+        ^lilypondFile;
     }
     /* --------------------------------------------------------------------------------------------------------
     • show
-
-    a = FoscRhythmMaker();
-    a.(divisions: [1/4], ratios: #[1,1,1,1,1] ! 4);
-    a.show;
     -------------------------------------------------------------------------------------------------------- */
-    show { |timeSignatures|
-        var lilypondFile;
-        lilypondFile = this.illustrate(timeSignatures);
-        lilypondFile.show;
+    show { |defaultPaperSize, globalStaffSize=16, includes|
+        ^this.illustrate(defaultPaperSize, globalStaffSize, includes).show;
     }
     /* --------------------------------------------------------------------------------------------------------
     • value
+
+
+    a = FoscRhythmMaker();
+    b = a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[-6,4,3,-7]);
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
-    value { |divisions, ratios, masks|
+    value { |divisions, ratios, mask|
         selections = this.prMakeMusic(divisions, ratios);
-        selections = this.prApplyLogicalTieMasks(selections, masks);
-        selections = this.prApplySpecifiers(selections, divisions);
-        this.prGetBeamSpecifier.(selections);
+        selections = this.prApplyMask(selections, mask);
+
+        if (tupletSpecifier.notNil) { selections = tupletSpecifier.(selections, divisions) };
+        if (meterSpecifier.notNil) { selections = meterSpecifier.(selections, divisions) };
+        //!!!TODO: if (durationSpecifier.notNil) { selections = durationSpecifier.(selections, divisions) };
+        
+        this.prValidateSelections(selections);
+        this.prValidateTuplets(selections);
+
+        if (beamSpecifier.notNil) { beamSpecifier.(selections) };
+        
         ^selections;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • beamSpecifier
-
-    Gets beam specifier.
+    • beamEachDivision
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
-    • divisionMasks
-
-    Gets division masks.
+    • beamRests
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
-    • durationSpecifier
-
-    Gets duration spelling specifier.
+    • extractTrivial
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
-    • logicalTieMasks
-
-    Gets logical tie masks.
+    • rewriteRestFilled
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
-    • tieSpecifier
-
-    Gets tie specifier.
+    • rewriteSustained
     -------------------------------------------------------------------------------------------------------- */
-    /* --------------------------------------------------------------------------------------------------------
-    • tupletSpecifier
-
-    Gets tuplet spelling specifier.
-    -------------------------------------------------------------------------------------------------------- */
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PRIVATE CLASS METHODS
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* --------------------------------------------------------------------------------------------------------
-    • *prAllAreTupletsOrAllAreLeafSelections
-    -------------------------------------------------------------------------------------------------------- */
-    *prAllAreTupletsOrAllAreLeafSelections { |expr|
-        if (expr.every { |each| each.isKindOf(FoscTuplet) }) { ^true };
-        if (expr.every { |each| FoscRhythmMaker.prIsLeafSelection(each) }) { ^true };
-        ^false;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • *prIsLeafSelection
-    -------------------------------------------------------------------------------------------------------- */
-    *prIsLeafSelection { |expr|
-        if (expr.isKindOf(FoscSelection)) { ^expr.every { |each| each.isKindOf(FoscLeaf) } };
-        ^false;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • *prIsSignTuple
-    -------------------------------------------------------------------------------------------------------- */
-    *prIsSignTuple { |expr|
-        var prototype;
-        if (expr.isSequenceableCollection) {
-            prototype = [-1, 0, 1];
-            ^expr.every { |each| prototype.includes(each) }
-        };
-        ^false;
-    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • prApplyLogicalTieMasks
-
-
-    • Example 1
-
-    p = #[-1,3,3,3,3,3,3,-1]; // sustain ratios
-    m = FoscSustainMask(FoscPattern(p.abs.offsets.drop(-1)), hold: true);
-    n = FoscSilenceMask(FoscPattern.indices(p.indicesForWhich { |item| item < 0 }));
-    t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
-    a = FoscRhythmMaker(tupletSpecifier: t);
-    a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m, n]);
-    a.show;
-
-
-    • Example 2
-
-    p = #[-1,1,2,-1,1,1,-1,1,-1,1,1,-1,-1,3,-3];
-    m = FoscSustainMask(FoscPattern(p.abs.offsets.drop(-1)), hold: true);
-    n = FoscSilenceMask(FoscPattern.indices(p.indicesForWhich { |item| item < 0 }));
-    t = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRestFilled: true);
-    a = FoscRhythmMaker(tupletSpecifier: t);
-    a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], masks: [m, n]);
-    a.show;
+    • prApplyMask
     -------------------------------------------------------------------------------------------------------- */
-    prApplyLogicalTieMasks { |selections, masks|
-        var container;
-        if (masks.isNil) { ^selections };
-        if (masks.isSequenceableCollection.not) { masks = [masks] };
-        container = FoscContainer(selections);
-        masks.do { |mask| selections = mask.(FoscSelection(container)) };
-        selections = container.prEjectContents;
-        selections = selections.items.collect { |each| FoscSelection(each) };
-        ^selections;
+    prApplyMask { |selections, mask|
+        var newSelections, containers, container, logicalTies, leaves, newSelection;
+
+        if (mask.isNil) { ^selections };
+
+        newSelections = [];
+        containers = [];
+
+        selections.do { |selection|
+            container = FoscContainer();
+            container.addAll(selection);
+            containers = containers.add(container);
+        };
+
+        FoscSelection(selections).prApplyMask(mask, isCyclic: true);
+
+        containers.do { |container|
+            newSelection = container.prEjectContents;
+            newSelections = newSelections.add(newSelection);
+        };
+
+        ^newSelections;
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • prPrepareMasks
+    // prApplyMask { |selections, mask|
+    //     var newSelections, containers, container, logicalTies, leaves, newSelection;
 
-    x = FoscSilenceMask(FoscPattern(#[0,1]));
-    y = FoscSilenceMask(FoscPattern(#[0,4,5]));
-    a = FoscRhythmMaker().(1/4 ! 4, #[[1,1,1,1,1]], masks: [x,y]);
+    //     if (mask.isNil) { ^selections };
 
-    p = FoscPattern(#[0,1,4,5]) | FoscPattern.last(7);
-    m = FoscSustainMask(p);
-    a = FoscRhythmMaker().(1/4 ! 4, #[[1,1,1,1,1]], masks: [m]);
-    -------------------------------------------------------------------------------------------------------- */
-    prPrepareMasks { |masks|
-        var prototype;
-        prototype = [FoscSilenceMask, FoscSustainMask];
-        if (masks.isNil) { ^nil };
-        if (masks.isKindOf(FoscPattern)) { masks = [masks] };
-        if (prototype.any { |type| masks.isKindOf(type) }) { masks = [masks] };
-        masks = FoscPatternList(masks);
-        ^masks;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prPreviousDivisionsConsumed
-    
-    def _previous_divisions_consumed(self):
-        if not self.previous_state:
-            return 0
-        return self.previous_state.get('divisions_consumed', 0)
-    -------------------------------------------------------------------------------------------------------- */
-    prPreviousDivisionsConsumed {
-        ^previousState['divisionsConsumed'];  
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prPreviousIncompleteLastNote
-    
-    def _previous_incomplete_last_note(self):
-        if not self.previous_state:
-            return False
-        return self.previous_state.get('incomplete_last_note', False)
-    -------------------------------------------------------------------------------------------------------- */
-    // prPreviousIncompleteLastNote {
-    //     ^previousState['incompleteLastNote'];  
+    //     newSelections = [];
+    //     containers = [];
+
+    //     selections.do { |selection|
+    //         container = FoscContainer();
+    //         container.addAll(selection);
+    //         containers = containers.add(container);
+    //     };
+
+    //     logicalTies = FoscSelection(selections).selectLogicalTies;
+    //     mask = mask.repeatToAbsSum(logicalTies.size); // mask pattern repeats cyclically
+        
+    //     logicalTies.groupBySizes(mask.abs).do { |each, i|
+    //         leaves = each.selectLeaves;
+    //         if (mask[i] > 0) { leaves.prFuseLeaves } { leaves.prFuseLeavesAndReplaceWithRests };
+    //     };
+
+    //     containers.do { |container|
+    //         newSelection = container.prEjectContents;
+    //         newSelections = newSelections.add(newSelection);
+    //     };
+
+    //     ^newSelections;
     // }
-    /* --------------------------------------------------------------------------------------------------------
-    • prPreviousLogicalTiesProduced
-    
-    def _previous_logical_ties_produced(self):
-        if not self.previous_state:
-            return 0
-        return self.previous_state.get('logical_ties_produced', 0)
-    -------------------------------------------------------------------------------------------------------- */
-    // prPreviousLogicalTiesProduced {
-    //     ^previousState['logicalTiesProduced'];
-    // } 
-    /* --------------------------------------------------------------------------------------------------------
-    • prApplyMeterSpecifier
-    -------------------------------------------------------------------------------------------------------- */
-    prApplyMeterSpecifier { |selections|
-        if (meterSpecifier.isNil) { ^selections };
-        selections = meterSpecifier.(selections);
-        ^selections;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prApplySpecifiers
-    -------------------------------------------------------------------------------------------------------- */
-    prApplySpecifiers { |selections, divisions|
-        selections = this.prApplyTupletSpecifier(selections, divisions);
-        selections = this.prApplyMeterSpecifier(selections);
-        //!!!TODO: this.prApplyTieSpecifier(selections);
-        //!!!TODO: selections = this.prApplyLogicalTieMasks(selections);
-        this.prValidateSelections(selections);
-        this.prValidateTuplets(selections);
-        ^selections;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prApplyTieSpecifier
-    -------------------------------------------------------------------------------------------------------- */
-    // prApplyPhraseSpecifier { |selections|
-    //     var specifier;
-    //     specifier = this.prGetPhraseSpecifier;
-    //     ^specifier.(selections);
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • prApplyTupletSpecifier
-    -------------------------------------------------------------------------------------------------------- */
-    prApplyTupletSpecifier { |selections, divisions|
-        if (tupletSpecifier.isNil) { ^selections };
-        selections = tupletSpecifier.(selections, divisions);
-        ^selections;
-        // var specifier;
-        // specifier = this.prGetTupletSpecifier;
-        // selections = specifier.(selections, divisions);
-        // ^selections;
-    }
     /* --------------------------------------------------------------------------------------------------------
     • prCoerceDivisions
     -------------------------------------------------------------------------------------------------------- */
@@ -404,75 +256,20 @@ FoscRhythmMaker : FoscObject {
         ^divisions;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • prGetBeamSpecifier
-    -------------------------------------------------------------------------------------------------------- */
-    prGetBeamSpecifier {
-        if (beamSpecifier.notNil) { ^beamSpecifier };
-        ^FoscBeamSpecifier(beamEachDivision: true);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prGetDurationSpecifier
-    -------------------------------------------------------------------------------------------------------- */
-    prGetDurationSpecifier {
-        if (durationSpecifier.notNil) { ^durationSpecifier };
-        ^FoscDurationSpecifier();
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prGetTupletSpecifier
-    -------------------------------------------------------------------------------------------------------- */
-    prGetTupletSpecifier {
-        if (tupletSpecifier.notNil) { ^tupletSpecifier };
-        ^FoscTupletSpecifier();
-    }
-    /* --------------------------------------------------------------------------------------------------------
     • prMakeMusic
+
+    a = FoscRhythmMaker();
+    a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[-6,4,3,-7]);
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
     prMakeMusic { |divisions, ratios|
         var n, ratio, duration, selection;
         
-        case
-        { divisions.isSequenceableCollection && ratios.isSequenceableCollection } {
-            n = [divisions.size, ratios.size].maxItem;
-            divisions = divisions.wrapExtend(n);
-            ratios = ratios.wrapExtend(n);
-        }
-        { divisions.isSequenceableCollection && ratios.isKindOf(Pattern) } {
-            if (ratios.respondsTo('repeats') && { ratios.repeats != inf }) {
-                n = ratios.repeats;
-            } {
-                n = divisions.size;
-            };
-            divisions = divisions.wrapExtend(n);
-            ratios = ratios.asStream.nextN(n);
-        }
-        { divisions.isKindOf(Pattern) && ratios.isSequenceableCollection } {
-            if (divisions.respondsTo('repeats') && { divisions.repeats != inf }) {
-                n = divisions.repeats;
-            } {
-                n = ratios.size;
-            };
-            divisions = divisions.asStream.nextN(n);
-            ratios = ratios.wrapExtend(n);
-        }
-        { divisions.isKindOf(Pattern) && ratios.isKindOf(Pattern) } {
-            case 
-            { divisions.respondsTo('repeats') && ratios.respondsTo('repeats') } {
-                n = [divisions.repeats, ratios.repeats].minItem;
-            }
-            { divisions.respondsTo('repeats') && (ratios.respondsTo('repeats').not) } {
-                n = divisions.repeats;
-            }
-            { (divisions.respondsTo('repeats').not) && ratios.respondsTo('repeats') } {
-                n = ratios.repeats;
-            };
-            divisions = divisions.asStream.nextN(n);
-            ratios = ratios.asStream.nextN(n);
-        };
-        
-
+        n = [divisions.size, ratios.size].maxItem;
+        divisions = divisions.wrapExtend(n);
+        ratios = ratios.wrapExtend(n);
         selections = [];
         divisions = this.prCoerceDivisions(divisions);
-        assert(divisions.every { |each| each.isKindOf(FoscNonreducedFraction) });
         
         divisions.do { |division, i|
             ratio = ratios[i];
@@ -508,5 +305,34 @@ FoscRhythmMaker : FoscObject {
                 throw("%::prValidateTuplets: tuplet has no children.".format(this.species));
             }; 
         };
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE CLASS METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • *prAllAreTupletsOrAllAreLeafSelections
+    -------------------------------------------------------------------------------------------------------- */
+    *prAllAreTupletsOrAllAreLeafSelections { |expr|
+        if (expr.every { |each| each.isKindOf(FoscTuplet) }) { ^true };
+        if (expr.every { |each| FoscRhythmMaker.prIsLeafSelection(each) }) { ^true };
+        ^false;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *prIsLeafSelection
+    -------------------------------------------------------------------------------------------------------- */
+    *prIsLeafSelection { |expr|
+        if (expr.isKindOf(FoscSelection)) { ^expr.every { |each| each.isKindOf(FoscLeaf) } };
+        ^false;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *prIsSignTuple
+    -------------------------------------------------------------------------------------------------------- */
+    *prIsSignTuple { |expr|
+        var prototype;
+        if (expr.isSequenceableCollection) {
+            prototype = #[-1, 0, 1];
+            ^expr.every { |each| prototype.includes(each) }
+        };
+        ^false;
     }
 }

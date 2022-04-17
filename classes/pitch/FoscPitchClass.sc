@@ -1,360 +1,406 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscPitchClass
 
-inspect(FoscPitchClass("B"));
-inspect(FoscPitchClass(11.5));
-inspect(FoscPitchClass("D~"));
-inspect(FoscPitchClass("C#4"));
-inspect(FoscPitchClass("A#4"));
-inspect(FoscPitchClass(FoscPitch("Db5")));
-inspect(FoscPitchClass("cs")); // NOT YET IMPLEMENTED FOR lilypond INPUT
-inspect(FoscPitchClass("cs,,,")); // NOT YET IMPLEMENTED FOR lilypond INPUT
-inspect(FoscPitchClass(7.67)); // rounded to nearest quarter-tone
 
-FoscPitchClass("x"); //!!! SHOULD BREAK GRACEFULLY WITH ERROR MESSAGE
-"x".isPitchClassName;
-"x".isPitchName;
+• Example 1 - Initialize with a lilypond string and get some properties.
+
+a = FoscPitchClass("cs");
+a.str;
+a.format;
+a.cs;
+a.name;
+a.accidental;
+a.number;
+
+
+• Example 2 - Initialize with a pitch class number.
+
+a = FoscPitchClass(3.5);
+a.cs;
+
+Get nearest approximation in FoscTuning:current
+
+a = FoscPitchClass(1/3);
+a.number;
+a.str;
 ------------------------------------------------------------------------------------------------------------ */
 FoscPitchClass : FoscObject {
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// INIT
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	var <pitchClassName;
-	classvar manager;
-	*new { |val|
-		var pitchClassName;
-
-		manager = FoscPitchNameManager;
-
-		if (val.isKindOf(Symbol)) { val = val.asString };
-
-		pitchClassName = case
-		{ val.isNumber } { manager.pitchClassNumberToPitchClassName(val % 12) }
-		{ val.isString } {
-			case
-			{ val.isPitchClassName } { val }
-			{ val.isPitchName } { val.pitchClassName }
-			//{ val.isLilyPondPitchClassName } { FoscLilyPondToName(val) } //!!! waiting for Converter
-			//{ val.isLilyPondPitchName } { FoscLilyPondToName(val).pitchClassName }
-		}
-		{ val.isKindOf(FoscPitch) } { val.pitchClassName }
-		{ val.isKindOf(FoscPitchClass) } { val.pitchClassName }
-		{ Error("Can not initialize % from value: %".format(this.name, val)).throw };
-
-		^super.new.init(pitchClassName);
-	}
-	init { |argPitchClassName|
-		pitchClassName = argPitchClassName;
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// SPECIAL
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/* --------------------------------------------------------------------------------------------------------
-	• 
-	def __format__(self, format_specification=''):
-        r'''Formats component.
-
-        Set `format_specification` to `''`, `'lilypond'` or `'storage'`.
-
-        Returns string.
-        '''
-        from abjad.tools import systemtools
-        if format_specification in ('', 'lilypond'):
-            return self._lilypond_format
-        elif format_specification == 'storage':
-            return systemtools.StorageFormatAgent(self).get_storage_format()
-        return str(self)
-	-------------------------------------------------------------------------------------------------------- */
-  	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// NB: all of the following SPECIAL methods are defined in abjad:Pitch but not in abjad:PitchClass
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-  	/* --------------------------------------------------------------------------------------------------------
-	• add (abjad: __add__)
-	'''Adds `arg` to pitch class.
-
-	Returns new pitch class.
-	'''
-
-	x = FoscPitchClass('C#4');
-	x = x + 2;
-	x.pitchClassName;
-	-------------------------------------------------------------------------------------------------------- */
-    add { |expr|
-    	var pitch;
-		pitch = FoscPitch(this).add(expr);
-		^this.species.new(pitch);
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // INIT
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    var <name, <accidental;
+    *new { |name|
+        ^super.new.init(name);
     }
-	/* --------------------------------------------------------------------------------------------------------
-    • asFloat (abjad: __float__)
-	'''Changes pitchClassNumber to float.
+    init { |argName|
+        name = argName;
 
-	Returns float.
-	'''
+        case
+        { name.isString && { FoscPitchManager.isPitchClassName(name) } } {
+            // pass
+        }
+        { name.isString && { FoscPitchManager.isPitchName(name) } } {
+            name = FoscPitchManager.prSplitLilypondPitchName(name)[..1].join;
+            ^FoscPitchClass(name);
+        }
+        { name.isKindOf(Symbol) } {
+            ^FoscPitchClass(name.asString);
+        }
+        { name.isNumber } {
+            name = FoscPitchManager.midinoteToPitchName(name);
+            ^FoscPitchClass(name);
+        }
+        { name.isKindOf(FoscPitch) } {
+            ^FoscPitchClass(name.name);
+        }
+        { name.isKindOf(FoscPitchClass) } {
+            ^name;
+        }
+        { 
+            throw("Can't initialize % from value: %".format(this.species, name));
+        };
 
-	x = FoscPitchClass('C4');
-    x.pitchClassNumber.class;
-	-------------------------------------------------------------------------------------------------------- */
-    asFloat {
-    	^this.pitchClassNumber.asFloat;
+        accidental = FoscAccidental(FoscPitchManager.prSplitLilypondPitchName(name)[1]);
     }
-	/* --------------------------------------------------------------------------------------------------------
-    • asInteger (abjad: __int__)
-
-	'''Changes numbered pitch to integer.
-	
-	Returns integer.
-	'''
- 	
-	x = FoscPitchClass('C+4');
-    x.asInt;
-	-------------------------------------------------------------------------------------------------------- */
-    asInteger {
-    	^this.pitchClassNumber.asInteger;
-    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC INSTANCE METHODS: SPECIAL METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • == (abjad: __eq__)
-    a = FoscPitchClass('C#');
-    b = FoscPitchClass('Db');
-    c = FoscPitchClass('B');
-  	a == a;
+    • ==
+
+    a = FoscPitchClass("cs");
+    b = FoscPitchClass("ds");
+    c = FoscPitchClass("b");
+    a == a;
     a == b; // Enharmonic equivalents are treated as equal
     a == c;
-	-------------------------------------------------------------------------------------------------------- */
+    -------------------------------------------------------------------------------------------------------- */
     == { |expr|
-    	^(this.pitchClassNumber == FoscPitchClass(expr).pitchClassNumber);
+        ^(this.number == FoscPitchClass(expr).number);
     }
     /* --------------------------------------------------------------------------------------------------------
     • !=
-    a = FoscPitchClass('C#');
-    b = FoscPitchClass('Db');
-    c = FoscPitchClass('B');
-  	a != a;
+
+    a = FoscPitchClass("cs");
+    b = FoscPitchClass("ds");
+    c = FoscPitchClass("b");
+    a != a;
     a != b; // Enharmonic equivalents are treated as equal
     a != c;
-	-------------------------------------------------------------------------------------------------------- */
+    -------------------------------------------------------------------------------------------------------- */
     != { |expr|
-    	^(this == expr).not;
+        ^(this == expr).not;
     }
-	/* --------------------------------------------------------------------------------------------------------
+    /* --------------------------------------------------------------------------------------------------------
     • <
-	'''Is true when `arg` can be coerced to a numbered pitch and when this numbered pitch is less than `arg`. Otherwise false.
 
-	Returns true or false.
-	'''
+    Is true when 'expr' can be coerced to a numbered pitch and when this numbered pitch is less than 'expr'. Otherwise false.
 
-    a = FoscPitchClass('C#4');
-    b = FoscPitchClass('D#4');
-    c = FoscPitchClass('B3');
+    Returns true or false.
+    
+
+    a = FoscPitchClass("cs");
+    b = FoscPitchClass("ds");
+    c = FoscPitchClass("b");
     a < b;
     a < c;
-	-------------------------------------------------------------------------------------------------------- */
+    -------------------------------------------------------------------------------------------------------- */
     < { |expr|
-    	^(this.pitchClassNumber < FoscPitchClass(expr).pitchClassNumber);
+        ^(this.number < FoscPitchClass(expr).number);
     }
     /* --------------------------------------------------------------------------------------------------------
     • <=
-    a = FoscPitchClass('C#4');
-    b = FoscPitchClass('D#4');
-    c = FoscPitchClass('B3');
+
+    a = FoscPitchClass("cs");
+    b = FoscPitchClass("ds");
+    c = FoscPitchClass("b");
     a <= b;
     a <= c;
-	-------------------------------------------------------------------------------------------------------- */
+    -------------------------------------------------------------------------------------------------------- */
     <= { |expr|
-    	^(this.pitchClassNumber <= FoscPitchClass(expr).pitchClassNumber);
+        ^(this.number <= FoscPitchClass(expr).number);
     }
-	/* --------------------------------------------------------------------------------------------------------
+    /* --------------------------------------------------------------------------------------------------------
+    • add
+
+
+    !!!TODO: respelling
+
+
+    • Example 1
+
+    x = FoscPitchClass("cs");
+    x = x + 2;
+    x.str;
+
+
+    • Example 2
+
+    x = FoscPitchClass("cs");
+    x = x + FoscPitchClass("d");
+    x.str;
+    -------------------------------------------------------------------------------------------------------- */
+    add { |expr|
+        var semitones, respell, result;
+        
+        semitones = case
+        { expr.isKindOf(FoscPitchClass) } { expr.number }
+        { expr.isNumber } { expr }
+        {
+            throw("Bad argument type for %:%: '%'".format(this.species, thisMethod.name, expr));
+        };
+
+        respell = case
+        { this.isSharpened } { 'respellWithSharp' }
+        { this.isFlattened } { 'respellWithFlat' };
+        
+        result = this.species.new(this.number + semitones % 12);
+        if (respell.notNil && { result.isDiatonic.not }) { result = result.perform(respell) };
+        
+        ^result;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • asCompileString
+    
+    a = FoscPitchClass("cs");
+    a.cs;
+    -------------------------------------------------------------------------------------------------------- */
+    asCompileString {
+        ^"FoscPitchClass(%)".format(this.str.cs);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • format
+    
+    a = FoscPitchClass("cs");
+    a.format;
+    -------------------------------------------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------------------------------------------
     • neg
 
-	'''Negates pitchClassNumber. Equivalent to inversion around 0.
+    Negates number. Equivalent to inversion around 0.
 
-	Returns new PitchClass.
-	'''
-	
-	a = FoscPitchClass('D');
-	b = a.neg;
-	b.pitchClassNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	neg {
-		^this.species.new(this.pitchClassNumber.neg);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • str (abjad: __str__)
+    Returns new PitchClass.
     
-    a = FoscPitchClass('C#');
-    a.str;
-	-------------------------------------------------------------------------------------------------------- */
-    str {
-    	^this.lilypondPitchClassName;
-    }
-	/* --------------------------------------------------------------------------------------------------------
-    • sub
-    //••• !!! TODO: update to use NumberedInterval
-    def __sub__(self, arg):
-        r'''Subtracts `arg` from numbered pitch.
-
-        Returns numbered interval.
-        '''
-        from abjad.tools import pitchtools
-        if isinstance(arg, type(self)):
-            return pitchtools.NumberedInterval.from_pitch_carriers(
-                self, arg)
-        else:
-            interval = arg
-            return pitchtools.transpose_pitch_carrier_by_interval(
-                self, -interval)
+    a = FoscPitchClass('d');
+    b = a.neg;
+    b.number;
     -------------------------------------------------------------------------------------------------------- */
-    // sub { |expr|
-    // 	^(this.pitchNumber - expr);
-    // } 
+    neg {
+        ^this.species.new(this.number.neg);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • str
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/* --------------------------------------------------------------------------------------------------------
-    • accidental
-	-------------------------------------------------------------------------------------------------------- */
-	accidental {
-		^FoscAccidental(this.accidentalName);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • accidentalName
-	-------------------------------------------------------------------------------------------------------- */
-	accidentalName {
-		^pitchClassName.asString.accidentalName;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • alterationInSemitones
-	-------------------------------------------------------------------------------------------------------- */
-	alterationInSemitones {
-		^this.accidental.semitones;
-	}
-   	/* --------------------------------------------------------------------------------------------------------
-    • applyAccidental
-	-------------------------------------------------------------------------------------------------------- */
-	applyAccidental { |accidental|
-		^this.notYetImplemented(thisMethod);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • diatonicPitchClassName
-	-------------------------------------------------------------------------------------------------------- */
-	diatonicPitchClassName {
-		^pitchClassName.asString.diatonicPitchClassName;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • diatonicPitchClassNumber
-	-------------------------------------------------------------------------------------------------------- */
-	diatonicPitchClassNumber {
-		^manager.pitchClassNameToDiatonicPitchClassNumber(pitchClassName);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • lilypondPitchClassName
+    a = FoscPitchClass('cs');
+    a.str;
+    -------------------------------------------------------------------------------------------------------- */
+    str {
+        ^this.name;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • sub
 
-    a = FoscPitchClass(10);
-    a.lilypondPitchClassName;
-	-------------------------------------------------------------------------------------------------------- */
-	lilypondPitchClassName {
-		^manager.pitchClassNameToLilyPondPitchClassName(pitchClassName);
-	}
-	/* --------------------------------------------------------------------------------------------------------
+    • Example 1
+
+    x = FoscPitchClass("cs");
+    x = x - 2;
+    x.str;
+
+
+    • Example 2
+
+    x = FoscPitchClass("cs");
+    x = x - FoscPitchClass("d");
+    x.str;
+    -------------------------------------------------------------------------------------------------------- */
+    sub { |expr|
+        ^(this + expr.neg);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC INSTANCE PROPERTIES
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • isFlattened
+
+    a = FoscPitchClass("cs");
+    a.isFlattened;
+
+    a = FoscPitchClass("ctqf");
+    a.isFlattened;
+    -------------------------------------------------------------------------------------------------------- */
+    isFlattened {
+        ^(this.accidental.semitones < 0);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • isSharpened
+
+    a = FoscPitchClass("cs");
+    a.isSharpened;
+
+    a = FoscPitchClass("ctqf");
+    a.isSharpened;
+    -------------------------------------------------------------------------------------------------------- */
+    isSharpened {
+        ^(this.accidental.semitones > 0);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • name
+
+    a = FoscPitchClass("cs");
+    a.name;
+    -------------------------------------------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------------------------------------------
+    • number
+
+    a = FoscPitchClass("cs");
+    a.number;
+    -------------------------------------------------------------------------------------------------------- */
+    number {
+        var result; 
+
+        result = FoscPitchManager.diatonicPitchClassNameToDiatonicPitchClassNumber(this.name);
+        result = result + this.accidental.semitones;
+        if (result.frac == 0) { result = result.asInteger };
+        
+        ^result;
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC INSTANCE METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
     • invert
     
-    Inverts pitch-class about `axis`.
+    Inverts pitch-class about 'axis'.
 
-	Returns new pitch-class.
+    Returns new pitch-class.
 
 
-	a = FoscPitchClass(11);
-	b = a.invert(10);
-	b.pitchClassNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	invert { |axis|
-		var pitch;
-		pitch = FoscPitch(this).invert(axis);
-		^this.species.new(pitch);
-	}
-  	/* --------------------------------------------------------------------------------------------------------
-    • multiply
-    
-    Multiplies pitch-class by `n`.
+    • Example 1
 
-	Returns new pitch-class.
+    a = FoscPitchClass(11);
+    b = a.invert(0);
+    b.number;
+    b.str;
 
-	a = FoscPitchClass(7);
-	b = a.multiply(2);
-	b.pitchClassNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	multiply { |n|
-		var pitch;
-		pitch = FoscPitch(this).multiply(n);
-		^this.species.new(pitch);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • pitchClassNumber
-	-------------------------------------------------------------------------------------------------------- */
-	pitchClassNumber {
-		^this.diatonicPitchClassNumber + this.alterationInSemitones;
-	}
-	/* --------------------------------------------------------------------------------------------------------
+
+    • Example 2
+
+    a = FoscPitchClass("b");
+    b = a.invert(FoscPitchClass("c"));
+    b.number;
+    b.str;
+    -------------------------------------------------------------------------------------------------------- */
+    invert { |axis|
+        axis = this.species.new(axis);
+        ^(axis - (this + axis));
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • respell
+    -------------------------------------------------------------------------------------------------------- */
+    respell { |accidental='sharp'|
+        // NOT YET IMPLEMENTED
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • respellWithFlat
+
+    !!! DEPRECATE
+
+    a = FoscPitchClass("cs");
+    b = a.respellWithFlat;
+    b.str;
+    -------------------------------------------------------------------------------------------------------- */
+    // respellWithFlat {
+    //     //!!!TODO: update to use FoscTuning
+    //     var pitchClassName;
+    //     pitchClassName = FoscPitchManager.pitchClassNumberToPitchClassNameWithFlats(this.number);
+    //     ^this.species.new(pitchClassName);
+    // }
+    /* --------------------------------------------------------------------------------------------------------
+    • respellWithSharp
+
+    !!! DEPRECATE
+
+    a = FoscPitchClass("df");
+    b = a.respellWithSharp;
+    b.str;
+    -------------------------------------------------------------------------------------------------------- */
+    // respellWithSharp {
+    //     //!!!TODO: update to use FoscTuning
+    //     var pitchClassName;
+    //     pitchClassName = FoscPitchManager.pitchClassNumberToPitchClassNameWithSharps(this.number);
+    //     ^this.species.new(pitchClassName);
+    // }
+    /* --------------------------------------------------------------------------------------------------------
     • transpose
+
+    Transposes pitch-class by 'n''.
+
+    Returns new pitch-class.
+
+    a = FoscPitchClass(11);
+    b = a.transpose(9);
+    b.number;
+    b.str;
+    -------------------------------------------------------------------------------------------------------- */
+    transpose { |expr|
+        ^(this + expr);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE INSTANCE METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • prAlteration
+
+    a = FoscPitchClass("cs");
+    a.prAlteration;
+    -------------------------------------------------------------------------------------------------------- */
+    prAlteration {
+        ^this.accidental.semitones;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prApplyAccidental
     
-    Transposes pitch-class by `n`'.
+    a = FoscPitchClass("c");
+    a.prApplyAccidental("s").cs;
 
-	Returns new pitch-class.
+    a = FoscPitchClass("cs");
+    a.prApplyAccidental("s").cs;
+    -------------------------------------------------------------------------------------------------------- */
+    prApplyAccidental { |accidental|
+        accidental = this.accidental + FoscAccidental(accidental);
+        ^this.species.new(this.prDiatonicPitchClassName ++ accidental.str);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prDiatonicPitchClassName
 
-	a = FoscPitchClass(11);
-	b = a.transpose(9);
-	b.pitchClassNumber;
-	b.pitchClassName;
-	-------------------------------------------------------------------------------------------------------- */
-	transpose { |expr|
-		var pitch;
-		pitch = FoscPitch(this).transpose(expr);
-		^this.species.new(pitch);
-	}
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// DISPLAY
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/* --------------------------------------------------------------------------------------------------------
-    • inspect
-	-------------------------------------------------------------------------------------------------------- */
-	inspect {
-		super.inspect(#[
-			accidental, accidentalName, alterationInSemitones, diatonicPitchClassName, diatonicPitchClassNumber,
-			pitchClassNumber
-		]);
-	}
+    a = FoscPitchClass("c");
+    a.prDiatonicPitchClassName;
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PRIVATE
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/* --------------------------------------------------------------------------------------------------------
-    • 
-    def _get_format_specification(self):
-        if type(self).__name__.startswith('Named'):
-            values = [str(self)]
-        else:
-            values = [
-                mathtools.integer_equivalent_number_to_integer(float(self))
-                ]
-        return systemtools.FormatSpecification(
-            client=self,
-            coerce_for_equality=True,
-            storage_format_is_indented=False,
-            storage_format_args_values=values,
-            template_names=['pitch_class_name'],
-            )
-	-------------------------------------------------------------------------------------------------------- */
-}
-/* ---------------------------------------------------------------------------------------------------------------
-• FoscNamedPitchClass
-//!!!TODO
---------------------------------------------------------------------------------------------------------------- */
-FoscNamedPitchClass : FoscPitchClass {
-}
-/* ---------------------------------------------------------------------------------------------------------------
-• FoscNumberedPitchClass
-//!!!TODO
---------------------------------------------------------------------------------------------------------------- */
-FoscNumberedPitchClass : FoscPitchClass {
+    a = FoscPitchClass("cs");
+    a.prDiatonicPitchClassName;
+    -------------------------------------------------------------------------------------------------------- */
+    prDiatonicPitchClassName {
+        ^FoscPitchManager.diatonicPitchClassNumberToDiatonicPitchClassName(this.prDiatonicPitchClassNumber);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    •  prDiatonicPitchClassNumber
+
+    a = FoscPitchClass("c");
+    a.prDiatonicPitchClassNumber;
+
+    a = FoscPitchClass("cs");
+    a.prDiatonicPitchClassNumber;
+    -------------------------------------------------------------------------------------------------------- */
+    prDiatonicPitchClassNumber {
+        ^FoscPitchManager.diatonicPitchClassNameToDiatonicPitchClassNumber(this.name);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prLilypondFormat
+    
+    a = FoscPitchClass("cs");
+    a.prLilypondFormat;
+    -------------------------------------------------------------------------------------------------------- */
+    prLilypondFormat {
+        ^"%%".format(this.prDiatonicPitchClassName, this.accidental.str);
+    }
 }

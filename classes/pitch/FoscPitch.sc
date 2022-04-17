@@ -1,107 +1,127 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscPitch
 
+!!!TODO
+- Do not round 'midinote' when initialised with a number
+- Get nearest matching pitch name, but only round when a FoscTuning is active
 
-### TODO: abjad public methods
-accidental_spelling	// Accidental spelling of Abjad session (retrieves from abjad_configuration)
-apply_accidental
-
-### TODO: make set operations work for collections of pitches, eg:
-[60, 61, 62].collect { |each| FoscPitch(each) }.sect([60, 62].collect { |each| FoscPitch(each) });
+a = FoscPitch(60.1);
+a.midinote;
 
 
-• Example 1
+!!!TODO:
+- Establish consistent use of 'midinote' and 'pitchNumber' in: FoscPitch, FoscPitchSegment, FoscPitchSet, FoscPitchClassSet, FoscPitchManager, FoscTuning, FoscOctave
+- Perhaps create a utitilty class for bridging between SC and Fosc idioms, e.g. 'midinote', 'note', 'degree', 'octave', etc. to 'pitchNumber', etc.
 
-Quantize to 1/8th tones
 
-a = FoscPitch(60.25);
-a.pitchNumber;
+!!! add pitchNumber method (FoscPitch("cs'").pitchNumber == 1)
+!!! possibly call pitchNumber methods 'note' for SC pattern compatability (but confusion with FoscNote!!)
+
+
+
+• Example 1 - Initialize with a lilypond string and get some properties.
+
+a = FoscPitch("cs'");
+a.name;
 a.str;
+a.format;
+a.accidental.cs;
+a.octave.cs;
+a.pitchClass.cs;
+a.cps;
+a.isFlattened;
+a.isSharpened;
+a.midinote;
 
-a = FoscPitch(60.75);
-a.pitchNumber;
+
+
+//!!! TODO: a.respell(accidental: 'sharp'); 
+
+//!!! TODO: BROKEN
+a.respellWithSharps;
+a.respellWithFlats;
+a.invert(FoscPitch("c'"));
+a.transpose(5).cs;
+
+a.illustrate.format;
+a.show;
+
+
+• Example 2 - Initialize with a pitch number
+
+a = FoscPitch(0.5);
 a.str;
+a.show;
 
-
-• Example 2
-
-a = FoscPitch("C4", arrow: 'up');
-a.pitchNumber;
-a.str;
-
-a = FoscPitch("C#4", arrow: 'down');
-a.pitchNumber;
-a.str;
+FoscOctave
 ------------------------------------------------------------------------------------------------------------ */
 FoscPitch : FoscObject {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	var <pitchClass, <octave, <accidental, <arrow;
-	var manager;
-	*new { |val, arrow|
-		^super.new.init(val, arrow);
+    var <name;
+	*new { |name|
+        ^super.new.init(name);
 	}
-	init { |val, argArrow|
-		var initializer, arrowState;
-		manager = FoscPitchNameManager;
-		
-        initializer = case
-		{ val.isNumber } {
-            FoscNumberedPitch(val);
-        }
-		{ val.isKindOf(FoscPitch) } {
-            FoscNamedPitch(val.pitchName, val.arrow);
-        }
-		{ val.asString.isPitchName } {
-            FoscNamedPitch(val, argArrow);
-        }
-		{ val.asString.isLilyPondPitchName } {
-            FoscNamedPitch(manager.lilypondPitchNameToPitchName(val), argArrow);
-        }
-		{ val.isKindOf(FoscPitchClass) } {
-            FoscPitch(val.pitchClassName ++ "4", val.arrow);
-        }
-		{ 
-            throw("Can't initialize % from value: %".format(this.species, val));
-        };
+	init { |argName|
+        name = argName;
 
-		pitchClass = initializer.pitchClass;
-		octave = initializer.octave;
-		accidental = initializer.accidental;
-        arrow = initializer.arrow;
-        if (arrow.notNil && { #['up', 'down'].includes(arrow) }) {
-            accidental.arrow_(arrow);
+        case
+        { name.isString && { FoscPitchManager.isPitchName(name) } } {
+            // pass
+        }
+        { name.isKindOf(Symbol) } {
+            ^FoscPitch(name.asString);
+        }
+        { name.isNumber } {
+            name = FoscPitchManager.midinoteToPitchName(name);
+            ^FoscPitch(name);
+        }
+        { name.isKindOf(FoscPitchClass) } {
+            ^FoscPitch(name.name);
+        }
+        { name.isKindOf(FoscPitch) } {
+            ^name;
+        }
+        { 
+            throw("Can't initialize % from value: %".format(this.species, name));
         };
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC METHODS: SPECIAL
+	// PUBLIC INSTANCE METHODS: SPECIAL METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
-    • == (abjad: __eq__)
+    • ==
 
-    a = FoscPitch('C#4');
-    b = FoscPitch('Db4');
-    c = FoscPitch('B3');
+    a = FoscPitch("cs'");
+    b = FoscPitch("df'");
+    c = FoscPitch("b");
     a == a;
-    a == b; // Enharmonic equivalents are treated as equal
+    a == b;     // Enharmonic equivalents are treated as equal
     a == c;
+
+    m = a.midinote;
+    n = b.midinote;
+    m == n;
+
+    FoscObject
     -------------------------------------------------------------------------------------------------------- */
-    == { |expr|
-        ^(this.pitchNumber == FoscPitch(expr).pitchNumber);
-    }
+    // == { |expr|
+    //     ^this.midinote == FoscPitch(expr).midinote;
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • !=
 
-    a = FoscPitch('C#4');
-    b = FoscPitch('Db4');
-    c = FoscPitch('B3');
-    a != b; // Enharmonic equivalents are treated as equal
+    a = FoscPitch("cs'");
+    b = FoscPitch("df'");
+    c = FoscPitch("b");
+    a != b;     // Enharmonic equivalents are treated as equal
     a != c;
     a != a;
     -------------------------------------------------------------------------------------------------------- */
     != { |expr|
-        ^(this == expr).not;
+        //^this != expr;
+        ^(this.midinote != FoscPitch(expr).midinote);
     }
     /* --------------------------------------------------------------------------------------------------------
     • >
@@ -111,15 +131,15 @@ FoscPitch : FoscObject {
     Returns true or false.
     
 
-    a = FoscPitch('C#4');
-    b = FoscPitch('D#4');
-    c = FoscPitch('B3');
+    a = FoscPitch("cs'");
+    b = FoscPitch("ds'");
+    c = FoscPitch("b");
     a > b;
     a > c;
     a > a;
     -------------------------------------------------------------------------------------------------------- */
     > { |expr|
-        ^(this.pitchNumber > FoscPitch(expr).pitchNumber);
+        ^this.midinote > FoscPitch(expr).midinote;
     }
     /* --------------------------------------------------------------------------------------------------------
     • >=
@@ -128,15 +148,15 @@ FoscPitch : FoscObject {
 
     Returns true or false.
 
-    a = FoscPitch('C#4');
-    b = FoscPitch('D#4');
-    c = FoscPitch('B3');
+    a = FoscPitch("cs'");
+    b = FoscPitch("ds'");
+    c = FoscPitch("b");
     a >= a;
     a >= b;
     a >= c;
     -------------------------------------------------------------------------------------------------------- */
     >= { |expr|
-        ^(this.pitchNumber >= FoscPitch(expr).pitchNumber);
+        ^(this.midinote >= FoscPitch(expr).midinote);
     }
     /* --------------------------------------------------------------------------------------------------------
     • <
@@ -145,9 +165,9 @@ FoscPitch : FoscObject {
 
     Returns true or false.
 
-    a = FoscPitch('C#4');
-    b = FoscPitch('D#4');
-    c = FoscPitch('B3');
+    a = FoscPitch("cs'");
+    b = FoscPitch("ds'");
+    c = FoscPitch("b");
     a < b;
     a < c;
     a < a;
@@ -159,420 +179,421 @@ FoscPitch : FoscObject {
 
     Returns true or false.
 
-    a = FoscPitch('C#4');
-    b = FoscPitch('D#4');
-    c = FoscPitch('B3');
+    a = FoscPitch("cs'");
+    b = FoscPitch("ds'");
+    c = FoscPitch("b");
     a <= a;
     a <= b;
     a <= c;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
-	• add (abjad: __add__)
+    • add
 
-	Adds arg to numberd pitch.
+    • Example 1
 
-	Returns new numbered pitch.
-	
+    x = FoscPitch("cs");
+    x = x + 2;
+    x.str;
 
-	x = FoscPitch('C#4');
-	x = x + 2;
-	x.pitchName;
 
-    x = FoscPitch('C#4') + FoscInterval(2);
-    x.pitchName;
-	-------------------------------------------------------------------------------------------------------- */
+    • Example 2
+
+    x = FoscPitch("cs");
+    x = x + FoscPitch("d");
+    x.str;
+    -------------------------------------------------------------------------------------------------------- */
     add { |expr|
-        if (expr.isKindOf(FoscInterval)) { expr = expr.number };
-    	^FoscPitch(this.pitchNumber + FoscPitch(expr).pitchNumber);
+        var semitones, respell, result;
+        
+        semitones = case
+        { expr.isKindOf(FoscPitch) } { expr.midinote }
+        { expr.isNumber } { expr }
+        {
+            throw("Bad argument type for %:%: '%'".format(this.species, thisMethod.name, expr));
+        };
+
+        // respell = case
+        // { this.isSharpened } { 'respellWithSharp' }
+        // { this.isFlattened } { 'respellWithFlat' };
+        
+        result = this.species.new(this.midinote + semitones);
+        //if (respell.notNil && { result.isDiatonic.not }) { result = result.perform(respell) };
+        
+        ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • asCompileString
+    • format
+
+    a = FoscPitch("cs'");
+    a.format;
     -------------------------------------------------------------------------------------------------------- */
-    asCompileString {
-        ^"FoscPitch('%')".format(this.pitchName);
-    }
-	/* --------------------------------------------------------------------------------------------------------
-    • asFloat (abjad: __float__)
-
-	Changes numbered pitch to float.
-
-	Returns float.
-	
-
-	x = FoscPitch('C+4');
-    x.asFloat;
-	-------------------------------------------------------------------------------------------------------- */
-    asFloat {
-    	^this.pitchNumber.asFloat;
-    }
-	/* --------------------------------------------------------------------------------------------------------
-    • asInteger (abjad: __int__)
-
-	Changes numbered pitch to integer.
-	
-	Returns integer.
-	
- 	
-	x = FoscPitch('C+4');
-    x.asInt;
-	-------------------------------------------------------------------------------------------------------- */
-    asInteger {
-    	^this.pitchNumber.asInteger;
-    }
     /* --------------------------------------------------------------------------------------------------------
     • neg
 
-	Negates numbered pitch.
+    Negates 'midinote'. Equivalent to inversion around 0.
 
-	Returns new numbered pitch.
-	
-	
-	a = FoscPitch('C#4');
-	b = a.neg;
-	b.pitchNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	neg {
-		^FoscPitch(this.pitchNumber.neg);
-	}
-    /* --------------------------------------------------------------------------------------------------------
-    • storeArgs
+    Returns new PitchClass.
+    
+    a = FoscPitch("c");
+    b = a.neg;
+    b.midinote;
     -------------------------------------------------------------------------------------------------------- */
-    storeArgs {
-        ^[this.pitchName];
+    neg {
+        ^this.species.new(this.midinote.neg);
     }
     /* --------------------------------------------------------------------------------------------------------
-    • str (abjad: __str__)
+    • asCompileString
+
+    a = FoscPitch("cs'");
+    a.cs;
+    -------------------------------------------------------------------------------------------------------- */
+    asCompileString {
+        ^"FoscPitch(%)".format(this.str.cs);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • storeArgs
+
+    a = FoscPitch("cs'");
+    a.storeArgs;
+    -------------------------------------------------------------------------------------------------------- */
+    storeArgs {
+        ^[this.str];
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • str
     
+	a = FoscPitch("cs'");
+    a.str;
+
     a = FoscPitch('C#4');
     a.str;
 
-    •••••••••••••••••••• TODO
-    a = FoscPitch('C#4', arrow: 'up');
+    a = FoscPitch('C#+4');
     a.str;
 	-------------------------------------------------------------------------------------------------------- */
     str {
-    	^this.lilypondPitchName;
+    	^this.name;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • pitchString
-    
-    a = FoscPitch('C#4');
-    a.pitchString;
-    a.ps;
-    -------------------------------------------------------------------------------------------------------- */
-    pitchString {
-        ^"\"%\"".format(this.pitchName);
-    }
-	/* --------------------------------------------------------------------------------------------------------
     • sub
+
+    • Example 1
+
+    x = FoscPitchClass("cs");
+    x = x - 2;
+    x.str;
+
+
+    • Example 2
+
+    x = FoscPitchClass("cs");
+    x = x - FoscPitchClass("d");
+    x.str;
     -------------------------------------------------------------------------------------------------------- */
     sub { |expr|
-        ^this.notYetImplemented(thisMethod);
+        ^(this + expr.neg);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC PROPERTIES
+	// PUBLIC INSTANCE PROPERTIES
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
-    • accidentalName
+    • accidental
 
-    FoscPitch('Db5').accidentalName;
+    a = FoscPitch("cs'");
+    a.accidental;
+    a.accidental.name;
+    a.accidental.semitones;
+    -------------------------------------------------------------------------------------------------------- */
+    accidental {
+        ^this.pitchClass.accidental;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • cps
 
-    •••••••••••••••••••• DONE
-    FoscPitch('Db5', arrow: 'up').accidentalName;
-	-------------------------------------------------------------------------------------------------------- */
-	accidentalName {
-		^accidental.name;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • alterationInSemitones
-
-    FoscPitch('Db5').alterationInSemitones;
-
-    •••••••••••••••••••• DONE
-    FoscPitch('Db5', arrow: 'down').alterationInSemitones;
-	-------------------------------------------------------------------------------------------------------- */
-	alterationInSemitones {
-		^accidental.semitones;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • diatonicPitchClassName
-
-    FoscPitch('Db5').diatonicPitchClassName;
-	-------------------------------------------------------------------------------------------------------- */
-	diatonicPitchClassName {
-		^pitchClass.diatonicPitchClassName;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • diatonicPitchClassNumber
-
-    FoscPitch('Db5').diatonicPitchClassNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	diatonicPitchClassNumber {
-		^pitchClass.diatonicPitchClassNumber;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • diatonicPitchName
-
-    FoscPitch('Db5').diatonicPitchName;
-	-------------------------------------------------------------------------------------------------------- */
-	diatonicPitchName {
-		^(pitchClass.diatonicPitchClassName ++ octave.octaveName);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • diatonicPitchNumber
-
-    FoscPitch('Db5').diatonicPitchNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	diatonicPitchNumber {
-		^((12 * (octave.octaveNumber + 1)) + pitchClass.diatonicPitchClassNumber);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • isDiatonic
-
-    FoscPitch('Db5').isDiatonic;
-	-------------------------------------------------------------------------------------------------------- */
-	isDiatonic {
-		^(this.pitchClassName == this.diatonicPitchClassName);
-	}
-	/* --------------------------------------------------------------------------------------------------------
+    a = FoscPitch("a'");
+    a.cps;
+    -------------------------------------------------------------------------------------------------------- */
+    cps {
+        ^this.midinote.midicps;
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • isFlattened
 
-    FoscPitch('Db5').isFlattened;
-	-------------------------------------------------------------------------------------------------------- */
-	isFlattened {
-		^#['b', 'bb', '~', 'b~'].includes(this.accidentalName.asSymbol);
-	}
-	/* --------------------------------------------------------------------------------------------------------
+    a = FoscPitch("cs'");
+    a.isFlattened;
+    -------------------------------------------------------------------------------------------------------- */
+    isFlattened {
+        ^this.pitchClass.isFlattened;
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • isSharpened
 
-    FoscPitch('Db5').isSharpened;
-	-------------------------------------------------------------------------------------------------------- */
-	isSharpened {
-		^#['#', '##', '+', '#+'].includes(this.accidentalName.asSymbol);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • lilypondPitchName
-
-    FoscPitch('Db5').lilypondPitchName;
-
-    •••••••••••••••••••• DONE
-    FoscPitch('Db5', arrow: 'up').lilypondPitchName;
-	-------------------------------------------------------------------------------------------------------- */
-	lilypondPitchName {
-		^manager.pitchNameToLilypondPitchName(this.pitchName, arrow: arrow);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • midicps
-
-    FoscPitch('A4').midicps;
-	-------------------------------------------------------------------------------------------------------- */
-	midicps {
-		^this.pitchNumber.midicps;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • octaveName
-
-    FoscPitch('Db5').octaveName;
-	-------------------------------------------------------------------------------------------------------- */
-	octaveName {
-		^octave.octaveName;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • octaveNumber
-
-    FoscPitch('Db5').octaveNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	octaveNumber {
-		^octave.octaveNumber;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • pitchClassName
-
-    FoscPitch('Db5').pitchClassName;
-	-------------------------------------------------------------------------------------------------------- */
-	pitchClassName {
-		^pitchClass.pitchClassName;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • pitchClassNumber
-
-    FoscPitch('Db5').pitchClassNumber;
-
-    •••••••••••••••••••• TODO
-    FoscPitch('Db5', arrow: 'up').pitchClassNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	pitchClassNumber {
-		^pitchClass.pitchClassNumber;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • pitchName
-
-    FoscPitch('Db5').pitchName;
-	-------------------------------------------------------------------------------------------------------- */
-	pitchName {
-		^(pitchClass.pitchClassName ++ octave.octaveName);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • pitchNumber
-    
-    FoscPitch('Db~5').pitchNumber;
-
-    FoscPitch(61.5).pitchNumber;
-
-    FoscPitch('C4', arrow: 'up').pitchNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	pitchNumber {
-        var result;
-		result = (pitchClass.pitchClassNumber + 12 + (octave.octaveNumber * 12));
-        if (arrow.notNil) {
-            switch(arrow,
-                'up', { result = result + 0.25 },
-                'down', { result = result - 0.25 },
-            );
-        };
-        ^result;
-	}
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC METHODS: TRANSFORMATIONS
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/* --------------------------------------------------------------------------------------------------------
-    • applyAccidental
-	-------------------------------------------------------------------------------------------------------- */
-	applyAccidental { |accidental|
-		^this.notYetImplemented(thisMethod);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • multiply
-	
-    Multiplies pitch-class of numbered pitch by n and maintains octave.
-	
-	Returns new numbered pitch.
-	
-
-    a = FoscPitch(62);
-    a = a.multiply(3);
-    a.pitchNumber;
-	-------------------------------------------------------------------------------------------------------- */
-	multiply { |n=1|
-		var pitchClassNumber, octaveFloor;
-		pitchClassNumber = (this.pitchClassNumber * n) % 12;
-		octaveFloor = (this.octaveNumber + 1) * 12;
-		^this.species.new(pitchClassNumber + octaveFloor);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • invert
-
-	x = FoscPitch('Eb4');
-	x = x.invert(axis: 'D4');
-	x.pitchName;
-	-------------------------------------------------------------------------------------------------------- */
-	invert { |axis|
-		axis = FoscPitch(axis);
-		axis = axis.transpose(axis.pitchNumber - this.pitchNumber);
-		^this.species.new(axis);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • respellWithFlats
-
-    x = FoscPitch('C#4');
-	x.pitchName;
-	x = x.respellWithFlats;
-	x.pitchName;
-	-------------------------------------------------------------------------------------------------------- */
-	respellWithFlats {
-		^this.species.new(manager.pitchClassNumberToPitchClassNameWithFlats(pitchClass.pitchClassNumber) ++ octave.octaveName);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • respellWithSharps
-
-    x = FoscPitch('Db4');
-	x.pitchName;
-	x = x.respellWithSharps;
-	x.pitchName;
-	-------------------------------------------------------------------------------------------------------- */
-	respellWithSharps {
-		^this.species.new(manager.pitchClassNumberToPitchClassNameWithSharps(pitchClass.pitchClassNumber) ++ octave.octaveName);
-	}
-    /* --------------------------------------------------------------------------------------------------------
-    • toStaffPosition
-
-    Changes named pitch to staff position.
+    a = FoscPitch("cs'");
+    a.isSharpened;
     -------------------------------------------------------------------------------------------------------- */
-	toStaffPosition { |clef|
-        var staffPositionNumber, staffPosition;
-        staffPositionNumber = this.diatonicPitchNumber;
-        if (clef.notNil) {
-            clef = FoscClef(clef);
-            staffPositionNumber = staffPositionNumber + clef.middleCPositionNumber;
-        };
-        staffPosition = FoscStaffPosition(staffPositionNumber);
-        ^staffPosition;
+    isSharpened {
+        ^this.pitchClass.isSharpened;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • midinote
+
+    a = FoscPitch("cs'");
+    a.midinote;
+
+    a = FoscPitch("ctqf'");
+    a.midinote;
+
+    a = FoscPitch("c,");
+    a.midinote;
+    -------------------------------------------------------------------------------------------------------- */
+    midinote {
+        ^this.prDiatonicMidinote + this.prAlteration;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • octave
+
+    a = FoscPitch("cs'");
+    a.octave;
+    a.octave.name;
+    a.octave.number;
+    -------------------------------------------------------------------------------------------------------- */
+    octave {
+        ^FoscOctave(this);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • pitchClass
+
+    a = FoscPitch("cs'");
+    a.pitchClass;
+    a.pitchClass.name;
+    a.pitchClass.number;
+    -------------------------------------------------------------------------------------------------------- */
+    pitchClass {
+        ^FoscPitchClass(this);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PUBLIC INSTANCE METHODS
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/* --------------------------------------------------------------------------------------------------------
+    • illustrate
+
+    a = FoscPitch("cs''");
+    a.illustrate.format;
+    -------------------------------------------------------------------------------------------------------- */
+    illustrate {
+        var note, includes, lilypondFile;
+
+        note = FoscNote(this, 1/4);
+        if (this < 55) { note.attach(FoscClef('bass')) };
+        includes = "%/noteheads.ily".format(FoscConfiguration.stylesheetDirectory);
+        lilypondFile = FoscLilypondFile([note], includes: [includes]);
+        
+        ^lilypondFile;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • invert
+    
+    Inverts pitch about 'axis'.
+
+    Returns new pitch.
+
+
+    • Example 1
+
+    a = FoscPitch(59);
+    b = a.invert(60);
+    b.midinote;
+    b.str;
+
+
+    • Example 2
+
+    a = FoscPitch("b");
+    b = a.invert(FoscPitch("c'"));
+    b.midinote;
+    b.str;
+    -------------------------------------------------------------------------------------------------------- */
+    invert { |axis|
+        axis = this.species.new(axis);
+        ^(axis + (axis - this));
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • simplify
+
+    !!!TODO: should this return the smallest possible accidental alteration ??
+
+    Reduce alteration to between -2 and 2 while maintaining identical pitch number.
+
+    Returns named pitch.
+
+
+    >>> abjad.NamedPitch("cssqs'").simplify()
+    NamedPitch("dqs'")
+
+    >>> abjad.NamedPitch("cfffqf'").simplify()
+    NamedPitch('aqf')
+
+    >>> float(abjad.NamedPitch("cfffqf'").simplify()) == float(abjad.NamedPitch('aqf'))
+    True
+
+    note:: LilyPond by default only supports accidentals from double-flat to double-sharp.
+
+     def simplify(self):
+        alteration = self._get_alteration()
+        if abs(alteration) <= 2:
+            return self
+        diatonic_pc_number = self._get_diatonic_pc_number()
+        octave = int(self.octave)
+        while alteration > 2:
+            step_size = 2
+            if diatonic_pc_number == 2:  # e to f
+                step_size = 1
+            elif diatonic_pc_number == 6:  # b to c
+                step_size = 1
+                octave += 1
+            diatonic_pc_number = (diatonic_pc_number + 1) % 7
+            alteration -= step_size
+        while alteration < -2:
+            step_size = 2
+            if diatonic_pc_number == 3:  # f to e
+                step_size = 1
+            elif diatonic_pc_number == 0:  # c to b
+                step_size = 1
+                octave -= 1
+            diatonic_pc_number = (diatonic_pc_number - 1) % 7
+            alteration += step_size
+        diatonic_pc_name = _lib._diatonic_pc_number_to_diatonic_pc_name[
+            diatonic_pc_number
+        ]
+        accidental = Accidental(alteration)
+        octave = Octave(octave)
+        pitch_name = f"{diatonic_pc_name}{accidental!s}{octave!s}"
+        return type(self)(pitch_name, arrow=self.arrow)
+    -------------------------------------------------------------------------------------------------------- */
+    simplify {
+        // NOT YET IMPLEMENTED
     }
     /* --------------------------------------------------------------------------------------------------------
     • transpose
 
-    x = FoscPitch('A4');
+    Transpose pitch by 'semitones'.
+
+
+    • Example 1
+
+	x = FoscPitch(67);
 	x = x.transpose(semitones: 6);
-	x.pitchName;
+	x.midinote;
+
+
+    • Example 2 - spells the resulting pitch with the same accidental as the original pitch
+
+    x = FoscPitch("gs'");
+    x = x.transpose(semitones: 7);
+    x.str;
 	-------------------------------------------------------------------------------------------------------- */
 	transpose { |semitones|
-		var respell, result;
-		respell = case
-		{ this.isSharpened } { \respellWithSharps }
-		{ this.isFlattened } { \respellWithFlats };
-		result = this.species.new(this.pitchNumber + semitones);
-		if (respell.notNil && { result.isDiatonic.not }) { result = result.perform(respell) };
-		^result;
-	}
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC METHODS: DISPLAY
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/* --------------------------------------------------------------------------------------------------------
-    • show
-	-------------------------------------------------------------------------------------------------------- */
-	show {
-		^this.notYetImplemented;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • play
-	-------------------------------------------------------------------------------------------------------- */
-	play {
-		^this.notYetImplemented;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • inspect
-
-    FoscPitch("C#5").inspect;
-	-------------------------------------------------------------------------------------------------------- */
-	inspect {
-		super.inspect(#['pitchName', 'pitchNumber']);
+        ^(this + semitones);
 	}
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PRIVATE METHODS
+    // PRIVATE INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • prGetFormatSpecification
+    • prAlteration
 
-    - abjad 2.21
-    def _get_format_specification(self):
-    import abjad
-    return abjad.FormatSpecification(
-        self,
-        coerce_for_equality=True,
-        repr_is_indented=False,
-        storage_format_args_values=[self.name],
-        storage_format_is_indented=False,
-        storage_format_kwargs_names=['arrow'],
-        )
+    a = FoscPitch("cs'");
+    a.prAlteration;
     -------------------------------------------------------------------------------------------------------- */
-    prGetFormatSpecification {
-        ^FoscFormatSpecification(
-            coerceForEquality: true,
-            reprIsIndented: false,
-            storageFormatArgsValues: [this.name],
-            storageFormatIsIndented: false,
-            storageFormatKwargsNames: #['arrow']
-        );
+    prAlteration {
+        ^this.accidental.semitones;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prApplyAccidental
+
+    a = FoscPitch("cs'");
+    a.prApplyAccidental("f").str;
+
+    a = FoscPitch("bf'");
+    a.prApplyAccidental(FoscAccidental("f")).str;
+    -------------------------------------------------------------------------------------------------------- */
+    prApplyAccidental { |accidental|
+        var diatonicPitchClassName; 
+        diatonicPitchClassName = this.prDiatonicPitchClassName;
+        accidental = this.accidental + FoscAccidental(accidental);
+        ^this.species.new("%%%".format(diatonicPitchClassName, accidental.str, this.octave.str));
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prDiatonicMidinote
+    
+    a = FoscPitch("cs'");
+    a.prDiatonicMidinote;
+
+    a = FoscPitch("fs'");
+    a.prDiatonicMidinote;
+
+    a = FoscPitch("fs");
+    a.prDiatonicMidinote;
+    -------------------------------------------------------------------------------------------------------- */
+    prDiatonicMidinote {
+        ^this.prDiatonicPitchClassNumber + this.octave.midinote;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prDiatonicPitchClassName
+
+    a = FoscPitch("cs'");
+    a.prDiatonicPitchClassName;
+    -------------------------------------------------------------------------------------------------------- */
+    prDiatonicPitchClassName {
+        ^this.pitchClass.prDiatonicPitchClassName;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prDiatonicPitchClassNumber
+
+    a = FoscPitch("cs'");
+    a.prDiatonicPitchClassNumber;
+    -------------------------------------------------------------------------------------------------------- */
+    prDiatonicPitchClassNumber {
+        ^this.pitchClass.prDiatonicPitchClassNumber;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prDiatonicPitchName
+
+     a = FoscPitch("cs'");
+    a.prDiatonicPitchName;
+    -------------------------------------------------------------------------------------------------------- */
+    prDiatonicPitchName {
+        ^this.prDiatonicPitchClassName ++ this.octave.str;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prPitchClassName
+
+    a = FoscPitch("cs'");
+    a.prPitchClassName;
+    -------------------------------------------------------------------------------------------------------- */
+    prPitchClassName {
+        ^this.prDiatonicPitchClassName ++ this.accidental.str;   
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prPitchClassNumber
+
+    a = FoscPitch("df'");
+    a.prPitchClassNumber;
+    -------------------------------------------------------------------------------------------------------- */
+    prPitchClassNumber {
+        ^this.prDiatonicMidinote % 12;   
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prRespell    
+
+    FoscPitch("df'").prRespell('sharp').str;
+    FoscPitch("df'").prRespell('flat').str;
+    FoscPitch("c'").prRespell('flat').str;
+    FoscPitch("c'").prRespell('sharp').str;
+    -------------------------------------------------------------------------------------------------------- */
+    prRespell { |accidental='sharp'|
+        var name;
+        name = FoscPitchManager.respellPitchName(this.name, accidental);
+        ^this.species.new(name);
     }
     /* --------------------------------------------------------------------------------------------------------
     • prGetLilypondFormat
@@ -580,109 +601,4 @@ FoscPitch : FoscObject {
     prGetLilypondFormat {
         ^this.str;
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • prListFormatContributions
-    
-    - abjad 2.2.1
-    def _list_format_contributions(self):
-        contributions = []
-        if self.arrow is None:
-            return contributions
-        override_string = r'\once \override Accidental.stencil ='
-        override_string += ' #ly:text-interface::print'
-        contributions.append(override_string)
-        string = 'accidentals.{}.arrow{}'
-        string = string.format(self.accidental.name, str(self.arrow).lower())
-        override_string = r'\once \override Accidental.text ='
-        override_string += r' \markup {{ \musicglyph #"{}" }}'
-        override_string = override_string.format(string)
-        contributions.append(override_string)
-        return contributions
-    
-    a = FoscStaff([FoscNote(FoscPitch("C4", arrow: 'down'), [1, 4])]);
-    a.show;
-
-    a = FoscStaff([FoscNote(FoscPitch("C#4", arrow: 'up'), [1, 4])]);
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    prListFormatContributions {
-        var contributions, overrideString, string;
-        contributions = [];
-        if (this.arrow.isNil) { ^contributions };
-        overrideString = "\\once \\override Accidental.stencil =";
-        overrideString = overrideString + "#ly:text-interface::print";
-        contributions = contributions.add(overrideString);
-        string = "accidentals.%.arrow%";
-        // to be changed to: this.accidental.name (also change in FoscAccidental, FoscNoteHead)
-        string = string.format(this.accidental.unabbreviatedName, this.arrow.asString.toLower);
-        overrideString = "\\once \\override Accidental.text =";
-        overrideString = overrideString + "\\markup { \\musicglyph #\"%\" }";
-        overrideString = overrideString.format(string);
-        contributions = contributions.add(overrideString);
-        ^contributions;
-    }
-}
-/* ------------------------------------------------------------------------------------------------------------
-• FoscPitchInitializer
------------------------------------------------------------------------------------------------------------- */
-FoscPitchInitializer {
-	var <pitchClass, <accidental, <octave, <arrow;
-}
-/* ------------------------------------------------------------------------------------------------------------
-• FoscNamedPitch
-
-a = FoscPitch("C4", arrow: 'up');
-a.pitchNumber;
-a.str;
------------------------------------------------------------------------------------------------------------- */
-FoscNamedPitch : FoscPitchInitializer {
-	var <pitchName;
-	*new { |pitchName, arrow|
-		^if (pitchName.asString.isPitchName ){
-            super.new.init(pitchName.asString, arrow);
-        } {
-            throw("Can not initialize % from value: %".format(this.species, pitchName));
-        };
-	}
-	init { |argPitchName, argArrow|
-		pitchName = argPitchName;
-		pitchClass = FoscPitchClass(pitchName);
-		accidental = pitchClass.accidental;
-		octave = FoscOctave(pitchName);
-        arrow = argArrow;
-	}
-}
-/* ------------------------------------------------------------------------------------------------------------
-• FoscNumberedPitch
-
-
-a = FoscPitch(60.25);
-a.str;
-a.pitchNumber;
-
-a = FoscPitch(60.75);
-a.str;
-a.pitchNumber;
------------------------------------------------------------------------------------------------------------- */
-FoscNumberedPitch : FoscPitchInitializer {
-    var <pitchNumber;
-	*new { |pitchNumber|
-		^if (pitchNumber.isNumber) {
-			super.new.init(pitchNumber);
-		} {
-			throw("Can not initialize % from value: %".format(this.species, pitchNumber));
-		};
-	}
-	init { |argPitchNumber|
-        var list, index;
-
-		pitchNumber = argPitchNumber;
-		pitchClass = FoscPitchClass(pitchNumber);
-		accidental = pitchClass.accidental;
-		octave = FoscOctave(((pitchNumber / 12) - 1).floor);
-
-        list = #[0, 0.25, 0.5, 0.75];
-        index = list.indexOf(pitchNumber.frac.nearestInList(list));
-        arrow = switch(index, 1, 'up', 3, 'down', nil);
-	}
 }

@@ -13,11 +13,11 @@ a.items;
 
 a = FoscPitchClassSet([0, 2, 4, 8]);
 b = FoscPitchClassSet([1, 3, 4, 8]);
-a.sect(b).do { |each| each.pitchClassNumber.postln };
+a.sect(b).do { |each| each.pitchClass.number.postln };
 
 b = FoscPitchSet([60, 61, 62]);
 a = FoscPitchClassSet(b);
-a.items.do { |each| each.pitchClassNumber.postln }
+a.items.do { |each| each.pitchClass.number.postln }
 ------------------------------------------------------------------------------------------------------------ */
 FoscPitchClassSet : FoscTypedSet {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ FoscPitchClassSet : FoscTypedSet {
         } {
            if (items.isSequenceableCollection.not) { items = [items] };
            items = items.collect { |each| FoscPitchClass(each) };
-           items = items.sort { |a, b| a.pitchClassNumber < b.pitchClassNumber };
+           items = items.sort { |a, b| a.pitchClass.number < b.pitchClass.number };
         };
         //### assert(all in items isKindOf(FoscPitchClass))
         ^super.new(items, FoscPitchClass);
@@ -236,7 +236,7 @@ FoscPitchClassSet : FoscTypedSet {
 
     a = FoscPitchClassSet([1, 2, 3]);
     b = FoscPitchClassSet([2, 3, 4]);
-    a.difference(b).do { |each| each.pitchClassNumber.postln };
+    a.difference(b).do { |each| each.pitchClass.number.postln };
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • sect
@@ -247,7 +247,7 @@ FoscPitchClassSet : FoscTypedSet {
 
     a = FoscPitchClassSet([1, 2, 3]);
     b = FoscPitchClassSet([2, 3, 4]);
-    a.sect(b).do { |each| each.pitchClassNumber.postln };
+    a.sect(b).do { |each| each.pitchClass.number.postln };
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • isDisjoint
@@ -321,7 +321,7 @@ FoscPitchClassSet : FoscTypedSet {
 
     a = FoscPitchClassSet([1, 2, 3]);
     b = FoscPitchClassSet([2, 3, 4]);
-    a.symmetricDifference(b).do { |each| each.pitchClassNumber.postln };
+    a.symmetricDifference(b).do { |each| each.pitchClass.number.postln };
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • union
@@ -332,7 +332,7 @@ FoscPitchClassSet : FoscTypedSet {
 
     a = FoscPitchClassSet([1, 2, 3]);
     b = FoscPitchClassSet([2, 3, 4]);
-    a.union(b).do { |each| each.pitchClassNumber.postln };
+    a.union(b).do { |each| each.pitchClass.number.postln };
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • normalOrder

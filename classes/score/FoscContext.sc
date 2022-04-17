@@ -6,8 +6,7 @@ FoscContext : FoscContainer {
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	classvar <lilypondTypes;
-    var <lilypondType, <consistsCommands, <dependentWrappers, <removeCommands, <playbackManager;
-    var <defaultLilypondType='Voice';
+    var <lilypondType, <consistsCommands, <dependentWrappers, <removeCommands, <defaultLilypondType='Voice';
 	*initClass {
         lilypondTypes = #[
             'Score',
@@ -32,12 +31,11 @@ FoscContext : FoscContainer {
             'ChordNames'
         ];
     }
-    *new { |components, lilypondType='Context', isSimultaneous, name, tag, playbackManager|
-		^super.new(components, isSimultaneous, name, tag).initFoscContext(lilypondType, playbackManager);
+    *new { |components, lilypondType='Context', isSimultaneous, name|
+		^super.new(components, isSimultaneous, name).initFoscContext(lilypondType);
 	}
 	initFoscContext { |argLilypondType, argPlaybackManager|
 		lilypondType = argLilypondType;
-        playbackManager = argPlaybackManager;
 		consistsCommands = List[];
         dependentWrappers = List[];
 		removeCommands = List[];
@@ -48,13 +46,13 @@ FoscContext : FoscContainer {
  	/* --------------------------------------------------------------------------------------------------------
     • asCompileString
 
-    !!!TODO: not yet implemented
+    !!!TODO: INCOMPLETE
+
+    FoscVoice(lilypondType: 'VaticanaVoice', name: 'soprano').cs;
     -------------------------------------------------------------------------------------------------------- */
-    //asCompileString {
-        // if self[:].are_leaves():
-        //     return Container.__repr__(self)
-        // return self._get_abbreviated_string_format()
-    //}
+    asCompileString {
+        ^"%(%)".format(this.species.name, this.storeArgs.join(", "));
+    }
     /* --------------------------------------------------------------------------------------------------------
     • copy
     -------------------------------------------------------------------------------------------------------- */
@@ -69,7 +67,7 @@ FoscContext : FoscContainer {
     • storeArgs
     -------------------------------------------------------------------------------------------------------- */
     storeArgs {
-        ^[[], lilypondType, isSimultaneous, name, playbackManager];   
+        ^[[], lilypondType, isSimultaneous, name];   
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS
@@ -83,10 +81,12 @@ FoscContext : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
 	prFormatClosingSlot { |bundle|
         var result;
+        
         result = [];
         result = result.add(['indicators', bundle.closing.indicators]);
         result = result.add(['commands', bundle.closing.commands]);
         result = result.add(['comments', bundle.closing.comments]);
+        
         ^this.prFormatSlotContributionsWithIndent(result);
     }
 	/* --------------------------------------------------------------------------------------------------------
@@ -98,11 +98,14 @@ FoscContext : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prFormatConsistsCommands {
         var result, string;
+        
         result = [];
+        
         consistsCommands.do { |engraver|
             string = "\\consists %".format(engraver);
             result = result.add(string);
         };
+        
         ^result;
     }
 	/* --------------------------------------------------------------------------------------------------------
@@ -116,12 +119,14 @@ FoscContext : FoscContainer {
  	-------------------------------------------------------------------------------------------------------- */
 	prFormatInvocation {
 		var string;
-		if (name.notNil) {
+		
+        if (name.notNil) {
 			string = "\\context % = \"%\"".format(lilypondType, name);
 		} {
             string = "\\new %".format(lilypondType);
 		};
-		^string;
+		
+        ^string;
 	}
     /* --------------------------------------------------------------------------------------------------------
  	• prFormatOpenBracketsSlot
@@ -129,6 +134,7 @@ FoscContext : FoscContainer {
     prFormatOpenBracketsSlot { |bundle|
         var indent, result, bracketsOpen, removeCommands, consistsCommands, overrides, settings;
         var contribution, contributions, identifierPair;
+        
         indent = FoscLilypondFormatManager.indent;
         result = [];
         bracketsOpen = if (this.isSimultaneous) { #["<<"] } { #["{"] };
@@ -136,22 +142,28 @@ FoscContext : FoscContainer {
         consistsCommands = this.prFormatConsistsCommands;
         overrides = bundle.grobOverrides;
         settings = bundle.contextSettings;
+        
         if ([removeCommands, consistsCommands, overrides, settings].any { |item| item.notEmpty }) {
             contributions = [this.prFormatInvocation ++ " \\with {"];
             identifierPair = #['contextBrackets', 'open'];
             result = result.add([identifierPair, contributions]);
+            
             contributions = removeCommands.collect { |each| indent ++ each };
             identifierPair = #['engraverRemovals', 'removeCommands'];
             result = result.add([identifierPair, contributions]);
+            
             contributions = consistsCommands.collect { |each| indent ++ each };
             identifierPair = #['engraverConsists', 'consistsCommands'];
             result = result.add([identifierPair, contributions]);
+            
             contributions = overrides.collect { |each| indent ++ each };
             identifierPair = #['overrides', 'overrides'];
             result = result.add([identifierPair, contributions]);
+            
             contributions = settings.collect { |each| indent ++ each };
             identifierPair = #['settings', 'settings'];
             result = result.add([identifierPair, contributions]);
+            
             contributions = ["} %".format(bracketsOpen[0])];
             identifierPair = #['contextBrackets', 'open'];
             result = result.add([identifierPair, contributions]);
@@ -162,6 +174,7 @@ FoscContext : FoscContainer {
             identifierPair = #['contextBrackets', 'open'];
             result = result.add([identifierPair, contributions]);
         };
+
         ^result;
 	}
 	/* --------------------------------------------------------------------------------------------------------
@@ -169,10 +182,12 @@ FoscContext : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prFormatOpeningSlot { |bundle|
 		var result;
+        
         result = [];
         result = result.add(['comments', bundle.opening.comments]);
         result = result.add(['indicators', bundle.opening.indicators]);
         result = result.add(['commands', bundle.opening.commands]);
+        
         ^this.prFormatSlotContributionsWithIndent(result);
 	}
 	/* --------------------------------------------------------------------------------------------------------
@@ -184,12 +199,15 @@ FoscContext : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
 	prFormatRemoveCommands {
 		var result, string;
+        
         result = [];
-		removeCommands.as(Array).sort.do { |engraver|
+		
+        removeCommands.as(Array).sort.do { |engraver|
             string = "\\remove %".format(engraver);
             result = result.add(string);
         };
-		^result;
+		
+        ^result;
 	}
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE PROPERTIES
@@ -207,12 +225,14 @@ FoscContext : FoscContainer {
     /* --------------------------------------------------------------------------------------------------------
     • prGetPersistentWrappers
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prGetPersistentWrappers {
         var wrappers, indicator, key;
+        
         this.prUpdateNow(indicators: true);    
+        
         dependentWrappers.do { |wrapper|
             if (this.respondsTo('persistent') && { this.persistent }) { 
+                
                 case
                 { this.respondsTo('parameter') } {
                     key = indicator.parameter;
@@ -223,11 +243,13 @@ FoscContext : FoscContainer {
                 {
                     key = indicator.species.asSymbol;
                 };
+                
                 if (wrappers[key].isNil && { wrappers[key].startOffset <= wrapper[key].startOffset }) {
                     wrappers[key] = wrapper;
                 };
             };
         };
+
         ^wrappers;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,11 +295,13 @@ FoscContext : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     lilypondContext {
         var lilypondContext;
+        
         try {
             lilypondContext = FoscLilypondContext(lilypondType);
         } {
             lilypondContext = FoscLilypondContext(this.defaultlilypondType);
         };
+        
         ^lilypondContext;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -287,13 +311,8 @@ FoscContext : FoscContainer {
 
     Returns set.
     
-    a = FoscStaff([]);
+    a = FoscStaff();
     a.removeCommands.add('Horizontal_bracket_engraver');
     a.removeCommands;
-    -------------------------------------------------------------------------------------------------------- */
-    /* --------------------------------------------------------------------------------------------------------
-    • tag
-
-    Gets tag.
     -------------------------------------------------------------------------------------------------------- */
 }

@@ -116,12 +116,18 @@ FoscBlock : FoscObject {
     }
     /* --------------------------------------------------------------------------------------------------------
     • prGetFormatPieces
+
+    a = FoscContext([FoscNote(60, 1/4)]);
+    f = a.illustrate;
+    f.format;
     -------------------------------------------------------------------------------------------------------- */
     // abjad 3.0 !!!TODO: add tag stuff
     prGetFormatPieces { |tag|
         var indent, result, string, prototype, formattedAttributes, formattedContextBlocks;
+        
         indent = FoscLilypondFormatManager.indent;
         result = [];
+        
         if (
             this.prGetFormattedUserAttributes.isEmpty
             && { (this.respondsTo('contexts') && { this.contexts.notNil }).not }
@@ -133,26 +139,33 @@ FoscBlock : FoscObject {
             result = result.add(string);
             ^result;
         };
+        
         string = "% {".format(escapedName);
         result = result.add(string);
         prototype = [FoscLeaf, FoscMarkup];
+        
         items.do { |item|
             if (item.isKindOf(FoscContextBlock).not) {
                 if (prototype.any { |type| item.isKindOf(type) }) { item = [item] };
                 result = result.addAll(this.prFormatItem(item));
             };
         };
+        
         formattedAttributes = this.prGetFormattedUserAttributes;
         formattedAttributes = formattedAttributes.collect { |each| indent ++ each };
         result = result.addAll(formattedAttributes);
+        
         if (this.respondsTo('prFormattedContextBlocks') && { this.prFormattedContextBlocks.notNil} ) {
             formattedContextBlocks = this.prFormattedContextBlocks;
         } {
             formattedContextBlocks = [];
+        
         };
+        
         formattedContextBlocks = formattedContextBlocks.collect { |each| indent ++ each };
         result = result.addAll(formattedContextBlocks);
         result = result.add("}");
+
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------

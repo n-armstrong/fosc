@@ -267,7 +267,7 @@ FoscMeterSpecifier : FoscObject {
         components = mutate(container).ejectContents;
         componentDurations = components.items.collect { |each| each.prGetDuration };
         partSizes = componentDurations.split(durations).collect { |each| each.size };
-        selections = components.partitionBySizes(partSizes).items;
+        selections = components.groupBySizes(partSizes).items;
         
         ^selections;
     }

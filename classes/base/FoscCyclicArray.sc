@@ -185,35 +185,6 @@ FoscCyclicArray : FoscObject {
     Gets string representation of cyclic tuple.
 
     Returns string.
-
-    
-• Example ---
-
-        Gets string:
-
-        ::
-
-            >>> str(abjad.CyclicTuple('abcd'))
-            '(a, b, c, d)'
-
-    
-• Example ---
-
-        Gets string:
-
-        ::
-
-            >>> str(abjad.CyclicTuple([1, 2, 3, 4]))
-            '(1, 2, 3, 4)'
-
-    
-    def __str__(self):
-        if self:
-            contents = [str(item) for item in self._items]
-            contents = ', '.join(contents)
-            string = '({!s})'.format(contents)
-            return string
-        return '()'
     -------------------------------------------------------------------------------------------------------- */
     str {
         var contents, string;
@@ -223,23 +194,6 @@ FoscCyclicArray : FoscObject {
             string = "[%]".format(contents);
         };
         ^#[];
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PRIVATE METHODS
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* --------------------------------------------------------------------------------------------------------
-    • prGetFormatSpecification
-    
-    def _get_format_specification(self):
-        from abjad.tools import systemtools
-        return systemtools.FormatSpecification(
-            client=self,
-            repr_is_indented=False,
-            storage_format_args_values=[list(self._items)],
-            )
-    -------------------------------------------------------------------------------------------------------- */
-    prGetFormatSpecification {
-        ^this.notYetImplemented(thisMethod);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES

@@ -1,131 +1,200 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscAccidental
 
+a = FoscAccidental("s");
+a.str;
+a.semitones;
 
 
-a = FoscAccidental('b', arrow: 'up');
-a.name;
+a = FoscAccidental(-1.5);
+a.str;
+a.semitones;
 ------------------------------------------------------------------------------------------------------------ */
 FoscAccidental : FoscObject {
-	var <name, <arrow;
-	classvar manager;
-	*new { |val, arrow|
-		var name;
-        // if (#[nil, 'up', 'down'].includes(arrow).not) {
-        //     throw("%:%: bad value for 'arrow': %.".format(this.species, thisMethod.name, arrow));
-        // };
-		manager = FoscPitchNameManager;
-		name = case
-		{ val.isNumber && { val.inclusivelyBetween(-2, 2) } } {
-			manager.semitonesToAccidentalName(val.round(0.5));
+	var <name;
+	*new { |val|
+		case
+        { this.isAccidentalName(val) } {
+            ^super.new.init(val);
+        }
+        { val.isNumber && { val.inclusivelyBetween(-2, 2) } } {
+            //!!! TODO: get nearest match in FoscTuning:current ?
+			val = FoscPitchManager.semitonesToAccidentalName(val);
+            ^super.new.init(val);
 		}
-		{ val.asString.isAccidentalName } { val }
-		{ val.asString.isLilyPondAccidentalName } { manager.lilypondAccidentalNameToAccidentalName(val) }
-		{ val.asString.isEmpty } { "" }
+        { val.isKindOf(FoscAccidental) } {
+            ^val;
+        }
 		{ throw("Can not initialize % from value: %.".format(this.name, val)) };
-		^super.new.init(name, arrow);
 	}
-	init { |argName, argArrow|
-        name = manager.accidentalNameToLilypondAccidentalName(argName);
-        if (argArrow.notNil) { this.arrow_(argArrow) };
-        // name = manager.accidentalNameToLilypondAccidentalName(argName);
-        // if (arrow.notNil) {
-        //     switch(arrow, 
-        //         'up', { name = name ++ "r" },
-        //         'down', { name = name ++ "l" }
-        //     );
-        // };
+	init { |argName|
+        name = argName.asString;
 	}
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PUBLIC INSTANCE PROPERTIES
+    // PUBLIC INSTANCE METHODS: SPECIAL METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • arrow_
+    • ==
+
+    a = FoscAccidental("s");
+    b = FoscAccidental("");
+
+    a == a;
+    a == b;
     -------------------------------------------------------------------------------------------------------- */
-    arrow_ { |direction='up'|
-        if (#['up', 'down'].includes(direction).not) {
-            throw("%:%: bad value for 'arrow': %.".format(this.species, thisMethod.name, direction));
-        };
-        arrow = direction;
-        switch(arrow, 
-            'up', { name = name ++ "r" },
-            'down', { name = name ++ "l" }
-        );
+    == { |expr|
+        ^(this.semitones == FoscAccidental(expr).semitones);
     }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PUBLIC INSTANCE METHODS
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/* --------------------------------------------------------------------------------------------------------
-    • inspect
-    !!! DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    inspect {
-		super.inspect(#[name, semitones, lpStr]);
-	}
     /* --------------------------------------------------------------------------------------------------------
-    • lpStr
-    !!! DEPRECATE
+    • !=
+
+    a = FoscAccidental("s");
+    b = FoscAccidental("");
+
+    a != a;
+    a != b;
     -------------------------------------------------------------------------------------------------------- */
-	lpStr {
-		^this.str;
-	}
+    != { |expr|
+        ^(this == expr).not;
+    }
     /* --------------------------------------------------------------------------------------------------------
-    • semitones
+    • <
 
-    
-    FoscAccidental('s').name;
+    a = FoscAccidental("s");
+    b = FoscAccidental("");
 
-    FoscAccidental('s').semitones;
-
-    FoscAccidental('s', arrow: 'up').semitones;
-
-    FoscAccidental('f', arrow: 'down').semitones;
-
-    FoscAccidental('', arrow: 'down').semitones;
+    a < b;
+    b < a;
     -------------------------------------------------------------------------------------------------------- */
-	semitones {
-        var result;
-		result = manager.accidentalNameToSemitones(name);
-        // if (arrow.notNil) {
-        //     switch(arrow, 
-        //         'up', { result = result + 0.25 },
-        //         'down', { result = result - 0.25 }
-        //     );
-        // };
-        ^result;
-	}
+    < { |expr|
+        ^(this.semitones < FoscAccidental(expr).semitones);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • >
+
+    a = FoscAccidental("s");
+    b = FoscAccidental("");
+
+    a > b;
+    b > a;
+    -------------------------------------------------------------------------------------------------------- */
+    > { |expr|
+        ^(this < expr).not;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • <=
+
+    a = FoscAccidental("s");
+    b = FoscAccidental("");
+
+    a <= a;
+    a <= b;
+    b <= a;
+    -------------------------------------------------------------------------------------------------------- */
+    <= { |expr|
+        ^(this.semitones <= FoscAccidental(expr).semitones);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • >=
+
+    a = FoscAccidental("s");
+    b = FoscAccidental("");
+
+    a >= a;
+    a >= b;
+    b >= a;
+    -------------------------------------------------------------------------------------------------------- */
+    >= { |expr|
+        ^(this.semitones >= FoscAccidental(expr).semitones);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • add
+
+    a = FoscAccidental("s");
+    a = a + FoscAccidental("");
+    a.cs;
+
+    a = FoscAccidental("s");
+    a = a + FoscAccidental("ff");
+    a.cs;
+
+    a = FoscAccidental("s");
+    a = a + 1;
+    a.cs;
+    -------------------------------------------------------------------------------------------------------- */
+    add { |expr|
+        if (expr.isKindOf(FoscAccidental)) { expr = expr.semitones };
+        ^this.species.new(this.semitones + expr);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • sub
+
+    a = FoscAccidental("s");
+    a = a - FoscAccidental("");
+    a.cs;
+
+    a = FoscAccidental("s");
+    a = a - FoscAccidental("f");
+    a.cs;
+
+    a = FoscAccidental("s");
+    a = a - 1;
+    a.cs;
+    -------------------------------------------------------------------------------------------------------- */
+    sub { |expr|
+        if (expr.isKindOf(FoscAccidental)) { expr = expr.semitones };
+        ^this.species.new(this.semitones - expr);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • asCompileString
+
+    a = FoscAccidental("s");
+    a.asCompileString;
+
+    a = FoscAccidental("");
+    a.asCompileString;
+    -------------------------------------------------------------------------------------------------------- */
+    asCompileString {
+        ^"FoscAccidental(%)".format(this.str.cs);
+    }
     /* --------------------------------------------------------------------------------------------------------
     • str
     
-    FoscAccidental('s').str;
-
-    FoscAccidental('s', arrow: 'up').str;
-
-    FoscAccidental('', arrow: 'down').str;
+    a = FoscAccidental("s");
+    a.str;
     -------------------------------------------------------------------------------------------------------- */
     str {
         ^this.name;
     }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE INSTANCE METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • unabbreviatedName
+    • *isAccidentalName
 
-    ! Temporary: used for arrow overrides in FoscPitch
-    
-    FoscAccidental("#").unabbreviatedName;
+    FoscAccidental.isAccidentalName("s");
+    FoscAccidental.isAccidentalName("f");
+    FoscAccidental.isAccidentalName("ss");
+    FoscAccidental.isAccidentalName("qs");
+    FoscAccidental.isAccidentalName("tqf");
+    FoscAccidental.isAccidentalName("");
     -------------------------------------------------------------------------------------------------------- */
-    unabbreviatedName {
-        var abbreviationToName;
-        abbreviationToName = (
-            'ss':   "double sharp",
-            'tqs':  "three-quarters sharp",
-            's':    "sharp",
-            'qs':   "quarter sharp",
-            '':     "natural",
-            'qf':   "quarter flat",
-            'f':    "flat",
-            'tqf':  "three-quarters flat",
-            'ff':   "double flat"
-        );
-        ^abbreviationToName[manager.accidentalNameToLilypondAccidentalName(name).asSymbol];
+    *isAccidentalName { |name|
+        ^FoscPitchManager.isAccidentalName(name);
     }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC INSTANCE PROPERTIES
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • semitones
+
+    FoscAccidental("s").semitones;
+    FoscAccidental("f").semitones
+    FoscAccidental("").semitones;
+    FoscAccidental("ss").semitones;
+    FoscAccidental("tqf").semitones
+    -------------------------------------------------------------------------------------------------------- */
+	semitones {
+        ^FoscPitchManager.accidentalNameToSemitones(name);
+	}
 }

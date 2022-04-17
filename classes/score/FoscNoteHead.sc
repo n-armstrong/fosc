@@ -139,24 +139,6 @@ FoscNoteHead : FoscObject {
     // PRIVATE INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • prGetFormatSpecification
-    
-    a = FoscNoteHead(writtenPitch: FoscPitch("Db4"));
-    a.prGetFormatSpecification;
-    -------------------------------------------------------------------------------------------------------- */
-    // prGetFormatSpecification {
-    //     var arguments, reprText, agent, names;
-    //     arguments = [this.prFormatString.quote];
-    //     arguments = arguments.addAll(this.tweak.prGetAttributePairs);
-    //     arguments = arguments.collect { |each| each.asString }.join(", ");
-    //     reprText = "%(%)".format(this.species, arguments);
-    //     agent = FoscStorageFormatAgent(this); //!!! class doesn't exist
-    //     names = agent.signatureKeywordNames.as(Array);
-    //     if (names.includes('client')) { names.remove('client') };
-    //     if (names.includes('tweaks')) { names.remove('tweaks') };
-    //     ^FormatSpecification(this, reprText: reprText, storageFormatKwargs: names);
-    // }
-    /* --------------------------------------------------------------------------------------------------------
     • prGetFormatPieces
 
     a = FoscNoteHead(writtenPitch: 61, isCautionary: true);

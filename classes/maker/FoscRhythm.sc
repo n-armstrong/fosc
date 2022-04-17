@@ -12,6 +12,7 @@ a.value.do { |each| each.str.postln };
 a.show;
 
 
+
 • Example 2
 
 Can be nested.
@@ -25,14 +26,6 @@ a.show;
 Ircam-style rhythm-tree syntax.
 
 a = FoscRhythm(1/4, #[1, -2, [2, [1, 2, 4]]]);
-a.show;
-
-
-• Example 4 !!! DEPRECATED
-
-Floats are interpreted as ties.
-
-a = FoscRhythm(3/16, [1, 2, [2, [2.0, -3]]]);
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
 FoscRhythm : FoscTreeContainer {
@@ -121,12 +114,12 @@ FoscRhythm : FoscTreeContainer {
     
     Returns LilyPond file.
     -------------------------------------------------------------------------------------------------------- */
-    illustrate { |stretch=1|
+    illustrate {
         var selection, selections;
         selection = this.value.copy;
         selections = selection.leaves.groupBy { |a, b| a.parent != b.parent };
         selections.do { |each| each.beam(beamRests: false) };
-        ^FoscLilypondFile.rhythm([selection], stretch: stretch);
+        ^FoscLilypondFile.rhythm([selection]);
     }
     /* --------------------------------------------------------------------------------------------------------
     • inspect

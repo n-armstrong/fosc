@@ -21,13 +21,13 @@ FoscLeaf : FoscComponent {
 	// INIT
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
     var <afterGraceContainer, <graceContainer, <leafIndex, <multiplier, <writtenDuration;
-	*new { |writtenDuration, multiplier, tag|
+	*new { |writtenDuration, multiplier|
         if (writtenDuration.notNil) { writtenDuration = FoscDuration(writtenDuration) };
         if (writtenDuration.isAssignable.not) {
             throw("%:new: duration is not assignable: %.".format(this, writtenDuration.str));
         };
         if (multiplier.notNil) { multiplier = FoscMultiplier(multiplier) };
-		^super.new(tag).initFoscRhythmLeaf(writtenDuration, multiplier);
+		^super.new.initFoscRhythmLeaf(writtenDuration, multiplier);
 	}
 	initFoscRhythmLeaf { |argWrittenDuration, argMultiplier|
 		writtenDuration = argWrittenDuration;
@@ -302,47 +302,38 @@ FoscLeaf : FoscComponent {
     /* --------------------------------------------------------------------------------------------------------
     • prFormatLeafNucleus
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prFormatLeafNucleus {
-        var localTag, strings;
-        strings = this.prGetBody;
-        if (tag.notNil) {
-            localTag = FoscTag(tag);
-            strings = FoscLilypondFormatManager.tag(strings, tag: localTag);
-        };
-        ^['nucleus', strings];
+        ^['nucleus', this.prGetBody];
     }
     /* --------------------------------------------------------------------------------------------------------
     • prFormatOpenBracketsSlot
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prFormatOpenBracketsSlot { |bundle|
         ^[]
     }
     /* --------------------------------------------------------------------------------------------------------
     • prFormatOpeningSlot
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prFormatOpeningSlot { |bundle|
         var result;
+
         result = [];
         result = result.add(['comments', bundle.opening.comments]);
         result = result.add(['indicators', bundle.opening.indicators]);
         result = result.add(['commands', bundle.opening.commands]);
         result = result.add(['spanners', bundle.opening.spanners]);
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • prGetCompactRepresentation
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prGetCompactRepresentation {
         ^"(%)".format(this.prGetFormattedDuration);
     }
     /* --------------------------------------------------------------------------------------------------------
     • prGetFormatPieces
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prGetFormatPieces {
         ^this.prGetLilypondFormat.split("\n");
     }
@@ -355,7 +346,6 @@ FoscLeaf : FoscComponent {
     a = FoscLeaf(3/8, multiplier: 3/2);
     a.prGetFormattedDuration;
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prGetFormattedDuration {
         var durationString;
         durationString = writtenDuration.lilypondDurationString;
@@ -375,16 +365,18 @@ FoscLeaf : FoscComponent {
     a.leafAt(0).attach(FoscMetronomeMark(1/4, 72));
     a.doLeaves { |each| each.prGetDurationInSeconds.asFloat.postln };
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prGetDurationInSeconds {
         var mark, result;
+        
         mark = this.prGetEffective(FoscMetronomeMark) ?? { FoscMetronomeMark(#[1, 4], 60) };
+        
         if (mark.isImprecise.not) {
             result = this.prGetDuration / mark.referenceDuration / mark.unitsPerMinute * 60;
         } {
             throw("%:%: can't get duration in seconds - tempo is imprecise."
                 .format(this.species, thisMethod.name));
         };
+        
         ^FoscDuration(result);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -392,23 +384,17 @@ FoscLeaf : FoscComponent {
 
     a = FoscStaff(FoscLeafMaker().(60 ! 4, [1/4]));
     a[0..].tie;
-    a[0].prGetLogicalTie.components;
+    a[0].prGetLogicalTie.items;
 
 
-    a = FoscStaff(FoscLeafMaker().(#[60,60,62,64,65,65], [1/4,1/24,1/12,1/8,1/4,1/4]));
-    m = a.selectLeaves;
-    tie(m[0..1]);
-    tie(m[4..5]);
-    //a.show;
+    a = FoscStaff(FoscLeafMaker().(60 ! 4, [5/16]));
+    a.doLogicalTies { |each| each.items.postln };
 
-    x = a.leafAt(1);
-    x.cs; // correct
-    x.prSibling(-1).cs; // correct
-    x.prLeafAt(-1).cs; // correct
-
-    x.prGetLogicalTie.components.collect { |each| each.cs };
+    a = FoscLeafMaker().(60 ! 4, [5/16]);
+    a.leaves.do { |leaf| leaf.prGetLogicalTie.items.postln };
+    a.doLogicalTies { |each| each.items.postln };
+    a.logicalTies.items;
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prGetLogicalTie {
         var leavesBefore, leavesAfter, currentLeaf, previousLeaf, nextLeaf, leaves;
         
@@ -420,14 +406,15 @@ FoscLeaf : FoscComponent {
             loop {
                 previousLeaf = currentLeaf.prLeafAt(-1);
                 if (previousLeaf.isNil) { break.value };
+                
                 if (
-                    currentLeaf.prHasIndicator(FoscRepeatTie)
-                    || { previousLeaf.prHasIndicator(FoscTie) }
+                    currentLeaf.prHasIndicator(FoscRepeatTie) || { previousLeaf.prHasIndicator(FoscTie) }
                 ) {
                     leavesBefore = leavesBefore.insert(0, previousLeaf);
                 } {
                     break.value;
                 };
+                
                 currentLeaf = previousLeaf;
             };
         };
@@ -438,14 +425,15 @@ FoscLeaf : FoscComponent {
             loop {
                 nextLeaf = currentLeaf.prLeafAt(1);
                 if (nextLeaf.isNil) { break.value };
+                
                 if (
-                    currentLeaf.prHasIndicator(FoscTie)
-                    || { nextLeaf.prHasIndicator(FoscRepeatTie) }
+                    currentLeaf.prHasIndicator(FoscTie) || { nextLeaf.prHasIndicator(FoscRepeatTie) }
                 ) {
                     leavesAfter = leavesAfter.add(nextLeaf);
                 } {
                     break.value;
                 };
+                
                 currentLeaf = nextLeaf;
             };
         };

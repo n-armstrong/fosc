@@ -78,8 +78,12 @@ FoscChord : FoscLeaf {
             };
         };
 
+        if (writtenPitches.isString) {
+            writtenPitches = FoscPitchManager.pitchStringToPitches(writtenPitches);
+        };
+        
         writtenPitches = writtenPitches ?? { #[60,64,67] };
-        writtenPitches = FoscPitchParser(writtenPitches); //!!!TODO: incompatible with LilypondDrums
+        //writtenPitches = FoscPitchParser(writtenPitches); //!!!TODO: incompatible with LilypondDrums
         writtenDuration = writtenDuration ?? { FoscDuration(1, 4) };
         n = writtenPitches.size;
         areCautionary = areCautionary ?? { Array.fill(n, false) };
@@ -119,12 +123,12 @@ FoscChord : FoscLeaf {
     /* --------------------------------------------------------------------------------------------------------
     • asCompileString
 
-    a = FoscChord(#[60, 64, 67], 1/4);
+    a = FoscChord(#[60,64,67], 1/4);
     a.cs;
     -------------------------------------------------------------------------------------------------------- */
     asCompileString {
         var pitches, duration;
-        pitches = this.writtenPitches.items.collect { |each| each.pitchName };
+        pitches = this.writtenPitches.items.collect { |each| each.name };
         pitches = pitches.join(" ");
         duration = this.writtenDuration.str;
         ^"FoscChord(\"%\", %)".format(pitches, duration);
@@ -191,16 +195,19 @@ FoscChord : FoscLeaf {
     prFormatLeafNucleus {
         var indent, result, currentFormat, formatList;
         var reAttackDuration, durationString, duratedPitches, duratedPitch, tremolo;
+        
         indent = FoscLilypondFormatManager.indent;
         result = [];
+        
         case
         { noteHeads.items.collect { |each| each.format }.any { |str| str.contains("\n") } } {
             noteHeads.do { |noteHead, i|
                 currentFormat = noteHead.format;
-                formatList = currentFormat.delimitBy("\\n");
+                formatList = currentFormat.split("\\n");
                 formatList = formatList.collect { |each| indent ++ each };
                 result = result.addAll(formatList);
             };
+
             result = result.insert(0, "<");
             result = result.add(">");
             result = result.join("\n");
@@ -210,21 +217,26 @@ FoscChord : FoscLeaf {
             reAttackDuration = this.prTremoloReattackDuration;
             durationString = reAttackDuration.lilypondDurationString;
             duratedPitches = [];
+
             noteHeads.do { |noteHead|
                 duratedPitch = noteHead.format ++ durationString;
                 duratedPitches = duratedPitches.add(duratedPitch);
             };
+            
             tremolo = FoscInspection(this).indicatorOfType(FoscTremolo);
+            
             if (tremolo.isSlurred) {
                 duratedPitches[0] = duratedPitches[0] ++ " \(";
                 duratedPitches[duratedPitches.lastIndex] = duratedPitches.last ++ " \)";
             };
+            
             result = duratedPitches.join(" ");
         }
         {
             result = result.addAll(noteHeads.items.collect { |each| each.format });
             result = "<%>%".format(result.join(" "), this.prGetFormattedDuration);
         };
+        
         ^['nucleus', [result]];
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -343,14 +355,15 @@ FoscChord : FoscLeaf {
     Sets note-heads in chord.
 
 
-    a = FoscChord("C4 E4 G4", [1, 4]);
-    a.noteHeads.items.do { |each| each.writtenPitch.ps.postln };
+    a = FoscChord("c' e' g'", [1, 4]);
+    a.noteHeads.items.do { |each| each.writtenPitch.cs.postln };
     a.noteHeads_("F#4 B4 D#5 E5");
     a.noteHeads.items.do { |each| each.writtenPitch.ps.postln };
     -------------------------------------------------------------------------------------------------------- */
     noteHeads_ { |argNoteHeads|
         noteHeads = FoscNoteHeadList([], this);
-        if (argNoteHeads.isSequenceableCollection) { argNoteHeads = FoscPitchParser(argNoteHeads) };
+        //"noteHeads: ".post; noteHeads.postln;
+        //if (argNoteHeads.isSequenceableCollection) { argNoteHeads = FoscPitchParser(argNoteHeads) };
         noteHeads.addAll(argNoteHeads);
     }
     /* --------------------------------------------------------------------------------------------------------

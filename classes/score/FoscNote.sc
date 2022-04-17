@@ -79,9 +79,9 @@ FoscNote : FoscLeaf {
     -------------------------------------------------------------------------------------------------------- */
     asCompileString {
         var pitch, duration;
-        pitch = this.writtenPitch.pitchName;
+        pitch = this.writtenPitch.name;
         duration = this.writtenDuration.str;
-        ^"FoscNote('%', %)".format(pitch, duration);
+        ^"FoscNote(\"%\", %)".format(pitch, duration);
     }
     /* --------------------------------------------------------------------------------------------------------
 	• storeArgs

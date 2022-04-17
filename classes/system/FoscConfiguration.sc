@@ -1,10 +1,10 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscConfiguration
 
-FoscConfiguration.getLilypondVersionString
+FoscConfiguration.lilypondVersionString
 ------------------------------------------------------------------------------------------------------------ */
 FoscConfiguration {
-    classvar lilypondExecutablePath="lilypond";
+    classvar lilypondExecutablePath="lilypond", <tuning;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,22 +13,21 @@ FoscConfiguration {
     -------------------------------------------------------------------------------------------------------- */
     *initClass {
         var stylesheetsDir, returnCode;
-        if (File.exists(this.foscOutputDirectory).not) {
-            File.mkdir(this.foscOutputDirectory);
+
+        if (File.exists(this.outputDirectory).not) {
+            File.mkdir(this.outputDirectory);
         };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC CLASS METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • *getLilypondVersionString
+    • *lilypondVersionString
     
-	FoscConfiguration.getLilypondVersionString;
+	FoscConfiguration.lilypondVersionString;
     -------------------------------------------------------------------------------------------------------- */
-    *getLilypondVersionString {
+    *lilypondVersionString {
     	var executablePath, str, versionString;
-		//TODO: get executable path using FoscIOManager
-		//executablePath = this.executablePath;
         executablePath = this.lilypondExecutablePath;
 		^versionString ?? {
 			str = (executablePath + "--version").unixCmdGetStdOut;
@@ -38,6 +37,30 @@ FoscConfiguration {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE CLASS PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • *outputDirectory
+
+    FoscConfiguration.outputDirectory;
+    -------------------------------------------------------------------------------------------------------- */
+    *outputDirectory {
+        ^"%/fosc-output".format(Platform.userConfigDir);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *rootDirectory
+
+    FoscConfiguration.rootDirectory;
+    -------------------------------------------------------------------------------------------------------- */
+    *rootDirectory {
+        ^"%/fosc".format(Platform.userExtensionDir);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *stylesheetDirectory
+
+    FoscConfiguration.stylesheetDirectory;
+    -------------------------------------------------------------------------------------------------------- */
+    *stylesheetDirectory {
+        ^"%/stylesheets".format(this.rootDirectory);
+    }
     /* --------------------------------------------------------------------------------------------------------
     • *lilypondExecutablePath
 
@@ -54,7 +77,7 @@ FoscConfiguration {
     /* --------------------------------------------------------------------------------------------------------
     • *lilypondExecutablePath_
 
-    The executable path should be set in the user's startup file. e.g.:
+    The executable path should be set in the user startup file, e.g.:
 
     FoscConfiguration.lilypondExecutablePath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
 
@@ -64,23 +87,5 @@ FoscConfiguration {
     -------------------------------------------------------------------------------------------------------- */ 
     *lilypondExecutablePath_ { |path|
         lilypondExecutablePath = path;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • *foscOutputDirectory
-    -------------------------------------------------------------------------------------------------------- */
-    *foscOutputDirectory {
-        ^(Platform.userConfigDir ++ "/fosc-output");
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • *foscRootDirectory
-    -------------------------------------------------------------------------------------------------------- */
-    *foscRootDirectory {
-        ^(Platform.userExtensionDir ++ "/fosc");
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • *foscStylesheetDirectory
-    -------------------------------------------------------------------------------------------------------- */
-    *foscStylesheetDirectory {
-        ^this.foscRootDirectory ++ "/stylesheets";
     }
 }

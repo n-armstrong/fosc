@@ -50,15 +50,16 @@ FoscLilypondFormatManager : FoscObject {
     // abjad 3.0
     *bundleFormatContributions { |component|
 		var manager, bundle;
+
 		manager = FoscLilypondFormatManager;
 		bundle = FoscLilypondFormatBundle();
 		manager.prPopulateIndicatorFormatContributions(component, bundle);
-		//manager.prPopulateSpannerFormatContributions(component, bundle);
 		manager.prPopulateContextSettingFormatContributions(component, bundle);
         manager.prPopulateGrobOverrideFormatContributions(component, bundle);
         manager.prPopulateGrobRevertFormatContributions(component, bundle);
         bundle.sortOverrides;
-		^bundle;
+		
+        ^bundle;
 	}
     /* --------------------------------------------------------------------------------------------------------
     • *formatLilypondAttribute
@@ -412,26 +413,35 @@ FoscLilypondFormatManager : FoscObject {
 	}
     /* --------------------------------------------------------------------------------------------------------
     • *prPopulateGrobOverrideFormatContributions
+
+    a = FoscContext([FoscNote(60, 1/4)]);
+    a.prGetFormatPieces;
     -------------------------------------------------------------------------------------------------------- */
     *prPopulateGrobOverrideFormatContributions { |component, bundle|
-        var result, isOnce, grob, contributions, pitch, arrow, noteHeadContributions;
+        var result, isOnce, grob, contributions, pitch, noteHeadContributions;
+        
         result = [];
         isOnce = component.isKindOf(FoscLeaf);
         grob = override(component);
         contributions = grob.prListFormatContributions('override', isOnce);
-        result.do { |each|
-            if (each.includes('NoteHead') && { each.includes('pitch') }) { contributions.remove(each) };
-        };
-        try {
-            pitch = component.pitch;
-            arrow = pitch.arrow;
-        } {
-            arrow = nil;
-        };
-        if (#['up', 'down'].includes(arrow)) {
-            noteHeadContributions = pitch.prListFormatContributions;
-            contributions = contributions.addAll(noteHeadContributions);
-        };
+        
+        // result.do { |each|
+        //     if (each.includes('NoteHead') && { each.includes('pitch') }) { contributions.remove(each) };
+        // };
+        
+        // try {
+        //     pitch = component.pitch;
+        //     arrow = pitch.arrow;
+        // } {
+        //     arrow = nil;
+        
+        // };
+
+        // if (#['up', 'down'].includes(arrow)) {
+        //     noteHeadContributions = pitch.prListFormatContributions;
+        //     contributions = contributions.addAll(noteHeadContributions);
+        // };
+        
         bundle.grobOverrides.addAll(contributions);
 	}
     /* --------------------------------------------------------------------------------------------------------

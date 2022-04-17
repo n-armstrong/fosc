@@ -25,7 +25,7 @@ Partition selection by sizes and beam each new selection.
 
 a = FoscStaff(FoscLeafMaker().((60..75), [1/32]));
 set(a).autoBeaming = false;
-a[0..].partitionBySizes(#[3,4,6,3]).do { |sel| sel.beam };
+a[0..].groupBySizes(#[3,4,6,3]).do { |sel| sel.beam };
 a.show;
 
 
@@ -35,7 +35,7 @@ Beams can be tweaked.
 
 a = FoscStaff(FoscLeafMaker().((60..75), [1/32]));
 set(a).autoBeaming = false;
-a[0..].partitionBySizes(#[3,4,6,3]).do { |selection|
+a[0..].groupBySizes(#[3,4,6,3]).do { |selection|
     b = FoscStartBeam(direction: 'up', tweaks:#['positions', [6,6], 'color', 'grey']);
     selection.beam(startBeam: b);
 };
@@ -48,7 +48,7 @@ Specify spanning beams using 'durations' and 'spanBeamCount'.
 
 x = FoscLeafMaker().((60..83), [1/16]);
 d = [[1/4, 1/8],[1/8, 1/4],[1/4, 1/8],[1/8, 1/4]];
-m = x.partitionBySizes(#[6,6,6,6]);
+m = x.groupBySizes(#[6,6,6,6]);
 m.do { |sel, i| sel.beam(durations: d[i], spanBeamCount: 1) };
 x.show;
 ------------------------------------------------------------------------------------------------------------ */
@@ -77,18 +77,23 @@ x.show;
             thisIndex = originalLeaves.indexOf(leaf);
             previousLeaf = originalLeaves[thisIndex - 1];
             previous = 0;
+            
             if (FoscStartBeam.prIsBeamable(previousLeaf, beamRests: beamRests)) {
                 previous = previousLeaf.writtenDuration.flagCount;
             };
+            
             nextLeaf = originalLeaves[thisIndex + 1];
             next = 0;
+            
             if (FoscStartBeam.prIsBeamable(nextLeaf, beamRests: beamRests)) {
                 next = nextLeaf.writtenDuration.flagCount;
             };
+            
             [previous, next];
         };
 
         leaves = [];
+        
         originalLeaves.do { |leaf|
             if (FoscStartBeam.prIsBeamable(leaf, beamRests: beamRests)) { leaves = leaves.add(leaf) };
         };
@@ -100,6 +105,7 @@ x.show;
         leaves[1..].do { |leaf|
             thisIndex = originalLeaves.indexOf(run.last);
             thatIndex = originalLeaves.indexOf(leaf);
+            
             if (thisIndex + 1 == thatIndex) {
                 run = run.add(leaf);
             } {
@@ -123,30 +129,35 @@ x.show;
                 startBeam = startBeam ?? { FoscStartBeam(tweaks: tweaks) };
                 stopBeam = stopBeam ?? { FoscStopBeam() };
                 startLeaf.detach(FoscStartBeam);
-                startLeaf.attach(startBeam, tag: tag);
+                startLeaf.attach(startBeam);
                 stopLeaf.detach(FoscStopBeam);
-                stopLeaf.attach(stopBeam, tag: tag);
+                stopLeaf.attach(stopBeam);
 
                 if (stemletLength.notNil) {
                     staff = startLeaf.prGetParentage.firstInstanceOf(FoscStaff);
                     lilypondType = try { staff.lilypondType } { 'Staff' };
                     string = "\\override %.Stem.stemlet-length = %".format(lilypondType, stemletLength);
                     literal = FoscLilypondLiteral(string);
+                    
                     block { |break|
                         startLeaf.prGetIndicators.do { |indicator|
                             if (indicator == literal) { break.value };
                         };
-                        startLeaf.attach(literal, tag: tag);
+                        
+                        startLeaf.attach(literal);
                     };
+                    
                     staff = stopLeaf.prGetParentage.firstInstanceOf(FoscStaff);
                     lilypondType = try { staff.lilypondType } { 'Staff' };
                     string = "\\revert %.Stem.stemlet-length".format(lilypondType);
                     literal = FoscLilypondLiteral(string, formatSlot: 'after');
+                    
                     block { |break|
                         stopLeaf.prGetIndicators.do { |indicator|
                             if (indicator == literal) { break.value };
                         };
-                        stopLeaf.attach(literal, tag: tag);
+                        
+                        stopLeaf.attach(literal);
                     };
                 };
             };
@@ -178,29 +189,31 @@ x.show;
                 if (FoscStartBeam.prIsBeamable(firstLeaf, beamRests: false)) {
                     left = if (isFirstPart) { 0 } { flagCount };
                     beamCount = FoscBeamCount(left, flagCount);
-                    firstLeaf.attach(beamCount, tag: tag);
+                    firstLeaf.attach(beamCount);
                 };
 
                 if (FoscStartBeam.prIsBeamable(lastLeaf, beamRests: false)) {
                     flagCount = lastLeaf.writtenDuration.flagCount;
                     right = if (isLastPart) { 0 } { flagCount };
                     beamCount = FoscBeamCount(flagCount, right);
-                    lastLeaf.attach(beamCount, tag: tag);
+                    lastLeaf.attach(beamCount);
                 };
             } {
                 if (FoscStartBeam.prIsBeamable(firstLeaf, beamRests: false)) {
                     left = if (isFirstPart) { 0 } { spanBeamCount };
                     beamCount = FoscBeamCount(left, flagCount);
-                    firstLeaf.attach(beamCount, tag: tag);
+                    firstLeaf.attach(beamCount);
                 };
 
                 if (FoscStartBeam.prIsBeamable(lastLeaf, beamRests: false)) {
                     flagCount = lastLeaf.writtenDuration.flagCount;
+                    
                     if (isLastPart) {
                         left = flagCount;
                         right = 0;
                     } {
                         # previous, next = leafNeighbors.(lastLeaf, originalLeaves);
+                        
                         case
                         { previous == next && { next == 0 }} {
                             left = flagCount;
@@ -227,12 +240,14 @@ x.show;
                             right = min(previous, flagCount);
                         };
                     };
+                    
                     beamCount = FoscBeamCount(left, right);
-                    lastLeaf.attach(beamCount, tag: tag);
+                    lastLeaf.attach(beamCount);
                 };
-
+    
                 if (part.size > 2) {
                     part[1..(part.lastIndex - 1)].do { |middleLeaf|
+                        
                         if (
                             FoscStartBeam.prIsBeamable(middleLeaf, beamRests: beamRests)
                             && { silentPrototype.includes(middleLeaf.species).not }
@@ -267,7 +282,7 @@ x.show;
                             };
 
                             beamCount = FoscBeamCount(left, right);
-                            middleLeaf.attach(beamCount, tag: tag);
+                            middleLeaf.attach(beamCount);
                         };
                     };
                 };

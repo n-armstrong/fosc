@@ -64,12 +64,14 @@ FoscDurationSpecifier : FoscObject {
     a = FoscDurationSpecifier(rewriteMeter: true).([a], meters: m);
     // attach time signatures where necessary
     t = nil;
+
     a.do { |sel, i|
         if (m[i] != t) {
             sel.leafAt(0).attach(FoscTimeSignature(m[i]));
             t = m[i];
         };
     };
+    
     FoscStaff(a).show;
 
 
@@ -132,13 +134,13 @@ FoscDurationSpecifier : FoscObject {
 
     a = FoscStaff(FoscLeafMaker().(#[60,60,62,62,64,64], [1/2,1/32,7/8,1/16,1/32,1/2]));
     m = a.selectLeaves;
-    m.partitionBySizes(#[2,2,2]).do { |each| each.tie };
+    m.groupBySizes(#[2,2,2]).do { |each| each.tie };
     a.leafAt(0).attach(FoscTimeSignature(#[2,4]));
     a.leafAt(1).attach(FoscTimeSignature(#[4,4]));
     a.leafAt(5).attach(FoscTimeSignature(#[2,4]));
 
     // use temporary containers to rewrite in-score selections of music
-    n = m.partitionBySizes(#[1,3,2]);    
+    n = m.groupBySizes(#[1,3,2]);    
     n.do { |selection| mutate(selection).wrap(FoscContainer()) };
     mutate(a[1][0..]).rewriteMeter(FoscMeter(#[4,4]));
     x = a.prDelItem(1);
@@ -278,7 +280,7 @@ FoscDurationSpecifier : FoscObject {
         components = mutate(voice).ejectContents;
         componentDurations = components.items.collect { |each| FoscInspection(each).duration };
         partLengths = componentDurations.split(durations).collect { |each| each.size };
-        selections = components.partitionBySizes(partLengths);
+        selections = components.groupBySizes(partLengths);
         ^selections;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

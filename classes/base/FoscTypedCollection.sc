@@ -11,7 +11,7 @@ FoscTypedCollection : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     var <collection, <itemClass;
 	*new { |items, itemClass|
-        if (items.isKindOf(this.species)) {
+        if (items.isKindOf(this)) {
             items = items.items;
         } {
             if (itemClass.isNil) { ^throw("%: itemClass cannot be nil.".format(this.name)) };

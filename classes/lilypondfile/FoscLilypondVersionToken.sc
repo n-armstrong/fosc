@@ -20,7 +20,7 @@ FoscLilypondVersionToken : FoscObject {
         ^super.new.init(versionString);
     }
     init { |argVersionString|
-        if (argVersionString.isNil) { argVersionString = FoscConfiguration.getLilypondVersionString };
+        if (argVersionString.isNil) { argVersionString = FoscConfiguration.lilypondVersionString };
         versionString = argVersionString;
 
     }

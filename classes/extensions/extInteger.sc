@@ -41,18 +41,22 @@
     -------------------------------------------------------------------------------------------------------- */
     partitionByRatio { |ratio|
         var result, divisions, cumulativeDivisions, roundedDivision, ratioSigns;
+        
         result = [0];
         divisions = ratio.collect { |part| (this.abs.asFloat * abs(part)) / ratio.abs.sum };
         cumulativeDivisions = divisions.offsets[1..];
+        
         cumulativeDivisions.do { |division|
             roundedDivision = division.round.asInteger - (result.sum);
             if ((division - division.round) == 0.5) { roundedDivision = roundedDivision + 1 };
             result = result.add(roundedDivision);
         };
+        
         result = result[1..];
         if (this.sign == -1) { result = result.collect { |each| each.neg } };
         ratioSigns = ratio.collect { |each| each.sign };
         result = result.collect { |each, i| (each * ratioSigns[i]).asInteger };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -69,12 +73,14 @@
     -------------------------------------------------------------------------------------------------------- */
     partitionIntoCanonicParts { |decreaseMonotonic=true|
         var result, previousEmpty, binaryN, binaryLength, placeValue;
+        
         if (this == 0) { ^0 };
         result = [];
         previousEmpty = true;
         binaryN = this.abs.asBinaryString;
         binaryN = binaryN[binaryN.indexOf($1)..];
         binaryLength = binaryN.size;
+        
         binaryN.do { |x, i|
             if (x == $1) {
                 placeValue = 2 ** (binaryLength - i - 1);
@@ -88,8 +94,14 @@
                 previousEmpty = true;
             };
         };
+        
         result = result.collect { |each| (each * this.sign).asInteger };
-        if (decreaseMonotonic) { ^result } { ^result.reverse };
+        
+        if (decreaseMonotonic) {
+            ^result;
+        } {
+            ^result.reverse;
+        };
     }
     /* --------------------------------------------------------------------------------------------------------
     • partitionIntoMaximallyEvenParts
@@ -161,15 +173,53 @@
     -------------------------------------------------------------------------------------------------------- */
     partitionIntoPartsLessThanDouble { |m|
         var result, currentValue, doubleM;
+        
         m = m.asInteger;
         result = [];
         currentValue = this;
         doubleM = 2 * m;
+        
         while { doubleM <= currentValue } {
             result = result.add(m);
             currentValue = currentValue - m;
         };
+        
         result = result.add(currentValue);
+        
         ^result;
     }
+    /* --------------------------------------------------------------------------------------------------------
+    • parts
+
+    m = FoscMask([-1,2,3,-inf], reverse: false, sustain: true);
+
+    (1..11).do { |n| m = n.parts([-1,2,3,-inf]); "% \t%".format(n, m).postln };
+    (1..11).do { |n| m = n.parts([-1,2,3,-inf], sustain: false); "% \t%".format(n, m).postln };
+    (1..11).do { |n| m = n.parts([-1,2,3,-inf], reverse: true); "% \t%".format(n, m).postln };
+
+
+    5.parts(-1);
+    5.parts(-3);
+    5.parts(-1, reverse: true);
+    5.parts(-3, reverse: true);
+    5.parts(-6);
+    -------------------------------------------------------------------------------------------------------- */
+    // parts { |ratio, reverse=false, sustain=true|
+    //     var result, signs;
+
+    //     if (ratio.isSequenceableCollection.not) { ratio = [ratio] };
+    //     signs = ratio.collect { |each| each.sign };
+    //     ratio = ratio.abs.extendToAbsSum(this);
+    //     signs = signs.extend(ratio.size, 1);
+    //     result = (ratio * signs).asInteger;
+        
+    //     if (sustain.not) {
+    //         result = result.collect { |each| if (each > 0) { 1 ! each } { each } };
+    //         result = result.flat;
+    //     };
+        
+    //     if (reverse) { result = result.reverse };
+        
+    //     ^result;
+    // }
 }

@@ -1,10 +1,12 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscPitchSet
 
+!!!TODO: add utility and transformation methods from Abjad
+
 x = FoscPitchSet(#[60,61,62]);
 x.cs;
 x.size;
-x.pitchNumbers;
+x.midinotes;
 x.pitchNames;
 
 • NB: abjad.PitchSet subclasses from Set not TypedSet
@@ -20,7 +22,7 @@ FoscPitchSet : FoscTypedSet {
         } {
            if (items.isSequenceableCollection.not) { items = [items] };
            items = items.collect { |each| FoscPitch(each) };
-           items = items.sort { |a, b| a.pitchNumber < b.pitchNumber };
+           items = items.sort { |a, b| a.midinote < b.midinote };
         };
         // • TODO: assert(all items isKindOf(FoscPitch))
         ^super.new(items, FoscPitch);
@@ -28,47 +30,42 @@ FoscPitchSet : FoscTypedSet {
 	/* --------------------------------------------------------------------------------------------------------
 	• newFromSelection
 
-	def from_selection(
-        class_,
-        selection,
-        item_class=None,
-        ):
-        Makes pitch set from 'selection'.
+    Makes pitch set from 'selection'.
 
-        ::
+    Returns pitch set.
+    
 
-            >>> staff_1 = Staff("c'4 <d' fs' a'>4 b2")
-            >>> staff_2 = Staff("c4. r8 g2")
-            >>> selection = select((staff_1, staff_2))
-            >>> pitchtools.PitchSet.from_selection(selection)
-            PitchSet(['c', 'g', 'b', "c'", "d'", "fs'", "a'"])
+    • Example 1
 
-        Returns pitch set.
-        
-        from abjad.tools import pitchtools
-        pitch_segment = pitchtools.PitchSegment.from_selection(selection)
-        return class_(
-            items=pitch_segment,
-            item_class=item_class,
-            )
+    a = FoscLeafMaker().((60..67).mirror, [1/4]);
+    b = FoscPitchSet.newFromSelection(a);
+    b.show;
     -------------------------------------------------------------------------------------------------------- */
-	*newFromSelection {
-		^this.notYetImplemented;
+	*newFromSelection { |selection|
+		var segment;    
+        segment = FoscPitchSegment.newFromSelection(selection);
+        ^this.new(segment);
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
-	• pitchNumbers
+	• midinotes
 	-------------------------------------------------------------------------------------------------------- */
-	pitchNumbers {
-		^this.items.collect { |each| each.pitchNumber };
+	midinotes {
+		^this.items.collect { |each| each.midinote };
 	}
+    /* --------------------------------------------------------------------------------------------------------
+    • pitches
+    -------------------------------------------------------------------------------------------------------- */
+    pitches {
+        ^this.items;
+    }
 	/* --------------------------------------------------------------------------------------------------------
 	• pitchNames
 	-------------------------------------------------------------------------------------------------------- */
 	pitchNames {
-		^this.items.collect { |each| each.pitchName };
+		^this.items.collect { |each| each.name };
 	}
     /* --------------------------------------------------------------------------------------------------------
     • difference
@@ -79,7 +76,7 @@ FoscPitchSet : FoscTypedSet {
 
     a = FoscPitchSet(#[61,62,63]);
     b = FoscPitchSet(#[62,63,64]);
-    a.difference(b).do { |each| each.pitchNumber.postln };
+    a.difference(b).do { |each| each.midinote.postln };
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • sect
@@ -90,7 +87,7 @@ FoscPitchSet : FoscTypedSet {
 
     a = FoscPitchSet(#[61,62,63]);
     b = FoscPitchSet(#[62,63,64]);
-    a.sect(b).do { |each| each.pitchNumber.postln };
+    a.sect(b).do { |each| each.midinote.postln };
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • isDisjoint
@@ -211,7 +208,7 @@ FoscPitchSet : FoscTypedSet {
     isEquivalentUnderTransposition { |pitchSet|
     	if (pitchSet.isKindOf(this.species).not) { ^false };
     	if (this.size != pitchSet.size) { ^false };
-    	^((this.pitchNumbers - pitchSet.pitchNumbers).asSet.size == 1);
+    	^((this.midinotes - pitchSet.midinotes).asSet.size == 1);
     }
     /* --------------------------------------------------------------------------------------------------------
     • register
@@ -220,9 +217,9 @@ FoscPitchSet : FoscTypedSet {
 
     Returns list of zero or more numbered pitches.
 	-------------------------------------------------------------------------------------------------------- */
-    register { |pitchClasses|
-        ^this.notYetImplemented(thisMethod);
-    }
+    // register { |pitchClasses|
+    //     ^this.notYetImplemented(thisMethod);
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • transpose
 
@@ -234,28 +231,17 @@ FoscPitchSet : FoscTypedSet {
     a = FoscPitchSet(#[61,62,63]);
 	b = a.transpose(3);
     b.cs;
-
-    def transpose(self, expr):
-        Transposes all pitches in pitch set by 'expr'.
-
-        Returns new pitch set.
-        
-        items = (pitch.transpose(expr) for pitch in self)
-        return new(self, items=items)
 	-------------------------------------------------------------------------------------------------------- */
 	transpose { |semitones|
     	^this.species.new(this.items.collect { |each| each.transpose(semitones) });
     }
 	/* --------------------------------------------------------------------------------------------------------
     • illustrate
+
+    a = FoscPitchSet(#[61,62,63]);
+    a.show;
 	-------------------------------------------------------------------------------------------------------- */
 	illustrate {
-        ^FoscLilypondFile.pitch([this.items]);
-	}
-	/* --------------------------------------------------------------------------------------------------------
-    • play
-	-------------------------------------------------------------------------------------------------------- */
-	play {
-        ^this.notYetImplemented(thisMethod);
+        ^FoscPitchSegment(this.pitches).illustrate;
 	}
 }

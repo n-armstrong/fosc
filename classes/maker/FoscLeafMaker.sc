@@ -6,11 +6,16 @@ Leaf-maker.
 Returns a FoscSelection.
 
 
+!!!TODO (see FoscPitchSegment):
+m = FoscLeafMaker().("d' e' f' g'", [1/4]);
+m.show;
+
+
 • Example 1
 
 Integer and string elements in pitches result in notes.
 
-m = FoscLeafMaker().(#[62,64,"F#5","G#5"], [1/4]);
+m = FoscLeafMaker().(#[62,64,"fs'","g'"], [1/4]);
 m.show;
 
 
@@ -30,7 +35,7 @@ m.show;
 
 Nil-valued elements in 'pitches' result in rests.
 
-m = FoscLeafMaker().(nil, 1/4 ! 4);
+m = FoscLeafMaker().([nil], 1/4 ! 4);
 m.show;
 
 
@@ -225,7 +230,10 @@ FoscLeafMaker {
         var nonreducedFractions, size, durationGroups, result, factors, currentPitches, leaves;
         var denominator, numerator, multiplier, ratio, tupletLeaves, tuplet;
 
-        pitches = FoscPitchParser(pitches);
+        // pitches = FoscPitchParser(pitches); //!!! deprecated
+
+        //!!! TODO: breaks on nil values
+        // pitches = FoscPitchSegment(pitches).pitches;
         if (durations.isSequenceableCollection.not) { durations = [durations] };   
         nonreducedFractions = durations.collect { |each| FoscNonreducedFraction(each) };
         size = [pitches.size, nonreducedFractions.size].maxItem;
@@ -258,7 +266,7 @@ FoscLeafMaker {
                         tag: tag
                     );
                     result = result.addAll(leaves.items);
-                    //result = result.addAll(leaves);
+                    //!!! result = result.addAll(leaves);
                 };
             } {
                 denominator = durationGroup[0].denominator;

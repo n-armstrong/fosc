@@ -33,10 +33,11 @@ FoscTuplet : FoscContainer {
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     var <denominator, <forceFraction, <isHidden, <multiplier, <tweaks;
-    *new { |multiplier, components, denominator, forceFraction=false, isHidden=false, tag, tweaks|
+    *new { |multiplier, components, denominator, forceFraction=false, isHidden=false, tweaks|
         multiplier = multiplier ?? { FoscMultiplier(2, 3) };
         multiplier = FoscMultiplier(multiplier);
-        ^super.new(components, tag: tag).initFoscTuplet(multiplier, denominator, forceFraction, isHidden, tweaks);
+        
+        ^super.new(components).initFoscTuplet(multiplier, denominator, forceFraction, isHidden, tweaks);
     }
     initFoscTuplet { |argMultiplier, argDenominator, argForceFraction, argHide, tweaks|
         multiplier = FoscMultiplier(argMultiplier);
@@ -61,14 +62,17 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     *newFromDuration { |duration, components|
         var targetDuration, tuplet, contentsDuration, multiplier;
+        
         if (components.isNil || { components.size <= 0 }) {
             ^throw("%::newFromDuration: components can not be empty.".format(this.species));
         };
+        
         targetDuration = FoscDuration(duration);
         tuplet = FoscTuplet(1, components);
         contentsDuration = FoscInspection(tuplet).duration;
         multiplier = targetDuration / contentsDuration;
         tuplet.multiplier_(multiplier);
+        
         ^tuplet;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -100,22 +104,11 @@ FoscTuplet : FoscContainer {
         basicWrittenDuration = basicProlatedDuration.equalOrGreaterAssignable;
         writtenDurations = ratio.collect { |each| each * basicWrittenDuration };
         leafMaker = FoscLeafMaker(increaseMonotonic: increaseMonotonic);
-
-        //!!!TODO: produces overly complex rhythms
-        // e.g.: FoscTuplet.newFromDurationAndRatio(3/16, #[1,1,1,1,1]).show;
-        // if (writtenDurations.every { |each| each.abs.isAssignable }) {
-        //     notes = writtenDurations.collect { |each|
-        //         each.str.postln;
-        //         if (each > 0) { FoscNote(60, each) } { FoscRest(each.abs) };
-        //     };
-        // } {
-            denominator = duration.denominator;
-            noteDurations = ratio.collect { |each| FoscDuration(each, denominator) };
-            pitches = noteDurations.collect { |each| if (each > 0) { 60 } { nil } };
-            leafDurations = noteDurations.abs;
-            notes = leafMaker.(pitches, leafDurations);
-        //};
-
+        denominator = duration.denominator;
+        noteDurations = ratio.collect { |each| FoscDuration(each, denominator) };
+        pitches = noteDurations.collect { |each| if (each > 0) { 60 } { nil } };
+        leafDurations = noteDurations.abs;
+        notes = leafMaker.(pitches, leafDurations);
         tuplet = FoscTuplet.newFromDuration(duration, notes);
         tuplet.normalizeMultiplier;
         
@@ -176,11 +169,11 @@ FoscTuplet : FoscContainer {
     a.show;
     -------------------------------------------------------------------------------------------------------- */
     denominator_ { |denominator|
-        assert(
-            denominator.isInteger && { denominator > 0 },
-            "%:%: denominator must be a positive integer: %."
-                .format(this.species, thisMethod.name, denominator);
-        );
+        // assert(
+        //     denominator.isInteger && { denominator > 0 },
+        //     "%:%: denominator must be a positive integer: %."
+        //         .format(this.species, thisMethod.name, denominator);
+        // );
         this.instVarPut('denominator', denominator);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -311,6 +304,7 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     multiplier_ { |multiplier| 
         var rational;
+        
         case
         { multiplier.isInteger || { multiplier.isKindOf(FoscFraction) } } {
             rational = FoscMultiplier(multiplier);
@@ -322,19 +316,16 @@ FoscTuplet : FoscContainer {
             throw("%:%: can't set tuplet multipler from: %."
                 .format(this.species, thisMethod.name, multiplier));
         };
+        
         if (rational > 0) {
             multiplier = rational;
         } {
             throw("%:%: multiplier must be positive: %."
                 .format(this.species, thisMethod.name, multiplier));   
         };
+        
         this.instVarPut('multiplier', multiplier);
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • tag
-
-    Gets tag.
-    -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • tweaks
 
@@ -377,8 +368,10 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     add { |component, preserveDuration=false|
         var oldDuration, newDuration;
+        
         if (preserveDuration) { oldDuration = this.prGetDuration };
         super.add(component);
+        
         if (preserveDuration) {
             newDuration = this.prGetContentsDuration;
             multiplier = oldDuration / newDuration;
@@ -417,8 +410,10 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     addAll { |components, preserveDuration=false|
         var oldDuration, newDuration;
+        
         if (preserveDuration) { oldDuration = this.prGetDuration };
         super.addAll(components);
+        
         if (preserveDuration) {
             newDuration = this.prGetContentsDuration;
             multiplier = oldDuration / newDuration;
@@ -529,9 +524,7 @@ FoscTuplet : FoscContainer {
     a.isTrivial;
     -------------------------------------------------------------------------------------------------------- */
     isTrivial {
-        this.doLeaves { |leaf|
-            if (leaf.multiplier.notNil) { ^false };
-        };
+        this.doLeaves { |leaf| if (leaf.multiplier.notNil) { ^false } };
         ^(this.multiplier == 1);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -557,6 +550,7 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     isTrivializable {
         var duration;
+        
         this.do { |component|
             if (component.isKindOf(FoscTuplet).not) {
                 assert(component.isKindOf(FoscLeaf));
@@ -584,16 +578,19 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     minimumDenominator_ { |denominator|
         var durations, nonreducedFractions;
-        assert(
-            denominator.isInteger && { denominator > 0 } && { denominator.isPowerOfTwo },
-            "%:%: denominator must be non-negative power of two: %"
-                .format(this.species, thisMethod.name, denominator);
-        );
+        
+        // assert(
+        //     denominator.isInteger && { denominator > 0 } && { denominator.isPowerOfTwo },
+        //     "%:%: denominator must be non-negative power of two: %"
+        //         .format(this.species, thisMethod.name, denominator);
+        // );
+        
         durations = [
             this.prGetContentsDuration,
             this.prGetPreprolatedDuration,
             FoscDuration(1, denominator)
         ];
+        
         nonreducedFractions = FoscDuration.durationsToNonreducedFractions(durations);
         denominator = nonreducedFractions[1].numerator;
         this.instVarPut('denominator', denominator);
@@ -615,8 +612,10 @@ FoscTuplet : FoscContainer {
     normalizeMultiplier {
         var integerExponent, leafMultiplier, oldWrittenDuration, newWrittenDuration, numerator, denominator;
         var localMultiplier;
+        
         integerExponent = this.multiplier.asFloat.log2.asInteger;
         leafMultiplier = FoscMultiplier(2) ** integerExponent;
+        
         this.do { |component|
             if (component.isKindOf(FoscLeaf)) {
                 oldWrittenDuration = component.writtenDuration;
@@ -624,6 +623,7 @@ FoscTuplet : FoscContainer {
                 component.prSetDuration(newWrittenDuration);
             };
         };
+        
         # numerator, denominator = leafMultiplier.pair;
         localMultiplier = FoscMultiplier(denominator, numerator);
         multiplier = localMultiplier * multiplier; 
@@ -687,19 +687,23 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     rewriteDots {
         var dotCounts, dotCount, globalDotCount, dotMultiplier, dotMultiplierReciprocal;
+        
         dotCounts = Set[];
+        
         this.do { |component|
             if (component.isKindOf(FoscTuplet)) { ^this };
             dotCount = component.writtenDuration.dotCount;
             dotCounts.add(dotCount);
         };
+        
         if (1 < dotCounts.size) { ^this };
-        assert(dotCounts.size == 1);
+        //assert(dotCounts.size == 1);
         globalDotCount = dotCounts.pop;
         if (globalDotCount == 0) { ^this };
         dotMultiplier = FoscMultiplier.fromDotCount(globalDotCount);
         multiplier = multiplier * dotMultiplier;
         dotMultiplierReciprocal = dotMultiplier.reciprocal;
+        
         this.do { |component|
             component.writtenDuration_(component.writtenDuration * dotMultiplierReciprocal);
         };
@@ -768,6 +772,7 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     trivialize {
         if (this.isTrivializable.not) { ^this };
+        
         this.do { |component|
             case
             { component.isKindOf(FoscTuplet) } {
@@ -780,6 +785,7 @@ FoscTuplet : FoscContainer {
                 throw("%:%: component type error: %".format(this.species, thisMethod.name, component));
             };
         };
+
         multiplier = FoscMultiplier(1);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -790,10 +796,12 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prFormatAfterSlot { |bundle|
         var result;
+        
         result = [];
         result = result.add(['grob reverts', bundle.grobReverts]);
         result = result.add(['commands', bundle.after.commands]);
         result = result.add(['comments', bundle.after.comments]);
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -813,14 +821,14 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prFormatCloseBracketsSlot {
         var result, strings;
+        
         result = [];
+        
         if (multiplier.notNil) {
             strings = ["}"];
-            if (tag.notNil) {
-                strings = FoscLilypondFormatManager.tag(strings, tag: tag);
-            };
             result = result.add([['selfBrackets', 'close'], strings]);
         };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -828,9 +836,11 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prFormatClosingSlot { |bundle|
         var result;
+        
         result = [];
         result = result.add(['commands', bundle.closing.commands]);
         result = result.add(['comments', bundle.closing.comments]);
+        
         ^this.prFormatSlotContributionsWithIndent(result);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -839,6 +849,7 @@ FoscTuplet : FoscContainer {
     prFormatLilypondFractionCommandString {
         if (isHidden) { ^"" };
         if (override(this).tupletNumber.vars.keys.includes('text')) { ^"" };
+        
         if (
             this.isAugmentation
             || { this.prHasPowerOfTwoDenominator.not }
@@ -847,6 +858,7 @@ FoscTuplet : FoscContainer {
         ) {
            ^"\\tweak text #tuplet-number::calc-fraction-text";
         };
+        
         ^"";
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -855,7 +867,9 @@ FoscTuplet : FoscContainer {
     prFormatOpenBracketsSlot {
         var result, contributor, scaleDurationsCommandString, contributions, fractionCommandString;
         var edgeHeightTweakString, strings, timesCommandString;
+        
         result = [];
+        
         if (multiplier > 0) {
             if (isHidden) {
                 contributor = [this, 'isHidden'];
@@ -866,23 +880,25 @@ FoscTuplet : FoscContainer {
                 contributor = ['selfBrackets', 'open'];
                 contributions = [];
                 fractionCommandString = this.prFormatLilypondFractionCommandString;
+                
                 if (fractionCommandString.notEmpty) {
                     contributions = contributions.add(fractionCommandString);
                 };
+                
                 edgeHeightTweakString = this.prGetEdgeHeightTweakString;
+                
                 if (edgeHeightTweakString.notEmpty) {
                     contributions = contributions.add(edgeHeightTweakString);
                 };
+                
                 strings = tweak(this).prListFormatContributions(directed: false);
                 contributions = contributions.addAll(strings);
                 timesCommandString = this.prGetTimesCommandString;
                 contributions = contributions.add(timesCommandString);
-                if (tag.notNil) {
-                    contributions = FoscLilypondFormatManager.tag(contributions, tag: tag);
-                };
                 result = result.add([contributor, contributions]);
             };
         };
+
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -890,9 +906,11 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prFormatOpeningSlot { |bundle|
         var result;
+
         result = [];
         result = result.add(['comments', bundle.opening.comments]);
         result = result.add(['commands', bundle.opening.commands]);
+        
         ^this.prFormatSlotContributionsWithIndent(result);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -916,8 +934,10 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prGetEdgeHeightTweakString {
         var duration, denominator;
+        
         duration = this.prGetPreprolatedDuration;
         denominator = duration.denominator;
+        
         if (denominator.isInteger && { denominator > 0 } && { denominator.isPowerOfTwo }) {
             ^"";
         } {
@@ -946,6 +966,7 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prGetMultiplierFractionString {
         var inverseMultiplier, nonreducedFraction, numer, denom;
+        
         if (denominator.notNil) {
             inverseMultiplier = this.multiplier.reciprocal;
             nonreducedFraction = FoscNonreducedFraction(inverseMultiplier);
@@ -954,6 +975,7 @@ FoscTuplet : FoscContainer {
         } {
             # numer, denom = this.multiplier.pair;
         };
+        
         ^"%/%".format(numer, denom);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -986,8 +1008,10 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prGetScaleDurationsCommandString {
         var string;
+        
         string = "\\scaleDurations #'(% . %) {";
         string = string.format(multiplier.numerator, multiplier.denominator);
+        
         ^string;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1039,65 +1063,16 @@ FoscTuplet : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prScale { |multiplier|
         var newDuration;
+        
         multiplier = FoscMultiplier(multiplier);
+        
         components.do { |component|
             if (component.isKindOf(FoscLeaf)) {
                 newDuration = multiplier * component.writtenDuration;
                 component.prSetDuration(newDuration);
             };
         };
+        
         this.normalizeMultiplier;
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • prSimplifyRedundantTuplet
-
-    • Example 1
-
-    a = FoscSelection(FoscTupletMaker().(2/8 ! 4, [1 ! 7]));
-    a = FoscStaff(a);
-    mutate(a).partition([4,13,4,7], partitionType: 'sustain');
-    a.show;
-
-    // simplify
-    FoscIteration(a).components(prototype: FoscTuplet).do { |each| each.prSimplifyRedundantTuplet };
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    // DEPRECATED ??
-    // prSimplifyRedundantTuplet {
-    //     var leaves, logicalTies, durations, tupletDuration, duration, leaf;
-
-    //     if (this.isRedundant.not) { ^nil };
-    //     leaves = [];
-    //     logicalTies = FoscSelection(this).byLogicalTie(parentageMask: this);
-    //     durations = logicalTies.music.collect { |each| each.duration };
-    //     tupletDuration = durations.sum;
-
-    //     logicalTies.do { |logicalTie, i|
-    //         duration = durations[i];
-    //         if (i == logicalTies.music.lastIndex) {
-    //             leaf = logicalTie.tail;
-    //         } {
-    //             leaf = logicalTie.head;
-    //         };
-    //         leaf.writtenDuration_(duration);
-    //         leaves = leaves.add(leaf);
-    //     };
-
-    //     components = leaves;
-    //     multiplier = FoscMultiplier(1);
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • prIsRestFilled
-    
-    a = FoscTuplet(2/3, [FoscNote(60, 1/4)]);
-    a.prIsRestFilled;
-
-    a = FoscTuplet(2/3, [FoscRest(1/4)]);
-    a.prIsRestFilled;
-    -------------------------------------------------------------------------------------------------------- */
-    // DEPRECATED ?
-    // prIsRestFilled {
-    //     iterate(this).byLeaf.do { |leaf| if (leaf.isKindOf(FoscRest).not) { ^false } };
-    //     ^true;
-    // }
 }

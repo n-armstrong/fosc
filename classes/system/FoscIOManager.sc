@@ -31,7 +31,7 @@ FoscIOManager : FoscObject {
 
     • Example 1
 
-    d = FoscConfiguration.foscOutputDirectory;
+    d = FoscConfiguration.outputDirectory;
     FoscIOManager.lastOutputFileName("ly", d);
 
     FoscIOManager.lastOutputFileName;
@@ -39,7 +39,7 @@ FoscIOManager : FoscObject {
     *lastOutputFileName { |extension, outputDirectory|
         var pattern, allFileNames, allOutput, result;
         pattern = "\\d{4,4}.[a-z]{2,3}";
-        outputDirectory = outputDirectory ?? { FoscConfiguration.foscOutputDirectory };
+        outputDirectory = outputDirectory ?? { FoscConfiguration.outputDirectory };
         if (File.exists(outputDirectory).not) { ^nil };
         allFileNames = "%/*".format(outputDirectory).pathMatch.collect { |each| each.basename };
         if (extension.notNil) {
@@ -109,12 +109,6 @@ FoscIOManager : FoscObject {
     }
     /* --------------------------------------------------------------------------------------------------------
     • *runLilypond
-
-    f = { |music, name, show=false|
-        p = "%/images/%".format(FoscConfiguration.foscRootDirectory, name);
-        x = music.write.asPDF("%.ly".format(p), p, flags: "-dresolution 100");
-        //if (show) { unixCmd("open %".format(x[0])) };
-    };
     -------------------------------------------------------------------------------------------------------- */
     *runLilypond { |lyPath, flags, outputPath, executablePath|
         var lilypondBase, command, exitCode, success;

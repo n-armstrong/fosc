@@ -18,7 +18,7 @@ FoscTypedList : FoscTypedSequenceableCollection {
 	// PUBLIC METHODS: LIST MODIFICATION
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
-    • concat
+    • ++
 	
 	Concatenates typed list and expr.
 
@@ -26,7 +26,14 @@ FoscTypedList : FoscTypedSequenceableCollection {
 
     a = FoscTypedList([1, 2, 3, 4], Number);
     b = FoscTypedList([5, 6], Number);
-    (a ++ b).inspect;
+    c = (a ++ b);
+    c.items;
+
+
+    a = FoscTypedList([1, 2, 3, 4], Number);
+    b = [5, 6];
+    c = (a ++ b);
+    c.items;
     -------------------------------------------------------------------------------------------------------- */
     ++ { |expr|
         var items;
@@ -41,22 +48,12 @@ FoscTypedList : FoscTypedSequenceableCollection {
 
     a = FoscTypedList([1, 2, 3, 4], Number);
     a.add(5);
-    a.inspect;
+    a.items;
     -------------------------------------------------------------------------------------------------------- */
     add { |item|
 		item = this.prItemCoercer(item);
        	this.prOnInsertion(item);
    		collection.add(item);
-    }
-	/* --------------------------------------------------------------------------------------------------------
-    • append -- REMOVE
-
-    a = FoscTypedList([1, 2, 3, 4], Number);
-    a.extend([5, 6, 7]);
-    a.inspect;
-    -------------------------------------------------------------------------------------------------------- */
-    append { |item|
-    	this.add(item);
     }
     /* --------------------------------------------------------------------------------------------------------
     • addAll
@@ -65,19 +62,13 @@ FoscTypedList : FoscTypedSequenceableCollection {
         items.do { |item| this.add(item) };
     }
     /* --------------------------------------------------------------------------------------------------------
-    • extend -- REMOVE
-    -------------------------------------------------------------------------------------------------------- */
-    extend { |items|
-        this.addAll(items);
-    }
-    /* --------------------------------------------------------------------------------------------------------
     • insert
 
     Inserts item at index.
 
     a = FoscTypedList([1, 2, 3, 4], Number);
     a.insert(1, 5);
-    a.inspect;
+    a.items;
     -------------------------------------------------------------------------------------------------------- */
     insert { |index, item|
         item = this.prItemCoercer(item);
@@ -91,7 +82,7 @@ FoscTypedList : FoscTypedSequenceableCollection {
 
     a = FoscTypedList([1, 2, 3, 4], Number);
     a.pop;
-    a.inspect;
+    a.items;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • prepend
@@ -100,7 +91,7 @@ FoscTypedList : FoscTypedSequenceableCollection {
 
     a = FoscTypedList([1, 2, 3, 4], Number);
     a.prepend(5);
-    a.inspect;
+    a.items;
     -------------------------------------------------------------------------------------------------------- */
     prepend { |item|
         this.insert(0, item);
@@ -112,7 +103,7 @@ FoscTypedList : FoscTypedSequenceableCollection {
 
     a = FoscTypedList([1, 2, 3, 4], Number);
     a[1] = 5;
-    a.inspect;
+    a.items;
     -------------------------------------------------------------------------------------------------------- */
     put { |index, item|
     	var oldItem;
@@ -129,7 +120,7 @@ FoscTypedList : FoscTypedSequenceableCollection {
 
     a = FoscTypedList([1, 2, 3, 4], Number);
     a.remove(3);
-    a.inspect;
+    a.items;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • removeAt
@@ -138,18 +129,18 @@ FoscTypedList : FoscTypedSequenceableCollection {
 
     a = FoscTypedList([1, 2, 3, 4], Number);
     a.removeAt(1);
-    a.inspect;
+    a.items;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • sort
 
     a = FoscTypedList([5, 2, 3, 4], Number);
     a.sort;
-    a.inspect;
+    a.items;
 
     a = FoscTypedList([5, 2, 3, 4], Number);
     a.sort { |a, b| a > b };
-    a.inspect;
+    a.items;
     -------------------------------------------------------------------------------------------------------- */
     sort { |func|
 		collection.sort(func);
@@ -241,6 +232,6 @@ FoscTypedList : FoscTypedSequenceableCollection {
     Inspect items in collection.
 
     a = FoscTypedList([1, 2, 3, 4], Number);
-    a.inspect;
+    a.items;
     -------------------------------------------------------------------------------------------------------- */
 }

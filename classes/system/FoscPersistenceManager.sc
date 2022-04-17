@@ -27,17 +27,22 @@ FoscPersistenceManager : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     asLY { |path, illustrateFunction ... args|
         var illustration, lyFileName, lyFile;
+        
         if (illustrateFunction.isNil) {
             illustrateFunction = client.illustrate;
         };
+        
         illustration = illustrateFunction.format; //!!!TODO: temporary
+        
         if (path.isNil) {
             lyFileName = FoscIOManager.nextOutputFileName;
-            path = FoscConfiguration.foscOutputDirectory ++ "/" ++ lyFileName;
+            path = FoscConfiguration.outputDirectory ++ "/" ++ lyFileName;
         };
+        
         lyFile = File(path, "w");
         lyFile.write(illustration);
         lyFile.close;
+        
         ^path;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -63,12 +68,14 @@ FoscPersistenceManager : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     asPDF { |lyPath, outputPath, illustrateFunction, flags, clean=false ... args|
         var success;
+        
         if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
         lyPath = this.asLY(lyPath, illustrateFunction, *args);
         outputPath = outputPath ?? { lyPath.splitext[0] };
         success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
         if (success && clean) { File.delete(lyPath) };
         outputPath = outputPath ++ ".pdf";
+        
         ^[outputPath, success];
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -79,18 +86,19 @@ FoscPersistenceManager : FoscObject {
 
     a = FoscNote(60, 1/4);
     n = "basic-usage/images/002";
-    p = "%/docs/%".format(FoscConfiguration.foscRootDirectory, n);
+    p = "%/docs/%".format(FoscConfiguration.rootDirectory, n);
     f = a.writePNG("%.ly".format(p), p);
     unixCmd("open %".format(f[0]));
     -------------------------------------------------------------------------------------------------------- */
     asPNG { |lyPath, outputPath, illustrateFunction, resolution=100, clean=true ... args|
         var flags, success;
+        
         if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
         lyPath = this.asLY(lyPath, illustrateFunction, *args);
         outputPath = outputPath ?? { lyPath.splitext[0] };
-        //flags = "-dbackend=eps -dno-gs-load-fonts -dinclude-eps-fonts --png";
         flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png".format(resolution);
         success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
+        
         if (success && clean) {
             #[
                 "%-1.eps",
@@ -100,7 +108,9 @@ FoscPersistenceManager : FoscObject {
                 "%.ly"
             ].do { |each| File.delete(each.format(outputPath)) };
         };
+        
         outputPath = (outputPath ++ ".png").shellQuote;
+        
         ^[outputPath, success];
     }
     /* --------------------------------------------------------------------------------------------------------

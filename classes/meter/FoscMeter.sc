@@ -5,13 +5,13 @@ Meter models a common practice understanding of beats and other levels of rhythm
 
 • Example 1
 
-FoscMeter(FoscTimeSignature([5, 4])).inspect;
+FoscMeter(FoscTimeSignature(#[5,4])).inspect;
 FoscMeter(FoscDuration(5, 4)).inspect;
 FoscMeter(FoscFraction(5, 4)).inspect;
-FoscMeter([5, 4]).inspect;
-FoscMeter(FoscRhythm([5, 4], [2, 3])).inspect;
-FoscMeter(FoscRhythm([5, 4], [1, [7, [3, 2, 2]], 2])).inspect;
-FoscMeter([5, 4], increaseMonotonic: true).inspect;
+FoscMeter(#[5,4]).inspect;
+FoscMeter(FoscRhythm(#[5,4], #[2,3])).inspect;
+FoscMeter(FoscRhythm(#[5,4], #[1,[7,[3,2,2]], 2])).inspect;
+FoscMeter(#[5,4], increaseMonotonic: true).inspect;
 
 
 a = FoscMeter([5,4]);
@@ -21,6 +21,8 @@ a.denominator;
 a.numerator;
 a.preferredBoundaryDepth;
 a.rootNode;
+
+FoscDuration
 ------------------------------------------------------------------------------------------------------------ */
 FoscMeter : FoscObject {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +51,12 @@ FoscMeter : FoscObject {
             factors = this.prFactors(numerator);
             this.prRecurse(rootNode, factors, denominator, increaseMonotonic);
         }
+        { object.isFloat } {
+            ^this.species.new(object.asFraction);
+        }
+        { object.isInteger } {
+            ^this.species.new([object, 1]);
+        }
         { object.isKindOf(FoscRhythm) } {
             object.do { |node|
                 if (node.prolation.denominator.isPowerOfTwo.not) {
@@ -76,6 +84,8 @@ FoscMeter : FoscObject {
 
     Returns true or false.
     
+
+    !!!TODO: not yet implemented
     -------------------------------------------------------------------------------------------------------- */
 
     /* --------------------------------------------------------------------------------------------------------

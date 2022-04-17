@@ -34,7 +34,7 @@ Partition selection by sizes, bracket each new selection, add text annotation.
 a = FoscStaff(FoscLeafMaker().((60..75), [1/32]));
 t = #[['bracket-flare', [0,0]], ['direction', 'up'], ['staff-padding', 0]];
 
-a[0..].partitionBySizes(#[3,4,6,3]).do { |sel, i|
+a[0..].groupBySizes(#[3,4,6,3]).do { |sel, i|
     sel.horizontalBracket(text: FoscMarkup(sel.size.asString).fontSize(-2), textAlign: -0.8, tweaks: t);
 };
 

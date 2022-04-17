@@ -7,19 +7,98 @@ FoscComponent : FoscObject {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
     var <indicatorsAreCurrent=false, <isForbiddenToUpdate=false, <overrides, <lilypondSettingNameManager;
     var <measureNumber, <offsetsAreCurrent=false, <offsetsInSecondsAreCurrent=false, <parent, <player; 
-    var <startOffset, startOffsetInSeconds, <stopOffset, stopOffsetInSeconds, <tag, <timespan, <wrappers;
-	*new { |tag|
-        if (tag.notNil) { assert([String, Symbol].any { |type| tag.isKindOf(type) }) };
-		^super.new.initFoscComponent(tag);
+    var <startOffset, startOffsetInSeconds, <stopOffset, stopOffsetInSeconds, <timespan, <wrappers;
+	*new {
+		^super.new.initFoscComponent;
 	}
-	initFoscComponent { |argTag|
-		tag = argTag;
+	initFoscComponent {
 		timespan = FoscTimespan();
 		wrappers = List[];
 	}
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • duration
+    -------------------------------------------------------------------------------------------------------- */
+    duration {
+        ^this.prGetDuration;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • eventList
+
+
+    !!!TODO: collect indicators and spanners (e.g. slurs for legato)
+
+
+    • Example 1
+
+    a = FoscChord([60,64,67], 1/4);
+    a.eventList;
+
+
+    • Example 2
+
+    a = FoscStaff(FoscLeafMaker().((60..72), [1/8]));
+    a[0..].hairpin('ppp < fff');
+    a.eventList.printAll;
+
+
+    • Example 3
+
+    Return a list of lists for simultaneous containers.
+
+    a = FoscStaff(FoscLeafMaker().((60..63), [1/32]));
+    b = FoscStaff(FoscLeafMaker().((67..70), [1/32]));
+    c = FoscScore([a, b]);
+    c.eventList; // throw exception
+    c.eventLists.do { |each| each.printAll; Post.nl };
+
+    c.do { |voice| voice.postln };
+    -------------------------------------------------------------------------------------------------------- */
+    eventList {
+        var events, logicalTies, amps, leaf, dur, midinote, amp, event;
+
+        this.prUpdateNow(offsetsInSeconds: true, indicators: true);
+
+        events = [];
+        
+        if (this.isKindOf(FoscContainer) && { this.isSimultaneous }) {
+            throw("'eventList' not implemented for simultaneous containers. Use 'eventLists'.");
+        } {
+            logicalTies = this.selectLogicalTies;
+            amps = this.prGetAmps(logicalTies);
+
+            logicalTies.do { |logicalTie, i|
+                leaf = logicalTie.head;
+                dur = (logicalTie.tail.stopOffsetInSeconds - leaf.startOffsetInSeconds).asFloat;
+                amp = amps[i];
+                
+                case
+                { leaf.isKindOf(FoscNote) } {
+                    midinote = leaf.writtenPitch.midinote;
+                    midinote = [midinote];
+                }
+                { leaf.isKindOf(FoscChord) } {
+                    midinote = leaf.writtenPitches.midinotes;
+                }
+                {
+                    midinote = 'rest';
+                };
+
+                event = (dur: dur, midinote: midinote, amp: amp);
+                events = events.add(event);
+            };
+        };
+
+        ^events;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • pattern
+    -------------------------------------------------------------------------------------------------------- */
+    pattern {
+        ^Pseq(this.eventList);
+    }
     /* --------------------------------------------------------------------------------------------------------
     • startOffsetInSeconds
 
@@ -44,11 +123,6 @@ FoscComponent : FoscObject {
             ^FoscMetronomeMark(#[1,4], 60).durationToSeconds(stopOffset);
         };
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • tag
-
-    Gets component tag.
-    -------------------------------------------------------------------------------------------------------- */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC INSTANCE METHODS: SPECIAL METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,32 +162,28 @@ FoscComponent : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     copy {
         var newComponent, manager;
+        
         newComponent = this.species.new(*this.storeArgs);
+        
         if (this.respondsTo('overrides') && { this.overrides.notNil }) {
             manager = override(this).copy;
             newComponent.instVarPut('overrides', manager);
         };
+        
         if (this.respondsTo('lilypondSettingNameManager') && { this.lilypondSettingNameManager.notNil }) {
             manager = set(this).copy;
             newComponent.instVarPut('lilypondSettingNameManager', manager);
         };
+        
         FoscInspection(this).annotationWrappers.do { |wrapper|
             newComponent.attach(wrapper.copy);
         };
+        
         wrappers.do { |wrapper|
             newComponent.attach(wrapper.copy);
         };
+        
         ^newComponent;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • format
-    
-    Formats component.
-
-    Returns string.
-    -------------------------------------------------------------------------------------------------------- */
-    format {
-        ^this.prGetLilypondFormat;
     }
     /* --------------------------------------------------------------------------------------------------------
     • illustrate
@@ -127,16 +197,38 @@ FoscComponent : FoscObject {
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
     a.show;
+
+
+    • Example 2
+
+    Include a path to include files (stylesheets, etc.)
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    p = "%/custom.ily".format(FoscConfiguration.stylesheetDirectory);
+    f = a.illustrate(includes: [p]);
+    f.show;
     -------------------------------------------------------------------------------------------------------- */
-    illustrate {
-        var stylesheetPath, includes, lilypondFile;
-        stylesheetPath = "%/default.ily".format(FoscConfiguration.foscStylesheetDirectory);
-        if (File.exists(stylesheetPath).not) {
-            warn("Default stylesheet not found at: %.".format(stylesheetPath));
-        } {
-            includes = [stylesheetPath];
+    illustrate { |defaultPaperSize, globalStaffSize, includes|
+        var lilypondFile;
+        
+        if (includes.isNil) {
+            includes = ["%/default.ily".format(FoscConfiguration.stylesheetDirectory)];
         };
-        lilypondFile = FoscLilypondFile(this, includes: includes);
+        
+        // if (File.exists(stylesheetPath).not) {
+        //     warn("Default stylesheet not found at: %.".format(stylesheetPath));
+        // } {
+        //     includes = [stylesheetPath];
+        // };
+        
+        lilypondFile = FoscLilypondFile(
+            this,
+            defaultPaperSize: defaultPaperSize,
+            includes: includes,
+            globalStaffSize: globalStaffSize
+        );
+        
+
         ^lilypondFile;
     }
 	/* --------------------------------------------------------------------------------------------------------
@@ -149,8 +241,677 @@ FoscComponent : FoscObject {
     storeArgs {
         ^[];
     }
+    /* --------------------------------------------------------------------------------------------------------
+    • str
+    -------------------------------------------------------------------------------------------------------- */
+    str {
+        ^this.format;
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PRIVATE METHODS
+    // PUBLIC INSTANCE METHODS: TOP LEVEL
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • annotate
+
+    a = FoscNote(60, 1/4);
+    a.annotate('foo', FoscClef('bass'));
+    FoscInspection(a).annotation('foo');
+    -------------------------------------------------------------------------------------------------------- */
+    annotate { |annotation, indicator|
+        var wrapper;
+        //!!!TODO: assert(annotation.isKindOf(Symbol)); // String as well ??
+        // receiver must be a subclass of FoscComponent !!! -- move this method to FoscComponent ?
+        wrapper = FoscWrapper(
+            component: this,
+            indicator: indicator,
+            annotation: annotation
+        );
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • attach
+
+    !!! TODO: attaches to FoscComponents and FoscSelections? can this method be moved lower in the tree?
+    !!! if not, then add a test for a valid receiver type to the top of the method.
+
+    Attaches 'attachment' to receiver.
+
+    First form attaches indicator to single leaf.
+
+    Second form attaches spanner to leaf selection.
+
+    Third for attaches grace container to leaf.
+
+    Fourth form attaches time signature to measure.
+
+    Fifth form attaches wrapper to unknown (?).
+
+    Returns nil.
+
+
+    • Example 1
+
+    Attaches clef to first note in staff:
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    a[0].attach(FoscClef('bass'));
+    a[0].wrappers;
+    a.format;
+
+
+    • Example 2
+
+    Attaches accent to last note in staff:
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    a[3].attach(FoscArticulation('>'));
+    a.format;
+    -------------------------------------------------------------------------------------------------------- */
+    attach { |attachment, context, deactivate, syntheticOffset, tag, wrapper=false|
+        var target, nonIndicatorPrototype, result, message, graceContainer, isAcceptable, component;
+        var annotation, indicator, localWrapper;
+
+        target = this;
+        assert(attachment.notNil, "%:attach: attachment cannot be nil.".format(target));
+        nonIndicatorPrototype = [FoscAfterGraceContainer, FoscGraceContainer];
+
+        if (context.notNil && nonIndicatorPrototype.any { |type| attachment.isKindOf(type) }) {
+            throw("%:attach: set context for indicators, not %.".format(target, attachment));
+        };
+
+        if (attachment.respondsTo('prBeforeAttach')) { attachment.prBeforeAttach(target) };
+
+        if (attachment.respondsTo('prAttachmentTestAll')) {
+            result = attachment.prAttachmentTestAll(target);
+            if (result.not) {
+                assert(result.isSequenceableCollection);
+                result = result.collect { |each| " " ++ each };
+                message = "%.prAttachmentTestAll():";
+                result.insert(0, message);
+                message = result.join("\n");
+                throw(message);
+            };
+        };
+
+        graceContainer = [FoscAfterGraceContainer, FoscGraceContainer];
+
+        case
+        { graceContainer.any { |type| attachment.isKindOf(type) } } {
+            if (target.isKindOf(FoscLeaf).not) {
+                throw("%:attach: grace containers attach to a single leaf.".format(target));
+            };
+            attachment.prAttach(target);
+            ^target;
+        };
+
+        assert(target.isKindOf(FoscComponent));
+
+        case
+        { target.isKindOf(FoscContainer) } {
+            isAcceptable = false;
+            if ([Dictionary, String, FoscWrapper].any { |type| attachment.isKindOf(type) }) {
+                isAcceptable = true;
+            };
+            if (attachment.respondsTo('canAttachToContainers') &&
+                { attachment.canAttachToContainers == true }) {
+                isAcceptable = true;
+            };
+            if (isAcceptable.not) {
+                throw("Can't attach % to a container: %.".format(attachment, target));
+            };
+        }
+        { target.isKindOf(FoscLeaf).not } {
+            throw("%:attach: indicator % must attach to leaf, not: %.".format(target, attachment, target));
+        };
+
+        component = target;
+        assert(component.isKindOf(FoscComponent));
+
+        annotation = nil;
+
+        if (attachment.isKindOf(FoscWrapper)) {
+            annotation = attachment.annotation;
+            context = context ?? { attachment.context };
+            deactivate = deactivate ?? { attachment.deactivate };
+            syntheticOffset = syntheticOffset ?? { attachment.syntheticOffset };
+            tag = tag ?? { attachment.tag };
+            attachment.prDetach;
+            attachment = attachment.indicator;
+        };
+
+        if (attachment.respondsTo('context')) {
+            context = context ?? { attachment.context };
+        };
+
+        localWrapper = FoscWrapper(
+            annotation: annotation,
+            component: component,
+            context: context,
+            deactivate: deactivate ? false,
+            indicator: attachment,
+            syntheticOffset: syntheticOffset,
+            tag: tag
+        );
+
+        //localWrapper.prBindComponent(component);
+        if (wrapper) { ^localWrapper };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • detach
+
+    • Example 1
+
+    Detach by class.
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    a[0].attach(FoscArticulation('>'));
+    a.format;
+
+    a[0].detach(FoscArticulation);
+    a.format;
+
+
+    • Example 2
+
+    Detach by instance.
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    i = FoscArticulation('>');
+    a[0].attach(i);
+    a.format;
+
+    a[0].detach(i);
+    a.format;
+    -------------------------------------------------------------------------------------------------------- */
+    detach { |object, byID=false|
+        var target, afterGraceContainer, graceContainer, inspector, result;
+
+        target = this;
+        inspector = FoscInspection(target);
+
+        if (object.isKindOf(Class)) {
+            case
+            { object === FoscAfterGraceContainer } {
+                afterGraceContainer = inspector.afterGraceContainer;
+            }
+            { object === FoscGraceContainer } {
+                graceContainer = inspector.graceContainer;
+            }
+            {
+                assert(target.respondsTo('wrappers'));
+                result = [];
+                
+                target.wrappers.do { |wrapper|
+                    if (wrapper.isKindOf(object)) {
+                        target.wrappers.remove(wrapper);
+                        result = result.add(wrapper);
+                    } {
+                        if (wrapper.indicator.isKindOf(object)) {
+                            wrapper.prDetach;
+                            result = result.add(wrapper.indicator);
+                        };
+                    };
+                };
+
+                ^result;
+            };
+        } {
+            case
+            { object.isKindOf(FoscAfterGraceContainer) } {
+                afterGraceContainer = inspector.afterGraceContainer;
+            }
+            { object.isKindOf(FoscGraceContainer) } {
+                graceContainer = inspector.graceContainer;
+            }
+            {
+                assert(target.respondsTo('wrappers'));
+                result = [];
+                target.wrappers.do { |wrapper|
+                    if (wrapper === object) {
+                        wrapper.prDetach;
+                        result = result.add(wrapper);
+                    } {
+                        if (wrapper.indicator == object) {
+                            if (byID && { object.hash != wrapper.indicator.hash }) {
+                                // pass
+                            } {
+                                wrapper.prDetach;
+                                result = result.add(wrapper.indicator);
+                            };
+                        };
+                    };
+                };
+                ^result;
+            };
+        };
+
+        result = [];
+        if (afterGraceContainer.notNil) { result = result.add(afterGraceContainer) };
+        if (graceContainer.notNil) { result = result.add(graceContainer) };
+        if (byID) {
+            result = result.select { |each| each.hash == object.hash };
+        };
+        result.do { |each| each.prDetach };
+        ^result;
+
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • override
+
+
+    • Example 1
+
+    a = FoscNote(60, 1/4);
+    override(a).noteHead.color = 'red';
+    override(a).noteHead.size = 12;
+    a.format;
+    -------------------------------------------------------------------------------------------------------- */
+    override {
+        if (this.respondsTo('overrides').not) {
+            throw("%: does not respond to override.".format(this.species));
+        };
+        if (this.overrides.isNil) {
+            this.instVarPut('overrides', FoscLilypondGrobNameManager());
+        };
+        ^this.overrides;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • set
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], 1/8));
+    set(a).instrumentName = FoscMarkup("Violin");
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    set {
+        if (this.respondsTo('lilypondSettingNameManager').not) {
+            throw("%: does not respond to set.".format(this.species));
+        };
+        if (this.lilypondSettingNameManager.isNil) {
+            this.instVarPut('lilypondSettingNameManager', FoscLilypondSettingNameManager());
+        };
+        ^this.lilypondSettingNameManager;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • tweak
+
+    • Example 1
+
+    Tweaks markup:
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    m = FoscMarkup('Allegro assai', direction: 'above');
+    tweak(m).color = 'red';
+    m.format;
+    a[0].attach(m);
+    a.format;
+
+
+    Survives copy:
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    m = FoscMarkup('Allegro assai', direction: 'above');
+    tweak(m).color = 'red';
+    n = m.copy;
+    a.leafAt(0).attach(n);
+    //a.show;
+    a.format;
+
+
+    !!!TODO: DOES NOT SURVIVE DOT-CHAINING
+
+    Survives dot-chaining:
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    m = FoscMarkup('Allegro assai', direction: 'above');
+    tweak(m).color = 'red';
+    m = m.italic;
+    a.leafAt(0).attach(m);
+    //a.show;
+    a.format;
+
+    ### abjad:
+    \new Staff
+    {
+        c'4
+        - \tweak color #red
+        ^ \markup {
+            \italic
+                "Allegro assai"
+            }
+        d'4
+        e'4
+        f'4
+    }
+    ###
+
+    !!!TODO: DOES NOT WORK FOR OPPOSITE-DIRECTED COINCIDENT MARKUP
+
+    Works for opposite-directed coincident markup:
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    m = FoscMarkup('Allegro assai', direction: 'above');
+    tweak(m).color = 'red';
+    a.leafAt(0).attach(m);
+    n = FoscMarkup('... ma non troppo', direction: 'below');
+    tweak(n).color = 'blue';
+    tweak(n).staffPadding = 4;
+    a.leafAt(0).attach(n);
+    //a.show;
+    a.format;
+
+    ### abjad:
+    \new Staff
+    {
+        c'4
+        - \tweak color #red
+        ^ \markup { "Allegro assai ..." }
+        - \tweak color #blue
+        - \tweak staff-padding #4
+        _ \markup { "... ma non troppo" }
+        d'4
+        e'4
+        f'4
+    }
+    ###
+
+
+    !!!TODO: NOT WORKING
+
+    Ignored for same-directed coincident markup:
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    m = FoscMarkup('Allegro assai', direction: 'above');
+    tweak(m).color = 'red';
+    a.leafAt(0).attach(m);
+    n = FoscMarkup('... ma non troppo', direction: 'above');
+    tweak(n).color = 'blue';
+    tweak(n).staffPadding = 4;
+    a.leafAt(0).attach(n);
+    //a.show;
+    a.format;
+
+    ### abjad:
+    \new Staff
+    {
+        c'4
+        - \tweak color #red
+        ^ \markup { "Allegro assai ..." }
+        - \tweak color #blue
+        - \tweak staff-padding #4
+        ^ \markup { "... ma non troppo" }
+        d'4
+        e'4
+        f'4
+    }
+    ###
+
+
+    • Example 2
+
+
+    Tweaks note-head:
+
+    a = FoscStaff(FoscLeafMaker().(#[60,61,62,63], [1/4]));
+    tweak(a[1].noteHead).color = 'red';
+    a.format;
+
+
+    !!!TODO: NOT YET IMPLEMENTED
+
+    Tweaks grob aggregated to note-head:
+
+    a = FoscStaff(FoscLeafMaker().(#[60,61,62,63], [1/4]));
+    tweak(a[1].noteHead).accidental.color = 'red';
+    //a.show;
+    a.format;
+
+    ### abjad:
+    \new Staff
+    {
+        c'4
+        \tweak Accidental.color #red
+        cs'4
+        d'4
+        ds'4
+    }
+    ###
+
+
+    • Example 3
+
+    Returns LilyPond tweak manager:
+
+    m = FoscMarkup('Allegro assai', direction: 'above');
+    tweak(m);
+
+
+    • Example 4
+
+    !!!TODO:
+
+    Tweak objectessions work like this:
+
+    >>> abjad.tweak('red').color
+    LilyPondTweakManager(('color', 'red'))
+
+    >>> abjad.tweak(6).Y_offset
+    LilyPondTweakManager(('Y_offset', 6))
+
+    >>> abjad.tweak(False).bound_details__left_broken__text
+    LilyPondTweakManager(('bound_details__left_broken__text', False))
+
+
+
+    • Example X
+
+    a = FoscHairpin('p < f');
+    b = FoscLilypondTweakManager();
+    b.setTweaks(a, #[['dynamicLineSpanner', 5]]);
+    a.tweaks;
+    a.tweaks.prGetAttributePairs;
+
+
+    • Example Y
+
+    a = FoscHorizontalBracket();
+    tweak(a).color = 'red';
+    tweak(a).staffPadding = 5;
+    a.tweaks.prGetAttributePairs;
+    -------------------------------------------------------------------------------------------------------- */
+    tweak {
+        var constants, prototype, manager;
+        
+        if (this.respondsTo('tweaks').not) {
+            throw("% does not respond to tweak.".format(this.species));
+        };
+        constants = #['above', 'below', 'down', 'left', 'right', 'up'];
+        prototype = [Boolean, SimpleNumber, String, SequenceableCollection, FoscScheme];
+        
+        if (constants.includes(this) || { prototype.any { |type| this.isKindOf(type) } }) {
+            manager = FoscLilypondTweakManager();
+            manager.pendingValue_(this);
+            ^manager;
+        };
+        
+        if (this.tweaks.isNil) {
+            this.instVarPut('tweaks', FoscLilypondTweakManager());
+        };
+        
+        ^this.tweaks;
+    }
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE CLASS METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • prGetAmps
+    -------------------------------------------------------------------------------------------------------- */
+    prGetAmps { |logicalTies, defaultDynamic|
+        var indices, pairs, result, indicators, partSizes, size, nextPair, currentDynamic, triple;
+        var startDynamic, dynamicTrend, stopDynamic, startVal, stopVal;
+
+        defaultDynamic = defaultDynamic ?? { FoscDynamic('mf') };
+        indices = [];
+        pairs = [];
+        result = [];
+        
+        logicalTies.do { |logicalTie, i|
+            indicators = logicalTie.head.prGetIndicators([FoscDynamic, FoscDynamicTrend]);
+            if (indicators.notEmpty) {
+                indices = indices.add(i);
+                pairs = pairs.add(indicators);
+            };
+        };
+
+        partSizes = indices.add(logicalTies.size).intervals;
+
+        pairs.do { |pair, i|
+            size = partSizes[i];
+            nextPair = pairs[i + 1];
+
+            case 
+            { pair.size == 1 } {
+                case
+                { pair[0].isKindOf(FoscDynamic) } {
+                    currentDynamic = pair[0];
+                    pair = [currentDynamic, nil];
+                }
+                { pair[0].isKindOf(FoscDynamicTrend) } {
+                    currentDynamic = currentDynamic ? defaultDynamic;
+                    pair = [currentDynamic] ++ pair;
+                };
+            }
+            { pair.size == 2 } {
+               currentDynamic = pair[0];
+            };
+
+            if (nextPair.notNil) {
+                case 
+                { nextPair[0].isKindOf(FoscDynamic) } {
+                    currentDynamic = nextPair[0];
+                    triple = pair ++ [currentDynamic];
+                }
+                { nextPair[0].isKindOf(FoscDynamicTrend) } {
+                    triple = pair ++ [currentDynamic];
+                };
+            } {
+                triple = [currentDynamic, nil, currentDynamic];
+            };
+
+            # startDynamic, dynamicTrend, stopDynamic = triple;
+            startVal = startDynamic.amp;
+            stopVal = stopDynamic.amp;
+            
+            //!!!TODO: hack - remove
+            case 
+            { stopVal.isNil && startVal.isNil} {
+                stopVal = startVal = 0.08;
+            }
+            { stopVal.isNil && startVal.notNil } {
+                stopVal = 0.08;
+            }
+            { startVal.isNil && stopVal.notNil } {
+                startVal = 0.08;
+            };
+                
+            case
+            { dynamicTrend.isNil || { dynamicTrend.shape == "--" } } {
+                result = result.addAll(Array.fill(size, startVal));
+            }
+            { dynamicTrend.notNil } {
+                result = result.addAll(Array.interpolation(size + 1, startVal, stopVal).drop(-1));
+            };
+        };
+
+        if (result.isEmpty) { 
+            result = Array.fill(logicalTies.size, defaultDynamic.amp);
+        };
+
+        ^result;
+    }
+    // prGetAmps { |logicalTies, defaultDynamic|
+    //     var indices, pairs, result, indicators, partSizes, size, nextPair, currentDynamic, triple;
+    //     var startDynamic, dynamicTrend, stopDynamic, startVal, stopVal;
+
+    //     defaultDynamic = defaultDynamic ?? { FoscDynamic('mf') };
+    //     indices = [];
+    //     pairs = [];
+    //     result = [];
+        
+    //     logicalTies.do { |logicalTie, i|
+    //         indicators = logicalTie.head.prGetIndicators([FoscDynamic, FoscDynamicTrend]);
+    //         if (indicators.notEmpty) {
+    //             indices = indices.add(i);
+    //             pairs = pairs.add(indicators);
+    //         };
+    //     };
+
+    //     partSizes = indices.add(logicalTies.size).intervals;
+
+    //     pairs.do { |pair, i|
+    //         size = partSizes[i];
+    //         nextPair = pairs[i + 1];
+
+    //         case 
+    //         { pair.size == 1 } {
+    //             case
+    //             { pair[0].isKindOf(FoscDynamic) } {
+    //                 currentDynamic = pair[0];
+    //                 pair = [currentDynamic, nil];
+    //             }
+    //             { pair[0].isKindOf(FoscDynamicTrend) } {
+    //                 currentDynamic = currentDynamic ? defaultDynamic;
+    //                 pair = [currentDynamic] ++ pair;
+    //             };
+    //         }
+    //         { pair.size == 2 } {
+    //            currentDynamic = pair[0];
+    //         };
+
+    //         if (nextPair.notNil) {
+    //             case 
+    //             { nextPair[0].isKindOf(FoscDynamic) } {
+    //                 currentDynamic = nextPair[0];
+    //                 triple = pair ++ [currentDynamic];
+    //             }
+    //             { nextPair[0].isKindOf(FoscDynamicTrend) } {
+    //                 triple = pair ++ [currentDynamic];
+    //             };
+    //         } {
+    //             triple = [currentDynamic, nil, currentDynamic];
+    //         };
+
+    //         # startDynamic, dynamicTrend, stopDynamic = triple;
+    //         startVal = startDynamic.scalar;
+    //         stopVal = stopDynamic.scalar;
+            
+    //         //!!!TODO: hack - remove
+    //         case 
+    //         { stopVal.isNil && startVal.isNil} {
+    //             stopVal = startVal = 0.08;
+    //         }
+    //         { stopVal.isNil && startVal.notNil } {
+    //             stopVal = 0.08;
+    //         }
+    //         { startVal.isNil && stopVal.notNil } {
+    //             startVal = 0.08;
+    //         };
+                
+    //         case
+    //         { dynamicTrend.isNil || { dynamicTrend.shape == "--" } } {
+    //             result = result.addAll(Array.fill(size, startVal));
+    //         }
+    //         { dynamicTrend.notNil } {
+    //             result = result.addAll(Array.interpolation(size + 1, startVal, stopVal).drop(-1));
+    //         };
+    //     };
+
+    //     if (result.isEmpty) { 
+    //         result = Array.fill(logicalTies.size, defaultDynamic.scalar);
+    //     };
+
+    //     ^result;
+    // }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PRIVATE INSTANCE METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • prCacheNamedChildren
@@ -262,9 +1023,11 @@ FoscComponent : FoscObject {
     // abjad 3.0
     prFormatComponent { |pieces=false|
         var result, contributions, bundle, contributor, contribution;
+        
         result = [];
         contributions = [];
         bundle = FoscLilypondFormatManager.bundleFormatContributions(this);
+        
         result = result.addAll(this.prFormatAbsoluteBeforeSlot(bundle));
         result = result.addAll(this.prFormatBeforeSlot(bundle));
         result = result.addAll(this.prFormatOpenBracketsSlot(bundle));
@@ -274,10 +1037,12 @@ FoscComponent : FoscObject {
         result = result.addAll(this.prFormatCloseBracketsSlot(bundle));
         result = result.addAll(this.prFormatAfterSlot(bundle));
         result = result.addAll(this.prFormatAbsoluteAfterSlot(bundle));
+        
         result.do { |each|
             # contributor, contribution = if (each.size == 1) { each[0] } { each };
             contributions = contributions.addAll(contribution) 
         };
+        
         if (pieces) { ^contributions } { ^contributions.join("\n") };
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -586,8 +1351,9 @@ FoscComponent : FoscObject {
         indicators = this.prGetIndicators(prototype, attributes, unwrap);
         case 
         { indicators.isEmpty } {
-            throw("%:% no attached indicators found matching %."
-                .format(this.species, thisMethod.name,prototype));
+            ^nil;
+            // throw("%:% no attached indicators found matching %."
+            //     .format(this.species, thisMethod.name,prototype));
         }
         { indicators.size > 1 } {
             throw("%:% multiple attached indicators found matching %."
@@ -903,14 +1669,6 @@ FoscComponent : FoscObject {
         ^nil;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • prTagStrings
-
-    FoscLilypondFormatManager.tag(["foo", "bar"], tag: 'CLAR');
-    -------------------------------------------------------------------------------------------------------- */
-    prTagStrings { |strings|
-        ^FoscLilypondFormatManager.tag(strings, tag: tag);
-    }
-    /* --------------------------------------------------------------------------------------------------------
     • prUpdateLater
     -------------------------------------------------------------------------------------------------------- */
     prUpdateLater { |offsets=false, offsetsInSeconds=false|
@@ -939,16 +1697,4 @@ FoscComponent : FoscObject {
     prUpdateNow { |offsets=false, offsetsInSeconds=false, indicators=false|
         ^FoscUpdateManager().prUpdateNow(this, offsets, offsetsInSeconds, indicators);
     }
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // TO BE DEPRECATED
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // prSibling2 { |n|
-    //     var sibling, index;
-    //     if (parent.isNil) { ^nil };
-    //     if (parent.isSimultaneous) { ^nil };
-    //     index = parent.indexOf(this) + n;
-    //     if ((0 <= index) && { index < parent.size }) { ^parent[index] } { ^nil };
-    // }
 }

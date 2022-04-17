@@ -36,15 +36,15 @@ FoscLilypondFormatBundle : FoscObject {
 	a.prGetFormatSpecification;
 	-------------------------------------------------------------------------------------------------------- */
 	// abjad 3.0 - TODO
-	prGetFormatSpecification {
-		var slotContributionNames, grobContributionNames, names;
-		slotContributionNames = #['absoluteBefore', 'absoluteAfter', 'before', 'after', 'opening',
-			'closing', 'right'];
-		grobContributionNames = #['contextSettings', 'grobOverrides', 'grobReverts'];
-		names = slotContributionNames.select { |name| this.perform(name).hasContributions };
-		names = names.add(grobContributionNames.select { |name| this.perform(name).notEmpty });
-		^FoscFormatSpecification(this, storageFormatKwargsNames: names);
-	}
+	// prGetFormatSpecification {
+	// 	var slotContributionNames, grobContributionNames, names;
+	// 	slotContributionNames = #['absoluteBefore', 'absoluteAfter', 'before', 'after', 'opening',
+	// 		'closing', 'right'];
+	// 	grobContributionNames = #['contextSettings', 'grobOverrides', 'grobReverts'];
+	// 	names = slotContributionNames.select { |name| this.perform(name).hasContributions };
+	// 	names = names.add(grobContributionNames.select { |name| this.perform(name).notEmpty });
+	// 	^FoscFormatSpecification(this, storageFormatKwargsNames: names);
+	// }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////

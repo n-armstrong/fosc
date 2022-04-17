@@ -64,25 +64,25 @@ FoscSlotContributions : FoscObject {
 	a = FoscSlotContributions();
 	a.prGetFormatSpecification;
 	-------------------------------------------------------------------------------------------------------- */
-	prGetFormatSpecification {
-		var names;
-		names = [
-	        'articulations',
-	        'commands',
-	        'comments',
-	        'indicators',
-            'leaks',
-	        'markup',
-	        'spanners',
-	        'spannerStarts',
-	        'spannerStops',
-	        'stemTremolos',
-            //'tag',
-	        'trillSpannerStarts'
-        ];
-        names = names.select { |name| this.perform(name).notEmpty };
-		^FoscFormatSpecification(this, storageFormatKwargsNames: names);
-	}
+	// prGetFormatSpecification {
+	// 	var names;
+	// 	names = [
+	//         'articulations',
+	//         'commands',
+	//         'comments',
+	//         'indicators',
+ //            'leaks',
+	//         'markup',
+	//         'spanners',
+	//         'spannerStarts',
+	//         'spannerStops',
+	//         'stemTremolos',
+ //            //'tag',
+	//         'trillSpannerStarts'
+ //        ];
+ //        names = names.select { |name| this.perform(name).notEmpty };
+	// 	^FoscFormatSpecification(this, storageFormatKwargsNames: names);
+	// }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC PROPERTIES
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////

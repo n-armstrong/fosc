@@ -323,21 +323,6 @@ FoscDuration : FoscFraction {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-   /* --------------------------------------------------------------------------------------------------------
-   • prGetFormatSpecification
-
-   def _get_format_specification(self):
-       return systemtools.FormatSpecification(
-           client=self,
-           storage_format_args_values=[
-               self.numerator,
-               self.denominator,
-               ],
-           storage_format_is_indented=False,
-           storage_format_kwargs_names=[],
-           )
-   -------------------------------------------------------------------------------------------------------- */
-
     /* --------------------------------------------------------------------------------------------------------
     • prGroupNonreducedFractionsByImpliedProlation
 

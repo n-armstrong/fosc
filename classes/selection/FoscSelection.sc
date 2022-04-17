@@ -6,8 +6,6 @@ Selection of items (components / or other selections).
 m = [FoscNote(60, 1/4), FoscNote(62, 1/4)];
 a = FoscSelection(m);
 a.items;
-
-FoscSelection.dumpInterface
 ------------------------------------------------------------------------------------------------------------ */
 FoscSelection : FoscSequence {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,11 +23,51 @@ FoscSelection : FoscSequence {
     // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
+    • eventList
+
+
+    • Example 1
+
+    a = FoscLeafMaker().((60..72), [1/4]);
+    a.eventList.printAll;
+
+
+    • Throw an exception when items are not contiguous
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    b = FoscSelection([a.leafAt(1), a.leafAt(3)]);
+    b.eventList;
+    -------------------------------------------------------------------------------------------------------- */
+    eventList {
+        var container, eventList;
+
+        if (this.areContiguousLogicalVoice.not) {
+            throw("%:%: components in selection are not contiguous.".format(this.species, thisMethod.name));
+        };
+
+        container = FoscContainer(this);
+        eventList = container.eventList;
+        container.prEjectContents;
+
+        ^eventList;
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • items
 
     a = FoscSelection([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
     a.items;
     -------------------------------------------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------------------------------------------
+    • pattern
+
+    a = FoscMusicMaker();
+    b = a.(durations: 1/4 ! 10, divisions: #[[1,1,1,1]], mask: [1,2,3], pitches: (60..63));
+    p = b.pattern;
+    p.play;
+    -------------------------------------------------------------------------------------------------------- */
+    pattern {
+        ^Pseq(this.eventList);
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE CLASS METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +165,9 @@ FoscSelection : FoscSequence {
 
     b = FoscSelection([a.leafAt(1), a.leafAt(3)]);
     b[0..].areContiguousLogicalVoice;
+
+    c = FoscLeafMaker().(#[60,62,64,65], [1/4]);
+    c.leaves.areContiguousLogicalVoice;
     -------------------------------------------------------------------------------------------------------- */
     areContiguousLogicalVoice { |prototype|
         var allowableTypes, first, firstParentage, firstLogicalVoice, firstRoot, previous, currentParentage;
@@ -176,9 +217,12 @@ FoscSelection : FoscSequence {
     Is true when items in selection are all contiguous components in the same parent.
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
-    a[0..].areContiguousSameParent;
+    a.selectLeaves.areContiguousSameParent;
 
-    b = FoscSelection([a.leafAt(1), a.leafAt(3)]);
+    b = FoscSelection([a.leafAt(1), a.leafAt(2)]);
+    b[0..].areContiguousSameParent;
+
+    b = FoscSelection([a.leafAt(0), a.leafAt(2)]);
     b[0..].areContiguousSameParent;
     -------------------------------------------------------------------------------------------------------- */
     areContiguousSameParent { |prototype|
@@ -188,17 +232,14 @@ FoscSelection : FoscSequence {
         if (prototype.isSequenceableCollection.not) { prototype = [prototype] };
         if (this.size == 0) { ^true };
 
-        if (
-            items.every { |each|
-                prototype.any { |type| each.isKindOf(type) }
-                && { each.prGetParentage.isOrphan };
-            }
-        ) {
+        if (items.every { |each|
+            prototype.any { |type| each.isKindOf(type) } && { each.prGetParentage.isOrphan };
+        }) {
             ^true;
         };
 
         first = this[0];
-        if (this.any { |type| first.isKindOf(type) }.not) { ^false };
+        if (prototype.any { |type| first.isKindOf(type) }.not) { ^false };
         firstParent = first.parent;
         previous = first;
 
@@ -207,10 +248,7 @@ FoscSelection : FoscSequence {
             if (current.parent != firstParent) { sameParent = false };
             if (previous.prImmediatelyPrecedes(current).not) { strictlyContiguous = false };
             
-            if (
-                current.prGetParentage.isOrphan.not
-                && { sameParent.not || strictlyContiguous.not }
-            ) {
+            if (current.prGetParentage.isOrphan.not && { sameParent.not || strictlyContiguous.not }) {
                 ^false;
             };
             
@@ -228,7 +266,8 @@ FoscSelection : FoscSequence {
     a[0..].areLeaves;
     -------------------------------------------------------------------------------------------------------- */
     areLeaves {
-        ^items.every { |each| each.isKindOf(FoscLeaf) };
+        //^items.every { |each| each.isKindOf(FoscLeaf) };
+        ^this.every { |each| each.isKindOf(FoscLeaf) };
     }
     /* --------------------------------------------------------------------------------------------------------
     • areLogicalVoice
@@ -249,14 +288,9 @@ FoscSelection : FoscSequence {
         if (prototype.isSequenceableCollection.not) { prototype = [prototype] };   
         if (this.size == 0) { ^true };
 
-        if (
-            items.every { |each|
-                prototype.any { |type| each.isKindOf(type) }
-                && { each.prGetParentage.isOrphan };
-            }
-        ) {
-            ^true;
-        };
+        if (items.every { |each|
+            prototype.any { |type| each.isKindOf(type) } && { each.prGetParentage.isOrphan };
+        }) { ^true };
 
         first = this[0];
         if (prototype.any { |type| first.isKindOf(type) }.not)  { ^false };
@@ -265,14 +299,8 @@ FoscSelection : FoscSequence {
 
         this[1..].do { |current|
             parentage = current.prGetParentage(graceNotes: true);
-            
-            if (parentage.logicalVoice != firstLogicalVoice) {
-                sameLogicalVoice = false;
-            };
-            
-            if (parentage.isOrphan.not && sameLogicalVoice.not) {
-                ^false;
-            };
+            if (parentage.logicalVoice != firstLogicalVoice) { sameLogicalVoice = false };
+            if (parentage.isOrphan.not && sameLogicalVoice.not) { ^false };
         };
         
         ^true;
@@ -409,6 +437,18 @@ FoscSelection : FoscSequence {
     a = FoscSelection([FoscNote(60, 1/4), FoscNote(62, 1/4), FoscNote(64, 1/4)]);
     a.doAdjacentPairs { |a, b| [a.str, b.str].postln };
     -------------------------------------------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------------------------------------------
+    • doLogicalTies
+
+    a = FoscLeafMaker().((60..67), [5/16]);
+    a.doLogicalTies { |each| each.items.postln };
+    -------------------------------------------------------------------------------------------------------- */
+    doLogicalTies { |function, pitched, graceNotes=false|
+        var container;
+        container = FoscContainer(this);
+        container.doLogicalTies(function, pitched, graceNotes);
+        container.prEjectContents;
+    }
     /* --------------------------------------------------------------------------------------------------------
     • every
 
@@ -562,54 +602,72 @@ FoscSelection : FoscSequence {
     //     ^this.leaves.separate { |a, b| a.isPitched != b.isPitched };
     // }
     /* --------------------------------------------------------------------------------------------------------
-    • hash
-    • TODO: not yet implemented
-    -------------------------------------------------------------------------------------------------------- */
-    /* --------------------------------------------------------------------------------------------------------
-    • illustrate 
+    • groupBySizes
 
-    Attempts to illustrate selection. The illustration will usually work for simple selections that represent a contiguous snippet of a single voice of items.
+    • TODO: 'overhang' argument rather than 'isCyclic'
 
-    Returns LilyPond file.
-
-
-    • regular staff
-
-    a = FoscLeafMaker().(#[60,62,64,65,67,69,71,72], [1/8]);
+    a = FoscLeafMaker().((60..72), [1/8]);
+    a = a.groupBySizes([2,3,5,2,1]);
+    a.do { |each| if (each.size > 1) { each.slur } };
     a.show;
 
-    
-    • RhythmicStaff if all pitches = middle-c
-
-    a = FoscLeafMaker().(60 ! 8, [1/8]);
+    a = FoscLeafMaker().((60..72), [1/8]);
+    a = a.groupBySizes([2,3], isCyclic: true);
+    a.do { |each| if (each.size > 1) { each.slur } };
     a.show;
-
-    FoscComponent
     -------------------------------------------------------------------------------------------------------- */
-    illustrate {
-        var items, staff, foundDifferentPitch, score, lilypondFile;
+    groupBySizes { |sizes, isCyclic=false|
+        var selections;
         
-        items = this.deepCopy.flat;
-        staff = FoscStaff(items);
-        foundDifferentPitch = false;
-        
-        FoscIteration(staff).pitches.do { |pitch|
-            block { |break|
-                if (pitch != FoscPitch(60)) {
-                    foundDifferentPitch = true;
-                    break.value;
-                };
-            };
+        if (isCyclic) {
+            sizes = sizes.repeatToAbsSum(this.size);
+        } {
+            sizes = sizes.extendToAbsSum(this.size);
         };
         
-        if (foundDifferentPitch.not) { staff.lilypondType_('RhythmicStaff') };
+        selections = items.clumps(sizes).collect { |each| FoscSelection(each) };
         
-        score = FoscScore([staff]);
+        ^this.species.new(selections);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • illustrate
+
+    a = FoscMusicMaker();
+    b = a.(durations: [1/4], divisions: #[[1,1],[3,-2],[-4,3]]);
+    b.show(globalStaffSize: 15);
+    -------------------------------------------------------------------------------------------------------- */
+    illustrate { |defaultPaperSize, globalStaffSize, includes|
+        var isRhythmicTemplate=true, template, score, lilypondFile;
+
+        this.doLeaves({ |leaf|
+            if (leaf.isKindOf(FoscNote) && { leaf.writtenPitch != 60 }) { isRhythmicTemplate = false };
+        }, pitched: true);
+
+        if (isRhythmicTemplate) {
+            includes = ["%/rhythm-sketch.ily".format(FoscConfiguration.stylesheetDirectory)];
+            template = FoscGroupedRhythmicStavesScoreTemplate(staffCount: 1);
+        } {
+            includes = ["%/default.ily".format(FoscConfiguration.stylesheetDirectory)];
+            template = FoscStavesScoreTemplate(staffCount: 1); 
+        };
         
-        // lilypondFile = FoscLilypondFile(score);
-        // lilypondFile.headerBlock.tagline = false;
-        // ^lilypondFile;
-        ^score.illustrate;
+
+        score = template.();
+        score['v1'].add(this.deepCopy);
+        //if (includes.isNil) { includes = [this.defaultStylesheetPath] };
+        lilypondFile = score.illustrate(defaultPaperSize, globalStaffSize, includes);
+        
+        ^lilypondFile;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • show
+
+    a = FoscMusicMaker();
+    b = a.(durations: [1/4], divisions: #[[1,1],[3,-2],[-4,3]]);
+    b.show(globalStaffSize: 15);
+    -------------------------------------------------------------------------------------------------------- */
+    show { |defaultPaperSize, globalStaffSize=16, includes|
+        ^this.illustrate(defaultPaperSize, globalStaffSize, includes).show;
     }
     /* --------------------------------------------------------------------------------------------------------
     • includes (abjad: __contains__)
@@ -707,7 +765,7 @@ FoscSelection : FoscSequence {
     b = FoscSelection(a).leaves(reverse: true);
     b.do { |each| each.str.postln };
     -------------------------------------------------------------------------------------------------------- */
-    leaves { |prototype, exclude, graceNotes=false, pitched, reverse=false|
+    leaves { |prototype, pitched, graceNotes=false|
         prototype = prototype ? FoscLeaf;
         
         case 
@@ -718,12 +776,7 @@ FoscSelection : FoscSequence {
             prototype = [FoscMultimeasureRest, FoscRest, FoscSkip];
         };
         
-        ^this.components(
-            prototype: prototype,
-            exclude: exclude,
-            graceNotes: graceNotes,
-            reverse: reverse
-        );
+        ^this.components(prototype: prototype, graceNotes: graceNotes);
     }
     /* --------------------------------------------------------------------------------------------------------
     • logicalTies
@@ -768,19 +821,38 @@ FoscSelection : FoscSequence {
     
     b = FoscSelection(a).logicalTies(reverse: true);
     b.do { |each| each.items.collect { |each| each.cs }.postln };
+
+
+    a = FoscMusicMaker(beamEachRun: true);
+    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,-2], pitches: "c' d' ef' f'");
+    b.logicalTies(pitched: true).do { |e| e.cs.postln };
+    b.show;
+
+
+
+    a = FoscMusicMaker(beamEachRun: true);
+    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[-2,2], pitches: "c' d' ef' f'");
+    b = FoscStaff([b]);
+    b.doLeaves({ |leaf| leaf.cs.postln }, pitched: true);
+
+
+    c = FoscIteration(b).logicalTies(pitched: true);
+    c.do { |e| e.cs.postln };
+    c.all;
+
+
+    a = FoscMusicMaker(beamEachRun: true);
+    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,2], pitches: "c' d' ef' f'");
+    b.areContiguousSameParent;
+
+    a = FoscMusicMaker(beamEachRun: true);
+    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[-2,2], pitches: "c' d' ef' f'");
     -------------------------------------------------------------------------------------------------------- */
-    logicalTies { |exclude, graceNotes=false, nontrivial, pitched, reverse=false|
-        var components;
-        
-        components = FoscIteration(this).logicalTies(
-            exclude: exclude,
-            graceNotes: graceNotes,
-            nontrivial: nontrivial,
-            pitched: pitched,
-            reverse: reverse
-        );
-        
-        components = all(components);
+    logicalTies { |pitched, graceNotes=false|
+        var components, iterator;
+
+        iterator = FoscIteration(this).logicalTies(pitched, graceNotes);
+        components = iterator.all;
         
         ^FoscSelection(components);
     }
@@ -980,55 +1052,6 @@ FoscSelection : FoscSequence {
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • partitionByRatio
-
-    
-    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69,71,72], [1/8,1/8,1/8,1/8]));
-    b = a[0..].partitionByRatio(#[5, 11, 4]);
-    b.do { |sel| sel.items.collect { |each| each.str }.postln };
-    b.do { |sel| if (sel.size > 1) { sel.slur } };
-    b.items.postln;
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    partitionByRatio { |ratio|
-        var sizes, parts, selections;
-        
-        //• TODO: ratio = FoscRatio(ratio);
-        sizes = this.size.partitionByRatio(ratio);
-        parts = this.partitionBySizes(sizes);
-        selections = parts.items.collect { |each| this.species.new(each) };
-        
-        ^this.species.new(selections);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • partitionBySizes
-
-    • TODO: 'overhang' argument rather than 'isCyclic'
-
-    a = FoscLeafMaker().((60..72), [1/8]);
-    a = a.partitionBySizes([2,3,5,2,1]);
-    a.do { |each| if (each.size > 1) { each.attach(FoscSlur('below')) } };
-    a.show;
-
-    a = FoscLeafMaker().((60..72), [1/8]);
-    a = a.partitionBySizes([2,3], isCyclic: true);
-    a.do { |each| if (each.size > 1) { each.attach(FoscSlur('below')) } };
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    partitionBySizes { |sizes, isCyclic=false|
-        var selections;
-        
-        if (isCyclic) {
-            sizes = sizes.repeatToAbsSum(this.size);
-        } {
-            sizes = sizes.extendToAbsSum(this.size);
-        };
-        
-        selections = items.clumps(sizes).collect { |each| FoscSelection(each) };
-        
-        ^this.species.new(selections);
-    }
-    /* --------------------------------------------------------------------------------------------------------
     • put
 
     a = FoscSelection([FoscNote(60, 1/4), FoscNote(62, 1/4)]);
@@ -1098,19 +1121,10 @@ FoscSelection : FoscSequence {
     m.runs.do { |each| each.horizontalBracket(tweaks: #[['direction', 'up']]) };
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-    // runs { |exclude|
-    //     var result;
-    //     result = this.leaves(exclude: exclude, pitched: true);
-    //     result = result.groupByContiguity;
-    //     ^result;
-    // }
-    runs { |exclude|
+    runs {
         var result;
-        
-        result = this.leaves(exclude: exclude);
-        result = result.groupBy { |a, b| a.isPitched != b.isPitched };
+        result = this.leaves.groupBy { |a, b| a.isPitched != b.isPitched };
         result = result.items.select { |each| each[0].isPitched };
-        
         ^this.species.new(result);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1209,8 +1223,8 @@ FoscSelection : FoscSequence {
     tie(m[4..]);
     FoscSelection(a).tuplets.do { |each| each.str.postln };
     -------------------------------------------------------------------------------------------------------- */
-    tuplets { |exclude|
-        ^this.components(prototype: FoscTuplet, exclude: exclude);
+    tuplets {
+        ^this.components(prototype: FoscTuplet);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC METHODS: DISPLAY
@@ -1257,6 +1271,55 @@ FoscSelection : FoscSequence {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • prApplyMask
+
+
+    • Example 1
+
+    a = FoscStaff(FoscLeafMaker().((60..67), [1/8]));
+    a.selectLeaves.prApplyMask(#[3,1,2,-2]);
+    a.show;
+
+
+    • Example 2
+
+    Mask pattern applies only to part of selection when its sum is less than the number of logical ties.
+
+    a = FoscStaff(FoscLeafMaker().((60..67), [1/8]));
+    a.selectLeaves.prApplyMask(#[2,-1]);
+    a.show;
+
+
+    • Example 3
+
+    Mask pattern repeats cyclically when 'isCyclic' is true.
+
+    a = FoscStaff(FoscLeafMaker().((60..67), [1/8]));
+    a.selectLeaves.prApplyMask(#[2,-1], isCyclic: true);
+    a.show;
+
+
+    • Example 4
+
+    Mask pattern is truncated when its sum is greater than the number of logical ties.
+
+    a = FoscStaff(FoscLeafMaker().((60..67), [1/8]));
+    a.selectLeaves.prApplyMask(#[3,3,3]);
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    prApplyMask { |mask, isCyclic=false|
+        var logicalTies, leaves;
+
+        logicalTies = this.selectLogicalTies;
+        if (isCyclic) { mask = mask.repeatToAbsSum(logicalTies.size) };
+        logicalTies = logicalTies.groupBySizes(mask.abs)[0..(mask.size - 1)];
+        
+        logicalTies.do { |each, i|
+            leaves = each.leaves;
+            if (mask[i] > 0) { leaves.prFuseLeaves } { leaves.prFuseLeavesAndReplaceWithRests };
+        };
+    }
     /* --------------------------------------------------------------------------------------------------------
     • prAttachTieToLeaves
 
@@ -1321,7 +1384,7 @@ FoscSelection : FoscSequence {
     prDetachBeams {
         var leaves, tuplets, parentage;
 
-        leaves = this.selectLeaves;
+        leaves = this.leaves;
         tuplets = [];
 
         leaves.do { |leaf|
@@ -1348,7 +1411,45 @@ FoscSelection : FoscSequence {
     Detaches ties from leaves.
     -------------------------------------------------------------------------------------------------------- */
     prDetachTies {
-        this.selectLeaves.do { |leaf| leaf.detach(FoscTie) };
+        this.leaves.do { |leaf| leaf.detach(FoscTie) };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prFuse
+
+    • TODO: DEPRECATE -- use 'prFuseLeaves' only
+    
+    a = FoscStaff([FoscLeafMaker().(#[60,60], 1/4), FoscTuplet(2/3, { FoscNote(60, 1/8) } ! 3)]);
+    a.show;
+
+    a.selectLeaves[0..2].prFuse;
+    a.show;
+
+    • TODO: tie components and then fuse by parent
+    
+    a = FoscStaff([FoscLeafMaker().(#[60,60], 1/4), FoscTuplet(2/3, { FoscNote(60, 1/8) } ! 3)]);
+    a.selectLeaves[0..2].prAttachTieToLeaves;
+    b = a.selectLogicalTies[0];
+    b.prFuseLeavesByImmediateParent;
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    prFuse {
+        if (this.areContiguousLogicalVoice.not) {
+            throw("%:%: components must be contiguous and in same logical voice."
+                .format(this.species, thisMethod.name));
+        };
+        case
+        { items.every { |elem| elem.isKindOf(FoscLeaf) } } {
+            ^this.prFuseLeaves;
+        }
+        { items.every { |elem| elem.isKindOf(FoscTuplet) } } {
+            ^this.prFuseTuplets;
+        }
+        // { items.every { |elem| elem.isKindOf(FoscMeasure) } } {
+        //     ^this.prFuseMeasures;
+        // }
+        {
+            throw("%:%: can not fuse.".format(this.species, thisMethod.name));
+        }; 
     }
     /* --------------------------------------------------------------------------------------------------------
     • prFuseLeaves
@@ -1364,7 +1465,9 @@ FoscSelection : FoscSequence {
 
     a = FoscStaff(FoscRhythmMaker().([1/4], #[[1,[4,[1,1,1,1,1]]],[1,1,1]]));
     mutate(a).rewritePitches((60..72));
-    m = a.selectLeaves.partitionBySizes(#[1,6,2]);
+    a.show;
+
+    m = a.selectLeaves.groupBySizes(#[2,5,1,1]);
     m.do { |part| part.prFuseLeaves };
     a.show;
     -------------------------------------------------------------------------------------------------------- */
@@ -1374,7 +1477,7 @@ FoscSelection : FoscSequence {
         leaves = this.leaves;
 
         if (leaves.areContiguousLogicalVoice.not || { leaves.areLeaves.not }) {
-            ^FoscMethodError(thisMethod, "all components must be contiguous leaves.").throw;
+            throw("%:%: all components must be contiguous leaves.".format(this.species, thisMethod.name));
         };
 
         leaves = this;
@@ -1409,21 +1512,21 @@ FoscSelection : FoscSequence {
     /* --------------------------------------------------------------------------------------------------------
     • prFuseLeavesAndReplaceWithRests
 
-    • TODO: selective detachment of indicators ?
-
     • Example 1
 
     a = FoscStaff(FoscRhythmMaker().([1/4], #[[1,[4,[1,1,1,1,1]]],[1,1,1]]));
     m = a.selectLeaves[1..6].prFuseLeavesAndReplaceWithRests;
     a.show;
+
+    prDetachIndicators
     -------------------------------------------------------------------------------------------------------- */
     prFuseLeavesAndReplaceWithRests {
-        var leaves, groups, totalPreprolated, parent, index, leaf;
+        var leaves, groups, totalPreprolated, parent, index, rest;
 
         leaves = this.leaves;
 
         if (leaves.areContiguousLogicalVoice.not || { leaves.areLeaves.not }) {
-            ^FoscMethodError(thisMethod, "all components must be contiguous leaves.").throw;
+            throw("%:%: components must be contiguous leaves.".format(this.species, thisMethod.name));
         };
 
         leaves.prDetachBeams;
@@ -1432,22 +1535,42 @@ FoscSelection : FoscSequence {
         
         groups.do { |leaves, i|
             totalPreprolated = leaves.prGetPreprolatedDuration;
-
-            leaves.do { |leaf, i|
-                parent = leaf.parent;
-
-                if (parent.notNil) {
-                    index = parent.indexOf(leaf);
-                    if (i > 0) {
-                        parent.removeAt(index);
-                    } {
-                        leaf = FoscRest(leaf).prSetDuration(totalPreprolated);
-                        parent.prSetItem(index, leaf);
-                    };
-                };
-            };
+            rest = FoscMusicMaker().(durations: [totalPreprolated], divisions: [-1]);
+            mutate(leaves).replace(rest);
         };
     }
+    // prFuseLeavesAndReplaceWithRests {
+    //     var leaves, groups, totalPreprolated, parent, index, leaf;
+
+    //     leaves = this.leaves;
+
+    //     if (leaves.areContiguousLogicalVoice.not || { leaves.areLeaves.not }) {
+    //         throw("%:%: components must be contiguous leaves.".format(this.species, thisMethod.name));
+    //     };
+
+    //     leaves.prDetachBeams;
+    //     leaves.prDetachTies;
+    //     groups = leaves.groupBy { |a, b| a.parent != b.parent };
+        
+    //     groups.do { |leaves, i|
+    //         totalPreprolated = leaves.prGetPreprolatedDuration;
+
+    //         leaves.do { |leaf, i|
+    //             parent = leaf.parent;
+
+    //             if (parent.notNil) {
+    //                 index = parent.indexOf(leaf);
+                    
+    //                 if (i > 0) {
+    //                     parent.removeAt(index);
+    //                 } {
+    //                     leaf = FoscRest(leaf).prSetDuration(totalPreprolated);
+    //                     parent.prSetItem(index, leaf);
+    //                 };
+    //             };
+    //         };
+    //     };
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • prGetContentsDuration
     
@@ -1526,46 +1649,8 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byClass { |prototype, condition=true|
         var iterator;
-        iterator = FoscIterationAgent(this).byClass(prototype, condition);
+        iterator = FoscIteration(this).byClass(prototype, condition);
         ^FoscSelection(iterator.all);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prFuse
-
-    • TODO: DEPRECATE -- use 'prFuseLeaves' only
-    
-    a = FoscStaff([FoscLeafMaker().(#[60,60], 1/4), FoscTuplet(2/3, { FoscNote(60, 1/8) } ! 3)]);
-    a.show;
-
-    a.selectLeaves[0..2].prFuse;
-    a.show;
-
-    • TODO: tie components and then fuse by parent
-    
-    a = FoscStaff([FoscLeafMaker().(#[60,60], 1/4), FoscTuplet(2/3, { FoscNote(60, 1/8) } ! 3)]);
-    a.selectLeaves[0..2].prAttachTieToLeaves;
-    b = a.selectLogicalTies[0];
-    b.prFuseLeavesByImmediateParent;
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    prFuse {
-        if (this.areContiguousLogicalVoice.not) {
-            throw("%:%: components must be contiguous and in same logical voice."
-                .format(this.species, thisMethod.name));
-        };
-        case
-        { items.every { |elem| elem.isKindOf(FoscLeaf) } } {
-            ^this.prFuseLeaves;
-        }
-        { items.every { |elem| elem.isKindOf(FoscTuplet) } } {
-            ^this.prFuseTuplets;
-        }
-        { items.every { |elem| elem.isKindOf(FoscMeasure) } } {
-            ^this.prFuseMeasures;
-        }
-        {
-            throw("%:%: can not fuse.".format(this.species, thisMethod.name));
-        }; 
     }
     /* --------------------------------------------------------------------------------------------------------
     • byLeaf
@@ -1574,7 +1659,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byLeaf {
         var iterator;
-        iterator = FoscIterationAgent(this).byLeaf;
+        iterator = FoscIteration(this).byLeaf;
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1584,7 +1669,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byLogicalTie { |condition=true, parentageMask|
         var iterator;
-        iterator = FoscIterationAgent(this).byLogicalTie(condition, parentageMask);
+        iterator = FoscIteration(this).byLogicalTie(condition, parentageMask);
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1594,7 +1679,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byPitchedLeaf { |condition=true|
         var iterator;
-        iterator = FoscIterationAgent(this).byPitchedLeaf(condition);
+        iterator = FoscIteration(this).byPitchedLeaf(condition);
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1604,7 +1689,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byPitchedLogicalTie { |condition=true|
         var iterator;
-        iterator = FoscIterationAgent(this).byPitchedLogicalTie(condition);
+        iterator = FoscIteration(this).byPitchedLogicalTie(condition);
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1614,7 +1699,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byPitchedRun { |condition=true|
         var iterator;
-        iterator = FoscIterationAgent(this).byPitchedRun(condition);
+        iterator = FoscIteration(this).byPitchedRun(condition);
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1624,7 +1709,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byRun { |condition=true|
         var iterator;
-        iterator = FoscIterationAgent(this).byRun(condition);
+        iterator = FoscIteration(this).byRun(condition);
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1634,7 +1719,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byTimeline { |prototype, condition=true|
         var iterator;
-        iterator = FoscIterationAgent(this).byTimeline(prototype, condition);
+        iterator = FoscIteration(this).byTimeline(prototype, condition);
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1644,7 +1729,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byTimelineAndLogicalTie { |prototype, condition=true|
         var iterator;
-        iterator = FoscIterationAgent(this).byTimelineAndLogicalTie(prototype, condition);
+        iterator = FoscIteration(this).byTimelineAndLogicalTie(prototype, condition);
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1654,7 +1739,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     byTimelineAndPitchedLogicalTie { |prototype, condition=true|
         var iterator;
-        iterator = FoscIterationAgent(this).byTimelineAndPitchedLogicalTie(prototype, condition);
+        iterator = FoscIteration(this).byTimelineAndPitchedLogicalTie(prototype, condition);
         ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1664,27 +1749,6 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     duration {
         ^this.prGetContentsDuration;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • flattenSelections
-
-    • TODO: DEPRECATE ! - use selection:flat
-    -------------------------------------------------------------------------------------------------------- */
-    flattenSelections {
-        var prototype, result, recurse;
-        result = [];
-        prototype = [FoscSelection, SequenceableCollection];
-        recurse = { |val|
-            val.do { |each|
-                if (prototype.any { |type| each.isKindOf(type) }) {
-                    recurse.(each);
-                } {
-                    result = result.add(each);
-                };
-            };
-        };
-        recurse.(this);
-        items = result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • music

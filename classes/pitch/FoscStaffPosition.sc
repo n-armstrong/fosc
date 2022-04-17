@@ -103,7 +103,7 @@ FoscStaffPosition : FoscObject {
         offsetStaffPosition = this.species.new(offsetStaffPositionNumber);
         octaveNumber = offsetStaffPosition.number.div(7) + 4;
         diatonicPCNumber = offsetStaffPosition.number % 7;
-        pitchClassNumber = FoscPitchNameManager.diatonicPCNumberToDiatonicPitchClassNumber(diatonicPCNumber);
+        pitchClassNumber = FoscPitchManager.diatonicScaleDegreeToDiatonicPitchClassNumber(diatonicPCNumber);
         pitchNumber = 12 * (octaveNumber + 1);
         pitchNumber = pitchNumber + pitchClassNumber;
         pitch = FoscPitch(pitchNumber);

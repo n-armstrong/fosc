@@ -7,17 +7,43 @@ FoscContainer : FoscComponent {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	var <components, <identifier, <formatter, <name, <namedChildren, <isSimultaneous;
-    *new { |components, isSimultaneous, name, tag, identifier|
+	var <components, <formatter, <name, <namedChildren, <isSimultaneous;
+    *new { |components, isSimultaneous, name|
         components = components ? [];
-        ^super.new(tag).initFoscContainer(components, isSimultaneous, name, identifier);
+        ^super.new.initFoscContainer(components, isSimultaneous, name);
     }
-    initFoscContainer { |argComponents, argIsSimultaneous, argName, argIdentifier|
+    initFoscContainer { |argComponents, argIsSimultaneous, argName|
         namedChildren = ();
         isSimultaneous = argIsSimultaneous ? false;
         this.prInitializeComponents(argComponents);
-        identifier = argIdentifier;
-        name = argName;
+        if (argName.notNil) { name = argName.asSymbol };
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // NEW: ITERATION METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • doStaves
+    -------------------------------------------------------------------------------------------------------- */
+    doStaves { |function|
+        this.doComponents(function, FoscStaff);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • doStaffGroups
+    -------------------------------------------------------------------------------------------------------- */
+    doStaffGroups { |function|
+        this.doComponents(function, FoscStaffGroup);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • doTuplets
+    -------------------------------------------------------------------------------------------------------- */
+    doTuplets { |function|
+        this.doComponents(function, FoscTuplet);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • doVoices
+    -------------------------------------------------------------------------------------------------------- */
+    doVoices { |function|
+        this.doComponents(function, FoscVoice);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -28,15 +54,35 @@ FoscContainer : FoscComponent {
     Get components in container.
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
-    • identifier
+    • eventLists
 
-    Get bracket comment.
+    a = FoscStaff(FoscLeafMaker().((60..63), [1/32]));
+    b = FoscStaff(FoscLeafMaker().((67..70), [1/32]));
+    c = FoscScore([a, b]);
+    c.eventLists.do { |each| each.printAll; Post.nl };
     -------------------------------------------------------------------------------------------------------- */
-    /* --------------------------------------------------------------------------------------------------------
-    • identifier_
+    eventLists {
+        var lists, recurse, eventList;
 
-    Set bracket comment.
-    -------------------------------------------------------------------------------------------------------- */
+        if (this.isSimultaneous.not) {
+            throw("'eventLists' not implemented for non-simultaneous containers. Use 'eventList'.");
+        };
+
+        lists = [];
+
+        recurse = { |music|
+            if (music.isSimultaneous) {
+                music.do { |each| recurse.(each) };
+            } {
+                eventList = music.eventList;
+                if (eventList.notEmpty) { lists = lists.add(music.eventList) };
+            };
+        };
+
+        recurse.(this);
+
+        ^lists;
+    }
     /* --------------------------------------------------------------------------------------------------------
     • isSimultaneous
 
@@ -49,7 +95,9 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     isSimultaneous_ { |bool|
         if (bool.isNil) { ^this };
-        assert(bool.isKindOf(Boolean));
+        
+        //assert(bool.isKindOf(Boolean));
+        
         if (bool) {
             this.do { |component|
                 if (component.isKindOf(FoscContainer).not) {
@@ -58,6 +106,7 @@ FoscContainer : FoscComponent {
                 };
             };
         };
+        
         isSimultaneous = bool;
         this.prUpdateLater(offsets: true);
     }
@@ -73,6 +122,33 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     name_ { |name|
         this.instVarPut('name', name);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • pattern
+
+    
+    • Example 1
+
+    a = FoscStaff(FoscLeafMaker().((60..63), [1/32]));
+    p = a.pattern;
+    p.play;
+
+
+    • Example 2
+
+    a = FoscStaff(FoscLeafMaker().((60..63), [1/32]));
+    b = FoscStaff(FoscLeafMaker().((67..70), [1/32]));
+    c = FoscScore([a, b]);
+    p = c.pattern;
+    p.play;
+    -------------------------------------------------------------------------------------------------------- */
+    pattern { |name|
+        if (isSimultaneous) {
+            ^Ppar(this.eventLists.collect { |eventList| Pseq(eventList) });
+
+        } {
+            ^Pseq(this.eventList);
+        };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
@@ -169,7 +245,7 @@ FoscContainer : FoscComponent {
     a.storeArgs;
     -------------------------------------------------------------------------------------------------------- */
     storeArgs {
-        ^[[], identifier, isSimultaneous, name, tag];
+        ^[[], isSimultaneous, name];
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS
@@ -280,6 +356,7 @@ FoscContainer : FoscComponent {
         if (first.isNil) { first = 0 };
         if (second.isNil) { second = first + 1 };
         if (last.isNil) { last = try { components.lastIndex } { nil } };
+        
         if ([first, second, last].every { |each| each.notNil }) {
             ^this.prGetItem((first, second..last));
         } {
@@ -323,10 +400,8 @@ FoscContainer : FoscComponent {
     a.indexOf(b);
     -------------------------------------------------------------------------------------------------------- */
     indexOf { |component|
-        components.do { |each, i|
-            if (component == each) { ^i };
-        };
-        throw("%:%: % not in container.".format(this.species, thisMethod.name, component));
+        components.do { |each, index| if (component == each) { ^index } };
+        ^nil;
     }
     /* --------------------------------------------------------------------------------------------------------
     • insert
@@ -368,6 +443,7 @@ FoscContainer : FoscComponent {
             throw("%:%: index must be a non-negative integer: %."
                 .format(this.species, thisMethod.name, index));
         };
+
         this.prSetItem((index..index), component);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -441,10 +517,13 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     remove { |component|
         var index;
+        
         index = components.indexOf(component);
+        
         if (index.isNil) {
             throw("%:%: component not found in container.".format(this.species, thisMethod.name));
         };
+        
         ^this.prDelItem(index);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -463,10 +542,13 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     removeAt { |index|
         var component;
+        
         component = components[index];
+        
         if (component.isNil) {
             throw("%:%: no component found at index: %.".format(this.species, thisMethod.name, index));
         };
+        
         ^this.prDelItem(index);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -486,6 +568,7 @@ FoscContainer : FoscComponent {
             if (component.isKindOf(FoscComponent).not) { ^false };
             if (component.prGetParentage.isOrphan.not) { ^false };
         };
+        
         ^true;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -497,7 +580,9 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prCopyWithChildren {
         var newContainer, newComponent;
+        
         newContainer = this.copy;
+        
         this.do { |component|
             if (component.isKindOf(FoscContainer)) {
                 newComponent = component.prCopyWithChildren;
@@ -506,6 +591,7 @@ FoscContainer : FoscComponent {
             };
             newContainer.add(newComponent);
         };
+        
         ^newContainer;  
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -525,9 +611,11 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prDelItem { |index|
         var components;
+        
         components = this[index];
         if (components.isKindOf(FoscSelection).not) { components = FoscSelection([components]) };
         components.prSetParents(nil);
+        
         ^components;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -537,20 +625,23 @@ FoscContainer : FoscComponent {
     b = a.prEjectContents;
     b.items;
     a.components;
+
+
+    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+    b = a[0..2];
+    b.items;
     -------------------------------------------------------------------------------------------------------- */
     prEjectContents {
         var contents;
+        
         if (this.prGetParentage.parent.notNil) {
-            //throw("%:%: can't eject contents of in-score container.".format(this.species, thisMethod.name));
-            
-            // throw handler not reliably being caught
-            "ERROR: %:%: can't eject contents of in-score container."
-                .format(this.species, thisMethod.name).postln;
-            ^nil;
+            throw("%:%: can't eject contents of in-score container.".format(this.species, thisMethod.name));
         };
+
         contents = this[0..];
         contents.do { |component| component.prSetParent(nil) };
         components = [];
+        
         ^contents;
     } 
     /* --------------------------------------------------------------------------------------------------------
@@ -558,9 +649,11 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prFormatAfterSlot { |bundle|
         var result;
+        
         result = [];
         result = result.add(['commands', bundle.after.commands]);
         result = result.add(['comments', bundle.after.comments]);
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -568,10 +661,11 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prFormatBeforeSlot { |bundle|
         var result;
+        
         result = [];
         result = result.add(['comments', bundle.before.comments]);
         result = result.add(['commands', bundle.before.commands]);
-        // result = result.add(['tag', this.prFormatTag]); //!!!TODO
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -579,24 +673,11 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prFormatCloseBracketsSlot { |bundle|
         var result, bracketsClose;
+        
         result = [];
         bracketsClose = if (isSimultaneous) { [">>"] } { ["}"] };
-        
-        if (isSimultaneous) {
-            if (identifier.notNil) {
-                bracketsClose = [">> ".format(identifier)];
-            } {
-                bracketsClose = [">>"];
-            };
-        } {
-            if (identifier.notNil) {
-                bracketsClose = ["}} ".format(identifier)];
-            } {
-                bracketsClose = ["}"];
-            };
-        };
-
         result = result.add([['closeBrackets', ''], bracketsClose]);
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -604,10 +685,12 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prFormatClosingSlot { |bundle|
         var result;
+        
         result = [];
         result = result.add(['grobReverts', bundle.grobReverts]);
         result = result.add(['commands', bundle.closing.commands]);
         result = result.add(['comments', bundle.closing.comments]);
+        
         ^this.prFormatSlotContributionsWithIndent(result);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -618,12 +701,16 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prFormatContentPieces {
         var indent, result;
+        
         indent = FoscLilypondFormatManager.indent;
         result = [];
+        
         components.do { |component|
             result = result.addAll(component.format.split(Char.nl));
         };
+        
         result = result.collect { |each| indent ++ each };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -631,8 +718,10 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prFormatContentsSlot { |bundle|
         var result;
+        
         result = [];
         result = result.add([['contents', 'prGetContents'], this.prFormatContentPieces]);
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -640,23 +729,11 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prFormatOpenBracketsSlot { |bundle|
         var result, bracketsOpen;
-        result = [];
         
-        if (isSimultaneous) {
-            if (identifier.notNil) {
-                bracketsOpen = ["<< ".format(identifier)];
-            } {
-                bracketsOpen = ["<<"];
-            };
-        } {
-            if (identifier.notNil) {
-                bracketsOpen = ["{{ ".format(identifier)];
-            } {
-                bracketsOpen = ["{"];
-            };
-        };
-
+        result = [];
+        bracketsOpen = if (isSimultaneous) { ["<<"] } { ["{"] };
         result = result.add([['openBrackets', ''], bracketsOpen]);
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -664,11 +741,13 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prFormatOpeningSlot { |bundle|
         var result;
+
         result = [];
         result = result.add(['comments', bundle.opening.comments]);
         result = result.add(['commands', bundle.opening.commands]);
         result = result.add(['grobOverrides', bundle.grobOverrides]);
         result = result.add(['contextSettings', bundle.contextSettings]);
+        
         ^this.prFormatSlotContributionsWithIndent(result);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -676,33 +755,17 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prFormatSlotContributionsWithIndent { |slot|
         var indent, result, contributor, contributions;
+        
         indent = FoscLilypondFormatManager.indent;
         result = [];
+        
         slot.do { |each|
             # contributor, contributions = each;
             result = result.add([contributor, contributions.collect { |each| indent ++ each }]);
         };
+        
         ^result;
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • prFormatTag
-
-    !!!TODO: EXPERIMENTAL - not in abjad
-    - see FoscContainer:prFormatBeforeSlot
-    - see FoscSlotContributions:tag
-
-    a = FoscStaff([FoscNote(60, 1/4)], name: 'foo', tag: 'BAR');
-    a.format;
-    -------------------------------------------------------------------------------------------------------- */
-    // prFormatTag {
-    //     var result, string;
-    //     result = [];
-    //     if (tag.notNil) {
-    //         string = "\\tag #'%".format(tag);
-    //         result = result.add(string);
-    //     };
-    //     ^result;
-    // }
     /* --------------------------------------------------------------------------------------------------------
     • prGetAbbreviatedStringFormat
 
@@ -711,7 +774,9 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prGetAbbreviatedStringFormat {
         var summary, openBracketString, closeBracketString, localName, result;
+        
         summary = if (0 < this.size) { this.size.asString } { "" };    
+        
         if (isSimultaneous) {
             openBracketString = "<<";
             closeBracketString = ">>";
@@ -719,13 +784,16 @@ FoscContainer : FoscComponent {
             openBracketString = "{";
             closeBracketString = "}";
         };   
+        
         localName = if (name.notNil) { "-\"%\"" } { "" };
+        
         if (this.respondsTo('lilypondType') && { this.lilypondType.notNil }) {
             result = "<%%%%%>"
                 .format(this.lilypondType, localName, openBracketString, summary, closeBracketString);
         } {
             result = "<%%%%>".format(localName, openBracketString, summary, closeBracketString);
         };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -735,7 +803,7 @@ FoscContainer : FoscComponent {
     a.prGetCompactRepresentation;
     -------------------------------------------------------------------------------------------------------- */
     prGetCompactRepresentation {
-        if (components.isEmpty) { ^"{ }"};
+        if (components.isEmpty) { ^"{ }" };
         ^"{ % }".format(this.prGetContentsSummary);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -746,6 +814,7 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prGetContentsDuration {
         var duration;
+        
         if (this.isSimultaneous) {
             ^components.collect { |each| each.prGetPreprolatedDuration }.maxItem;
         } {
@@ -762,8 +831,10 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prGetContentsSummary {
         var result;
+        
         if (0 < this.size) {
             result = [];
+        
             components.do { |each|
                 case
                 {
@@ -782,6 +853,7 @@ FoscContainer : FoscComponent {
                     result = result.add(each.str);
                 };
             };
+
             ^result.join(" ");
         } {
             ^"";
@@ -799,19 +871,22 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prGetDurationInSeconds {
         var duration;
+        
         if (this.isSimultaneous) {
             duration = components.collect { |each| each.prGetDuration(inSeconds: true) }.maxItem;
             ^duration;
         } {
             duration = FoscDuration(0);
+        
             this.doLeaves { |leaf|
                 duration = duration + leaf.prGetDuration(inSeconds: true);
             };
+        
             ^duration;
         };
     }
     /* --------------------------------------------------------------------------------------------------------
-    • prGetItem (abjad: __getitem__)
+    • prGetItem
 
     Gets item at index in container. Traverses top-level items only.
     
@@ -834,11 +909,14 @@ FoscContainer : FoscComponent {
                 ^nil;
                 //throw("%:%: can't find component named %.".format(this.species, thisMethod.name, index));
             };
+            
             if (namedChildren[index].size > 1) {
                 throw("%:%: multiple components named %.".format(this.species, thisMethod.name, index));
             };
+
             ^namedChildren[index][0];
         };
+
         throw("%:%: can't get item at index: %.".format(this.species, thisMethod.name, index))
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -855,8 +933,10 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prInitializeComponents { |components|
         var localComponents, parent, start, stop;
+        
         if (components.isSequenceableCollection || { components.isKindOf(FoscSelection) }) {
             localComponents = [];
+        
             components.do { |item|
                 if (item.isKindOf(FoscSelection)) {
                     localComponents = localComponents.addAll(item.flat.items);
@@ -864,13 +944,16 @@ FoscContainer : FoscComponent {
                     localComponents = localComponents.add(item);
                 };
             };
+        
             components = localComponents;
+        
             components.do { |component|
                 if (component.isKindOf(FoscComponent).not) {
                     throw("%:new: must be a FoscComponent: %".format(this.species, component));
                 };
             };
         };
+        
         if (this.prAllAreOrphanComponents(components)) {
             this.instVarPut('components', components);
             FoscSelection(components).prSetParents(this);
@@ -896,6 +979,7 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prIterateBottomUp {
         var routine, recurse;
+       
         recurse = { |node|
             routine = Routine { 
                 if (node.isKindOf(FoscContainer)) {
@@ -906,7 +990,9 @@ FoscContainer : FoscComponent {
                 node.yield;
             };
         };
+       
         recurse.(this);
+        
         ^routine;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -917,6 +1003,7 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prIterateTopDown {
         var routine, recurse;
+        
         recurse = { |node|
             routine = Routine { 
                 node.yield;
@@ -927,7 +1014,9 @@ FoscContainer : FoscComponent {
                 };
             };
         };
+        
         recurse.(this);
+        
         ^routine;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -938,6 +1027,7 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     prIterateTopmost {
         var logicalTie;
+        
         ^Routine {
             this.do { |component|
                 if (component.isKindOf(FoscLeaf)) {
@@ -1047,16 +1137,20 @@ FoscContainer : FoscComponent {
         var componentIndicators, wrappers, prototype, newObject, start, stop, oldComponents;
 
         componentIndicators = []; 
+        
         FoscIteration(object).components.do { |component|
             //wrappers = component.prGetIndicators(unwrap: false);
             wrappers = FoscInspection(component).wrappers;
             componentIndicators = componentIndicators.addAll(wrappers);
         };
+        
         if (object.isSequenceableCollection.not) { object = [object] };
         if (index.isInteger) { index = [index, index + 1] };
+        
         prototype = [FoscComponent, FoscSelection];
         assert(object.every { |item| prototype.any { |type| item.isKindOf(type) } });
         newObject = [];   
+        
         object.do { |each|
             if (each.isKindOf(FoscSelection)) {
                 newObject = newObject.addAll(each.flat.items);
@@ -1064,19 +1158,25 @@ FoscContainer : FoscComponent {
                 newObject = newObject.add(each);
             };
         };
+        
         object = newObject;
+        
         assert(object.every { |each| each.isKindOf(FoscComponent) });
+        
         if (object.any { |each| each.isKindOf(FoscGraceContainer) }) {
             throw("%:%: grace container must be attached to note or chord."
                 .format(this.species, thisMethod.name));
         };
+        
         if (this.prCheckForCycles(object)) {
             throw("%:%: attempted to induce cycles.".format(this.species, thisMethod.name));
         };
+        
         start = index.first;
         stop = index.last;
         components = components.prSetItem((start..stop), object);
         object.do { |component| component.prSetParent(this) };
+        
         componentIndicators.do { |indicator|
             if (indicator.respondsTo('prUpdateEffectiveContext')) {
                 indicator.prUpdateEffectiveContext;
@@ -1090,8 +1190,6 @@ FoscContainer : FoscComponent {
 
     Preserves tuplet multiplier when container is a tuplet.
 
-    Preserves time signature denominator when container is a measure.
-
     Resizes resizable containers.
 
     Returns split parts.
@@ -1104,24 +1202,9 @@ FoscContainer : FoscComponent {
         var leftComponents, rightComponents, multiplier, left, right, halves, nonEmptyHalves, selection;
         var parent, start, stop;
 
-        // # partition my components
-        // left_components = self[:i]
-        // right_components = self[i:]
         leftComponents = this[..(index - 1)];
         rightComponents = this[index..];
 
-        // # instantiate new left and right containers
-        // if isinstance(self, Tuplet):
-        //     multiplier = self.multiplier
-        //     left = type(self)(multiplier, [])
-        //     mutate(left_components).wrap(left)
-        //     right = type(self)(multiplier, [])
-        //     mutate(right_components).wrap(right)
-        // else:
-        //     left = self.__copy__()
-        //     mutate(left_components).wrap(left)
-        //     right = self.__copy__()
-        //     mutate(right_components).wrap(right)
         if (this.isKindOf(FoscTuplet)) {
             multiplier = this.multiplier;
             left = this.species.new(multiplier, []);
@@ -1135,26 +1218,11 @@ FoscContainer : FoscComponent {
             mutate(rightComponents).wrap(right);
         };
         
-        // # save left and right containers together for iteration
-        // halves = (left, right)
-        // nonempty_halves = [half for half in halves if len(half)]
-        // # incorporate left and right parents in score if possible
-        // selection = select(self)
-        // parent, start, stop = selection._get_parent_and_start_stop_indices()
         halves = [left, right];
         nonEmptyHalves = halves.select { |half| half.components.notEmpty };
         selection = FoscSelection(this);
         # parent, start, stop = selection.prGetParentAndStartStopIndices;
         
-        // if parent is not None:
-        //     parent._components.__setitem__(slice(start, stop + 1), nonempty_halves)
-        //     for part in nonempty_halves:
-        //         part._set_parent(parent)
-        // else:
-        //     left._set_parent(None)
-        //     right._set_parent(None)
-        // # return new left and right containers
-        // return halves
         if (parent.notNil) {
             parent.components.prSetItem((start..(stop + 1)), nonEmptyHalves);
             nonEmptyHalves.do { |part| part.prSetParent(parent) };
@@ -1643,12 +1711,6 @@ FoscContainer : FoscComponent {
         // return list-wrapped halves of container
         ^[[left], [right]];
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • prSplitSimultaneousByDuration
-    -------------------------------------------------------------------------------------------------------- */
-    prSplitSimultaneousByDuration { |duration, tieSplitNotes=true, repeatTies=false|
-        ^this.notYetImplemented(thisMethod);
-    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE CLASS METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1659,133 +1721,9 @@ FoscContainer : FoscComponent {
         if (n.isKindOf(Integer).not || { n <= 0 }) {
             throw("%:%: n must be a positive Integer: %.".format(this.species, thisMethod.name, n));
         };
+
         while { n % 2 == 0 } { n = n.div(2) };
+        
         ^n;
     }
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // !!!TODO: TO BE DEPRECATED
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* --------------------------------------------------------------------------------------------------------
-    • includesAnyOfType
-    !!!TODO: DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    // includesAnyOfType { |type|
-    //     FoscIteration(this).components(prototype: type).do { |component|
-    //         if (component.notNil) { ^true };
-    //     };
-    //     ^false;
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • recursiveDo
-    !!!TODO: DEPRECATE
-
-    Iterates over every node in FoscContainer, including self.
-
-    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/12,1/12,1/12,1/4]));
-    a.recursiveDo { |each| each.postln };
-    //a.recursiveDo { |each| each.prGetParentage.depth.do { Post.tab }; each.postln };
-    -------------------------------------------------------------------------------------------------------- */
-    // recursiveDo { |func|
-    //     func.(this);
-    //     components.do { |item|
-    //         if (item.isKindOf(FoscContainer)) {
-    //             item.recursiveDo(func);
-    //         } {
-    //             item.do(func);
-    //         };
-    //     };
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • replace
-    !!!TODO: DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    // replace { |oldComponent, newContents, withdrawComponentsInExprFromCrossingSpanners=true|
-    //     var index;
-    //     index = components.indexOf(oldComponent);
-    //     this.put(index, newContents);
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • reverse
-    !!!TODO: DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    // reverse {
-    //     var spanners;
-    //     components = components.reverse;
-    //     this.prUpdateLater(offsets: true);
-    //     spanners = this.prDescendants.prSpanners;
-    //     spanners.do { |spanner|
-    //         spanner.prComponents.sort { |a, b| a.prGetTimespan.startOffset < b.prGetTimespan.startOffset };
-    //     };
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • prOnInsertionCheck
-    !!!TODO: DEPRECATE
-
-    Override and call corresponding method in superclass.
-    -------------------------------------------------------------------------------------------------------- */
-    // prOnInsertionCheck { |index, node|
-    //     var prototype;
-    //     prototype = [FoscComponent, FoscSelection];
-    //     if (prototype.any { |type| node.isKindOf(type) }.not) {
-    //         throw("%: can't insert a % in this container.".format(this.species, node.species)); 
-    //     };
-    //     super.prOnInsertionCheck(index, node);
-    // } 
-    /* --------------------------------------------------------------------------------------------------------
-    • prolation
-    !!!TODO: DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    // prolation {
-    //     throw("FoscContainer:prolation has been deprecacted. Is it needed here?");
-    //     //^FoscMultiplier(1);
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • prAddWithoutWithdrawingFromCrossingSpanners
-    !!!TODO: DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    // prAddWithoutWithdrawingFromCrossingSpanners { |component|
-    //     this.prSetItem(this.size, [component], withdrawComponentsInExprFromCrossingSpanners: false);
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • prCopyWithChildrenAndIndicatorsButWithoutSpanners
-    !!!TODO: DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    // prCopyWithChildrenAndIndicatorsButWithoutSpanners {
-    //     var new, newComponent;
-    //     new = this.prCopyWithIndicatorsButWithoutChildrenOrSpanners;
-    //     this.do { |component|
-    //         newComponent = component.prCopyWithChildrenAndIndicatorsButWithoutSpanners;
-    //         new.add(newComponent);
-    //     };
-    //     ^new;
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • prCopyWithIndicatorsButWithoutChildrenOrSpanners
-    !!!TODO: DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    // prCopyWithIndicatorsButWithoutChildrenOrSpanners {
-    //     var new;
-    //     new = super.prCopyWithIndicatorsButWithoutChildrenOrSpanners;
-    //     new.isSimultaneous_(this.isSimultaneous);
-    //     ^new;
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • prFlattenSelections
-    !!!TODO: DEPRECATE
-    -------------------------------------------------------------------------------------------------------- */
-    //!!!TODO: deprecate ??
-    // prFlattenSelections { |components|
-    //     var result;
-    //     components = [];
-    //     components.do { |each|
-    //         if (each.isKindOf(FoscSelection)) {
-    //             components = components.addAll(each.components);
-    //         } {
-    //             components = components.add(each);
-    //         };
-    //     };
-    //     ^components;
-    // }
 }

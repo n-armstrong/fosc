@@ -6,8 +6,8 @@ FoscStaff : FoscContext {
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	var <defaultlilypondType='Staff';
-    *new { |components, lilypondType='Staff', isSimultaneous, name, tag, playbackManager|
-		^super.new(components, lilypondType, isSimultaneous, name, tag, playbackManager);
+    *new { |components, lilypondType='Staff', isSimultaneous, name|
+		^super.new(components, lilypondType, isSimultaneous, name);
 	}
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS
@@ -25,10 +25,13 @@ FoscStaff : FoscContext {
     -------------------------------------------------------------------------------------------------------- */
     prOnInsertionCheck { |index, node|
         var prototype;
+        
         prototype = [FoscVoice, FoscRhythm, FoscLeaf, FoscSelection];
+        
         if (prototype.any { |type| node.isKindOf(type) }.not) {
             throw("%: can't insert a % in this container.".format(this.species, node.species)); 
         };
+        
         super.prOnInsertionCheck(index, node);
     }
 }

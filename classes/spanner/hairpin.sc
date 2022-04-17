@@ -52,7 +52,7 @@ a.show;
         knownShapes = FoscDynamicTrend.knownShapes;
 
         if (descriptor.isString) {
-            descriptor.delimitByWhiteSpace.do { |string|
+            descriptor.splitWhiteSpace.do { |string|
                 if (knownShapes.includesEqual(string)) {
                     dynamicTrend = FoscDynamicTrend(string);
                     indicators = indicators.add(dynamicTrend);

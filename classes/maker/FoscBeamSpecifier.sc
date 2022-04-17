@@ -11,7 +11,7 @@ Beams each division by default.
 a = FoscStaff(FoscLeafMaker().(#[60], (1/8 ! 2) ++ (1/16 ! 4) ++ (1/8 ! 4)));
 b = FoscStaff(a);
 set(a).autoBeaming = false;
-b = a.selectLeaves.partitionBySizes(#[4,6]);
+b = a.selectLeaves.groupBySizes(#[4,6]);
 FoscBeamSpecifier().(b);
 a.show;
 
@@ -22,7 +22,7 @@ Beams each division but exclude rests.
 
 a = FoscStaff(FoscLeafMaker().((60 ! 7) ++ [nil] ++ (60 ! 2), (1/8 ! 2) ++ (1/16 ! 4) ++ (1/8 ! 4)));
 set(a).autoBeaming = false;
-b = a.selectLeaves.partitionBySizes(#[4,6]);
+b = a.selectLeaves.groupBySizes(#[4,6]);
 FoscBeamSpecifier(beamEachDivision: true, beamRests: false).(b);
 a.show;
 
@@ -33,7 +33,7 @@ Beams each division and include rests.
 
 a = FoscStaff(FoscLeafMaker().((60 ! 7) ++ [nil] ++ (60 ! 2), (1/8 ! 2) ++ (1/16 ! 4) ++ (1/8 ! 4)));
 set(a).autoBeaming = false;
-b = a.selectLeaves.partitionBySizes(#[4,6]);
+b = a.selectLeaves.groupBySizes(#[4,6]);
 FoscBeamSpecifier(beamEachDivision: true, beamRests: true).(b);
 a.show;
 
@@ -44,7 +44,7 @@ Beams divisions together but exclude rests.
 
 a = FoscStaff(FoscLeafMaker().((60 ! 7) ++ [nil] ++ (60 ! 2), (1/8 ! 2) ++ (1/16 ! 4) ++ (1/8 ! 4)));
 set(a).autoBeaming = false;
-b = a.selectLeaves.partitionBySizes(#[4,6]);
+b = a.selectLeaves.groupBySizes(#[4,6]);
 FoscBeamSpecifier(beamDivisionsTogether: true, beamRests: false).(b);
 a.show;
 
@@ -55,7 +55,7 @@ Beams divisions together and include rests.
 
 a = FoscStaff(FoscLeafMaker().((60 ! 7) ++ [nil] ++ (60 ! 2), (1/8 ! 2) ++ (1/16 ! 4) ++ (1/8 ! 4)));
 set(a).autoBeaming = false;
-b = a.selectLeaves.partitionBySizes(#[4,6]);
+b = a.selectLeaves.groupBySizes(#[4,6]);
 FoscBeamSpecifier(beamDivisionsTogether: true, beamRests: true).(b);
 a.show;
 
@@ -66,7 +66,7 @@ Beams rests with stemlets.
 
 a = FoscStaff(FoscLeafMaker().((60 ! 7) ++ [nil] ++ (60 ! 2), (1/8 ! 2) ++ (1/16 ! 4) ++ (1/8 ! 4)));
 set(a).autoBeaming = false;
-b = a.selectLeaves.partitionBySizes(#[4,6]);
+b = a.selectLeaves.groupBySizes(#[4,6]);
 FoscBeamSpecifier(beamRests: true, stemletLength: 2).(b);
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
@@ -166,6 +166,11 @@ FoscBeamSpecifier : FoscObject {
     • value
 
     Calls beam specifier on 'selections'.
+
+
+    a = FoscMusicMaker(beamEachRun: true);
+    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[1,2,-1]);
+    b.show;
     -------------------------------------------------------------------------------------------------------- */
     value { |selections|
         var beam, durations, duration, components, leaves, runs;
@@ -206,13 +211,12 @@ FoscBeamSpecifier : FoscObject {
                 leaves.beam(beamRests: beamRests, stemletLength: stemletLength);
             };
         }
-        //!!!TODO: DEPRECATE ??
-        // { beamEachRun } {
-        //     runs = leaves.runs;
-        //     runs.do { |run|
-        //         run.beam(durations: durations, beamLoneNotes: false);
-        //     };
-        // };
+        //!!!TODO: beamRests, stemletLength, etc.
+        { beamEachRun } {
+            FoscSelection(selections).doRuns { |run|
+                run.beam(durations: durations, beamLoneNotes: false);
+            };
+        };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS

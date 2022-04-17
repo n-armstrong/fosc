@@ -185,15 +185,54 @@
         };
     }
     /* --------------------------------------------------------------------------------------------------------
+    • asFormattedString
+
+    !!! How to recursively handle items with rank > 1
+
+    a = "    ratio  freq      dB\n";
+    b = [1, 1, 2, 3.98783].asFormattedString(#[3,6,6,8],#[0,2,1,3]);
+    (a ++ b).postln; "";
+    -------------------------------------------------------------------------------------------------------- */
+    asFormattedString { |columnWidth=6, precision=2|
+        var result, lcolumnWidth, lprecision, characteristic, mantissa, str;
+        
+        if (columnWidth.isSequenceableCollection.not) { columnWidth = [columnWidth] };
+        if (precision.isSequenceableCollection.not) { precision = [precision] };
+
+        result = "";
+        
+        this.do { |item, i|
+            lcolumnWidth = columnWidth.wrapAt(i);
+
+            if (item.isNumber) {
+                lprecision = precision.wrapAt(i);
+                str = characteristic = item.asInteger.asString;
+                mantissa = item.frac.round(10 ** lprecision.neg);
+                mantissa = mantissa.asString.drop(2);
+                mantissa = mantissa.padRight(lprecision, "0");
+                if (lprecision != 0) { str = "%.%".format(characteristic, mantissa) };
+                str = str.padLeft(lcolumnWidth, " ");
+
+            } {
+                str = item.asString;
+                str = str.padLeft(lcolumnWidth - str.size, " ");
+            };
+
+            result = result ++ str;
+        };
+
+        ^result;
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • incise
 
     x = #[4,3,4,2];
     x.incise(0)
     -------------------------------------------------------------------------------------------------------- */
-    incise { |index=0, n=1|
-        var result;
-        result = [];
-    }
+    // incise { |index=0, n=1|
+    //     var result;
+    //     result = [];
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • intervals
     -------------------------------------------------------------------------------------------------------- */
@@ -217,8 +256,8 @@
     • mask
 
     a = (1..10);
-    a.mask([1, -1, 1, 1, -1, -1], isCyclic: false);
-    a.mask([1, -1, 1, 1, -1, -1], isCyclic: true);
+    a.mask(#[1,0,1,1,0,1], isCyclic: false);
+    a.mask(#[1,0,1,1,0,1], isCyclic: true);
 
     a = (1..10);
     a.mask([-1, 1], isCyclic: true);
@@ -226,24 +265,24 @@
     a = (1..10);
     a.mask([false, true], isCyclic: true);
     -------------------------------------------------------------------------------------------------------- */
-    mask { |pattern, isCyclic=false|
-        var result, val;
-        result = this.species.newClear(this.size);
-        pattern = pattern.collect { |each| each.binaryValue };
-        pattern = pattern.collect { |each| if (each == 0) { each = -1 } { each } };
-        this.do { |item, i|
-            if (isCyclic) {
-                result[i] = item * pattern.wrapAt(i);
-            } { 
-                if (pattern[i].notNil) {
-                    result[i] = item * pattern[i];
-                } {
-                    result[i] = item;
-                };
-            };
-        };
-        ^result;
-    }
+    // mask { |pattern, isCyclic=false|
+    //     var result, val;
+    //     result = this.species.newClear(this.size);
+    //     pattern = pattern.collect { |each| each.binaryValue };
+    //     pattern = pattern.collect { |each| if (each == 0) { each = -1 } { each } };
+    //     this.do { |item, i|
+    //         if (isCyclic) {
+    //             result[i] = item * pattern.wrapAt(i);
+    //         } { 
+    //             if (pattern[i].notNil) {
+    //                 result[i] = item * pattern[i];
+    //             } {
+    //                 result[i] = item;
+    //             };
+    //         };
+    //     };
+    //     ^result;
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • offsets
     -------------------------------------------------------------------------------------------------------- */
@@ -294,7 +333,7 @@
         ^order;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • partitionBySizes
+    • groupBySizes
 
     Partitions receiver by sizes.
 
@@ -303,24 +342,26 @@
 
     • Example 1
 
-    (0..16).partitionBySizes([3]);
+    (0..16).groupBySizes([3]);
 
 
     • Example 2
 
-    (0..16).partitionBySizes([3], overhang: true);
+    (0..16).groupBySizes([3], overhang: true);
+
+    (0..16).clump(3);
 
 
     • Example 3
     
-    (0..16).partitionBySizes([3], isCyclic: true);
+    (0..16).groupBySizes([3], isCyclic: true);
 
 
     • Example 4
     
-    (0..16).partitionBySizes([3], isCyclic: true, overhang: true);
+    (0..16).groupBySizes([3], isCyclic: true, overhang: true);
     -------------------------------------------------------------------------------------------------------- */
-    partitionBySizes { |sizes, isCyclic=false, overhang=false|
+    groupBySizes { |sizes, isCyclic=false, overhang=false|
         var result, count, i=0, start=0, stop, part;
         assert(
             sizes.every { |expr| expr.isInteger && { expr >= 0 } },
@@ -352,6 +393,29 @@
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
+    • parts
+
+
+    • Example 1
+
+    m = [5,7,11,3];
+    m.parts(#[-1,2,3,-inf]);
+
+    
+    • Example 2 - incise last
+
+    m = [5,7,11,3];
+    m.parts(#[-1,-inf], reverse: true);
+    -------------------------------------------------------------------------------------------------------- */
+    // parts { |ratio, reverse=false, sustain=true|
+    //     var result;
+
+    //     result = [];
+    //     this.do { |each| result = result.addAll(each.parts(ratio, reverse, sustain)) };
+
+    //     ^result;
+    // }
+    /* --------------------------------------------------------------------------------------------------------
     • partitionByRatio
 
     Partitions receiver into nearest integer-sized parts by ratio.
@@ -371,7 +435,7 @@
     partitionByRatio { |ratio|
         var sizes, parts;
         sizes = this.size.partitionByRatio(ratio);
-        parts = this.partitionBySizes(sizes);
+        parts = this.groupBySizes(sizes);
         ^parts;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -575,27 +639,39 @@
 	l = #[10,10,10, 10].collect { |each| FoscDuration(each) };
 	m = l.split(#[3,15,3], isCyclic: false, overhang: true);
 	m.do { |each| each.collect { |elem| elem.str }.postln };
+
+
+    l = #[10,10,10, 10].collect { |each| FoscDuration(each) };
+    n = #[3,15,3].collect { |each| FoscNonreducedFraction(each) };
+    m = l.split(n, isCyclic: false, overhang: true);
+    m.do { |each| each.collect { |elem| elem.str }.postln };
 	-------------------------------------------------------------------------------------------------------- */
 	split { |sums, isCyclic=false, overhang=false|
 		var result, currentIndex, currentPiece, currentPieceSum, overage;
 		var currentLastElement, needed, lastPiece;
-		result = [];
+		
+        result = [];
         currentIndex = 0;
 		currentPiece = [];
+        
         if (sums.sum > this.abs.sum) {
             sums = sums.truncateToAbsSum(this.abs.sum);
         };
-		if (isCyclic) {
+		
+        if (isCyclic) {
 			sums = sums.repeatToAbsSum(this.abs.sum, 'less');
 		};
-		sums.do { |sum|
+		
+        sums.do { |sum|
 			currentPieceSum = currentPiece.abs.sum;
+            
             while { currentPieceSum < sum } {
 				currentPiece = currentPiece.add(this[currentIndex]);
 				currentIndex = currentIndex + 1;
 				currentPieceSum = currentPiece.abs.sum;
 			};
-			case
+			
+            case
 			{ currentPieceSum == sum } {
 				currentPiece = this.species.newFrom(currentPiece);
 				result = result.add(currentPiece);
@@ -613,15 +689,18 @@
 				currentPiece = [overage];
 			};
 		};
-		if (overhang) {
+		
+        if (overhang) {
 			lastPiece = currentPiece;
 			lastPiece = lastPiece.addAll(this[currentIndex..]);
-			if (lastPiece.notEmpty) {
+			
+            if (lastPiece.notEmpty) {
 				lastPiece = this.species.newFrom(lastPiece);
 				result = result.add(lastPiece);
 			};
 		};
-		^this.species.newFrom(result);
+		
+        ^this.species.newFrom(result);
 	}
     /* --------------------------------------------------------------------------------------------------------
     • extendToAbsSum
@@ -647,20 +726,29 @@
 
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
-    doLeaves { |function, pitched, prototype, exclude, doNotIterateGraceContainers=false,
-        graceNotes=false, reverse=false|
+    doLeaves { |function, prototype, pitched, graceNotes=false|
         var iterator;
+        
         FoscObject.prCheckIsIterable(this, thisMethod);
-        iterator = FoscIteration(this).leaves(
-            prototype: prototype,
-            exclude: exclude,
-            doNotIterateGraceContainers: doNotIterateGraceContainers,
-            graceNotes: graceNotes,
-            pitched: pitched,
-            reverse: reverse
-        );
+        
+        iterator = FoscIteration(this).leaves(prototype: prototype, pitched: pitched, graceNotes: graceNotes);
+
         iterator.do(function);
     }
+    // doLeaves { |function, pitched, prototype, exclude, doNotIterateGraceContainers=false,
+    //     graceNotes=false, reverse=false|
+    //     var iterator;
+    //     FoscObject.prCheckIsIterable(this, thisMethod);
+    //     iterator = FoscIteration(this).leaves(
+    //         prototype: prototype,
+    //         exclude: exclude,
+    //         doNotIterateGraceContainers: doNotIterateGraceContainers,
+    //         graceNotes: graceNotes,
+    //         pitched: pitched,
+    //         reverse: reverse
+    //     );
+    //     iterator.do(function);
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • selectComponents
    

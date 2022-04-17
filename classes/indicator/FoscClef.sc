@@ -54,19 +54,19 @@ FoscClef : FoscObject {
             'treble': 2.5
         );
 
-    	clefNameToStaffPositionZero = (
-            'treble': FoscPitch('B4'),
-            'alto': FoscPitch('C4'),
-            'tenor': FoscPitch('A3'),
-            'bass': FoscPitch('D3'),
-            'french': FoscPitch('D5'),
-            'soprano': FoscPitch('G4'),
-            'mezzosoprano': FoscPitch('E4'),
-            'baritone': FoscPitch('F3'),
-            'varbaritone': FoscPitch('F3'),
-            'percussion': nil,
-            'tab': nil,
-		);
+  //   	clefNameToStaffPositionZero = (
+  //           'treble': FoscPitch('B4'),
+  //           'alto': FoscPitch('C4'),
+  //           'tenor': FoscPitch('A3'),
+  //           'bass': FoscPitch('D3'),
+  //           'french': FoscPitch('D5'),
+  //           'soprano': FoscPitch('G4'),
+  //           'mezzosoprano': FoscPitch('E4'),
+  //           'baritone': FoscPitch('F3'),
+  //           'varbaritone': FoscPitch('F3'),
+  //           'percussion': nil,
+  //           'tab': nil,
+		// );
     }
     *new { |name='treble', hide=false|
     	if (name.isKindOf(FoscClef)) { name = name.name };
@@ -203,7 +203,8 @@ FoscClef : FoscObject {
         alteration = 0;
         case
         { name.includes($_) } {
-            # baseName, suffix = clefName.delimitBy($_);
+            # baseName, suffix = clefName.split($_);
+
             case 
             { suffix == "8" } { alteration = 7 }
             { suffix == "15" } { alteration = 13 }
@@ -212,7 +213,8 @@ FoscClef : FoscObject {
             }
         }
         { name.includes($^) } {
-            # baseName, suffix = clefName.delimitBy($^);
+            # baseName, suffix = clefName.split($^);
+            
             case 
             { suffix == "8" } { alteration = -7 }
             { suffix == "15" } { alteration = -13 }

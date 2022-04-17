@@ -1,26 +1,96 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscPitchSegment
 
-• test 1
-n = [60, 62, 64];
-FoscPitchSegment(n).cs;
+!!! TODO: lilypond chord notation
+!!! TODO: file.layoutBlock.items.add(FoscLilypondLiteral("\\accidentalStyle dodecaphonic"));
+!!! TODO: 'clumps' (or 'groupBySizes(sizes, annotate: true)')
+!!! TODO: 'prAnnotatePartitions('horizontalBracket'/'slur'/'beam')'
+!!! TODO: basic combinatorial methods: permutations, combinations, compositions, partitions, cartesianProduct
+!!! TODO: add utility and transformation methods from Abjad
 
-• test 2
-n = "Bb4 F#5 C4 Cb4 E+4 G4 D+5";
-FoscPitchSegment(n).cs;
 
-• test 3: FoscPitchSegment does not wrap FoscPitchSegments
-n = "Bb4 F#5 <C4 Cb4> E+4 G4 D+5";
-FoscPitchSegment(n).cs;
+• Example 1 - initialize with midinotes
+
+m = FoscPitchSegment(#[60,62,64]);
+m.cs;
+
+
+• Example 2  - initialize with list of lilypond names
+
+m = FoscPitchSegment(#["cqs'", "cs'", "bqf'"]);
+m.cs;
+m.show;
+
+
+• Example 3  - initialize with a string of lilypond pitch names
+
+m = FoscPitchSegment("cqs' cs' bqf'");
+m.cs;
+m.show;
+
+
+• Example 4  - use a FoscTuning
+
+FoscTuning.current = FoscTuning.et72;
+m = FoscPitchSegment("cqs' cs' bqf' crf' etrs'");
+m.cs;
+m.show;
+
+
+• Example 5  - initialize from a FoscSelection
+
+m = FoscLeafMaker().((60, 61 .. 72), [1/4]);
+m = FoscPitchSegment(m);
+m.show;
+
+
+• Example 6  - initialize from a FoscContainer
+
+m = FoscStaff((60, 61 .. 72).collect { |each| FoscNote(each, 1/4) });
+m = FoscPitchSegment(m);
+m.show;
+
+
+FoscPitchManager
 ------------------------------------------------------------------------------------------------------------ */
 FoscPitchSegment : FoscTypedList {
-    var <player;
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	*new { |items|
-        items = FoscPitchParser(items);
+        //items = FoscPitchParser(items);
+        //!!!TODO: check 'items' is valid
+        //!!!TODO: replace next line with FoscPitchManager:pitchStringToPitches
+        //if (items.isString) { items = items.splitWhiteSpace };
+        if (items.isString) { items = FoscPitchManager.pitchStringToPitches(items) };
+        if (items.isKindOf(FoscSelection)) { ^this.newFromSelection(items) };
+        if (items.isKindOf(FoscContainer)) { ^this.newFromSelection(items.select) };
+        items = items.collect { |each| FoscPitch(each) };
 		^super.new(items, FoscPitch);
+	}
+	/* --------------------------------------------------------------------------------------------------------
+	• newFromSelection
+
+    Makes pitch segment from 'selection'.
+
+    Returns pitch segment.
+    
+        
+    • Example 1
+
+    a = FoscLeafMaker().((60..67).mirror, [1/4]);
+    b = FoscPitchSegment.newFromSelection(a);
+    b.show;
+    -------------------------------------------------------------------------------------------------------- */
+	*newFromSelection { |selection|
+		var pitches;
+        
+        selection.doLogicalTies({ |logicalTie|
+        	//!!! TODO: handle chords (writtenPitches)
+            pitches = pitches.add(logicalTie[0].writtenPitch);
+        }, pitched: true);
+
+        ^this.new(pitches);
 	}
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
@@ -28,13 +98,9 @@ FoscPitchSegment : FoscTypedList {
 	/* --------------------------------------------------------------------------------------------------------
     • asCompileString
     
-    FoscPitchSegment([60, 62, 64]).cs;
+    m = FoscPitchSegment(#[60,62,64]);
+	m.cs;
     -------------------------------------------------------------------------------------------------------- */
-    // asCompileString {
-    //     var pitchesStr;
-    //     pitchesStr = this.pitches.collect { |each| each.cs }.join(",\n\t");
-    //     ^"%([\n\t%\n])".format(this.species, pitchesStr);
-    // }
     /* --------------------------------------------------------------------------------------------------------
     • ==
     -------------------------------------------------------------------------------------------------------- */
@@ -58,156 +124,91 @@ FoscPitchSegment : FoscTypedList {
     storeArgs {
         ^[this.pitches]
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • str
-
-    FoscPitchSegment([60, 62, 64]).str;
-    -------------------------------------------------------------------------------------------------------- */
-    str {
-        ^"<%>".format("".scatList(this.pitches.collect { |each| each.str })[1..]);
-    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC INSTANCE METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
-    • pitches
-    -------------------------------------------------------------------------------------------------------- */
-    pitches {
-        ^this.items;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-	• pitchNumbers
+	• illustrate
+
+	!!!TODO: compatability with FoscChord
+	!!!TODO: if all pitches are in bass or treble registers, use one staff rather than piano score
+
+	m = FoscPitchSegment(#[48,55,58,63,69].mirror);
+	m.show;
 	-------------------------------------------------------------------------------------------------------- */
-	pitchNumbers {
-		^this.items.collect { |each| each.pitchNumber };
+	illustrate { |defaultPaperSize, globalStaffSize, includes|
+		var staff, selections, tweaks, score, includesPath, lilypondFile;
+
+        staff = FoscStaff(FoscLeafMaker().(this.pitches, [1/8]));
+        score = FoscScore.makePianoScore(staff);
+        includesPath = FoscConfiguration.stylesheetDirectory;
+        includes = includes ?? { ["%/noteheads.ily".format(includesPath)] };
+        lilypondFile = score.illustrate(defaultPaperSize, globalStaffSize, includes);
+        
+        ^lilypondFile;
 	}
-	/* --------------------------------------------------------------------------------------------------------
-	• pitchNames
-	-------------------------------------------------------------------------------------------------------- */
-	pitchNames {
-		^this.items.collect { |each| each.pitchName };
-	}
-    /* --------------------------------------------------------------------------------------------------------
-    • pitchString
-    -------------------------------------------------------------------------------------------------------- */
-	pitchString {
-        var pitchNames;
-        pitchNames = this.pitchNames.collect { |each| each.asString };  
-        ^pitchNames.join(" ").asCompileString;
-    }
     /* --------------------------------------------------------------------------------------------------------
     • invert
-	'''Inverts pitch segment about `axis`.
+	
+	Inverts pitch segment about `axis`.
 
 	Returns new pitch segment.
-	'''
 
-	a = FoscPitchSegment([60, 61, 62, 63]);
-	b = a.invert(66);
-	b.pitchNumbers;
 
-	a = FoscPitchSegment([60, 61, 62, 63]);
+	a = FoscPitchSegment(#[60,61,62,63]);
 	b = a.invert;
-	b.pitchNumbers;
+	b.midinotes;
+
+	a = FoscPitchSegment(#[60,61,62,63]);
+	b = a.invert(66);
+	b.midinotes;
 	-------------------------------------------------------------------------------------------------------- */
 	invert { |axis|
 		axis = axis ?? { this.items[0] };
 		^this.species.new(this.items.collect { |each| each.invert(axis) });
 	}
 	/* --------------------------------------------------------------------------------------------------------
-    • isEquivalentUnderTransposition
-
-	'''True if pitch set is equivalent to `expr` under transposition.
-	Otherwise false.
-
-	Returns true or false.
-	'''
-
-	a = FoscPitchSegment([60, 61, 62]);
-    b = FoscPitchSegment([61, 62, 63]);
-    c = FoscPitchSegment([60, 61, 63]);
-    isEquivalentUnderTransposition(a, b);
-    isEquivalentUnderTransposition(a, c);
-    isEquivalentUnderTransposition(a, a);
-	-------------------------------------------------------------------------------------------------------- */
-    isEquivalentUnderTransposition { |expr|
-    	if (expr.isKindOf(this.species).not) { ^false };
-    	if (this.size != expr.size) { ^false };
-    	^((this.pitchNumbers - expr.pitchNumbers).asSet.size == 1);
-    }
-	/* --------------------------------------------------------------------------------------------------------
-    • makeNotes
-	-------------------------------------------------------------------------------------------------------- */
-	makeNotes {
-		^this.notYetImplemented;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-     • multiply
-	''Multiplies pitch segment.
-	
-	Returns new pitch segment.
-   	
-   	a = FoscPitchSegment([60, 61, 62]);
-	b = a.multiply(3);
-	b.pitchNumbers;
-	-------------------------------------------------------------------------------------------------------- */
-	multiply { |n|
-		^this.species.new(this.items.collect { |each| each.multiply(n) });
-	}
-	/* --------------------------------------------------------------------------------------------------------
     • reverse
-	'''Retrograde of pitch segment.
+	
+	Retrograde of pitch segment.
 
 	Returns new pitch segment.
-  	'''
 
- 	a = FoscPitchSegment([60, 61, 62]);
-	b = a.retrograde;
-	b.pitchNumbers;
+ 	a = FoscPitchSegment(#[60,61,62]);
+	b = a.reverse;
+	b.midinotes;
 	-------------------------------------------------------------------------------------------------------- */
 	reverse {
 		^this.species.new(this.items.reverse);
 	}
 	/* --------------------------------------------------------------------------------------------------------
     • rotate
-	'''Rotates pitch segment.
+	
+	Rotates pitch segment.
 
 	Returns new pitch segment.
-	'''
 
-	a = FoscPitchSegment([60, 61, 62]);
+	a = FoscPitchSegment(#[60,61,62]);
 	b = a.rotate(-1);
-	b.pitchNumbers;
-
-	a = FoscPitchSegment([60, 61, 62]);
-	b = a.rotate(-1, transpose: true);
-	b.pitchNumbers;
+	b.midinotes;
 	-------------------------------------------------------------------------------------------------------- */
 	rotate { |n, transpose=false|
-		var rotatedPitches, newSegment, interval;
-		rotatedPitches = this.items.rotate(n);
-		newSegment = this.species.new(rotatedPitches);
-		if (transpose) {
-			//!!! TODO interval = newSegment[0] - this[0];
-			interval = this[0].pitchNumber - newSegment[0].pitchNumber;
-			if (this[0] != newSegment[0]) { newSegment = newSegment.transpose(interval) };
-		};
-		^newSegment;
+		^this.species.new(this.items.rotate(n));
 	}
 	/* --------------------------------------------------------------------------------------------------------
     • transpose
-	'''Transposes pitch segment by `expr`.
+	
+	Transposes pitch segment by `expr`.
 
 	Returns new pitch segment.
-	'''
 
-	a = FoscPitchSegment([60, 61, 62]);
+	a = FoscPitchSegment(#[60,61,62]);
 	b = a.transpose(1);
-	b.pitchNumbers;
+	b.midinotes;
 
-    a = FoscPitchSegment([60, 61, 62]);
-    b = a.transpose([12, 14, 16]);
-    b.pitchNumbers;
+    a = FoscPitchSegment(#[60,61,62]);
+    b = a.transpose(#[1,2,3]);
+    b.midinotes;
 	-------------------------------------------------------------------------------------------------------- */
 	transpose { |expr|
         if (expr.isSequenceableCollection) {
@@ -216,34 +217,44 @@ FoscPitchSegment : FoscTypedList {
             ^this.species.new(this.items.collect { |each| each.transpose(expr) });
         };
 	}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PUBLIC INSTANCE PROPERTIES
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • contour
+
+    a = FoscPitchSegment(#[60,61,62,61,60,59]);
+    a.contour;
+    -------------------------------------------------------------------------------------------------------- */
+    contour {
+    	var vals;
+        vals = this.midinotes.asSet.as(Array).sort;
+        ^this.midinotes.collect { |midinote| vals.indexOf(midinote) };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • cps
+	
+	a = FoscPitchSegment(#[60,61,62]);
+	a.cps;
+	-------------------------------------------------------------------------------------------------------- */
+	cps {
+		^this.items.collect { |each| each.cps };
+	}
 	/* --------------------------------------------------------------------------------------------------------
 	• hasDuplicates
-	'''True if pitch segment has duplicate items. Otherwise false.
+	
+	True if pitch segment has duplicate items. Otherwise false.
 	
 	Returns true or false.
-	'''
 
- 	a = FoscPitchSegment([60, 61, 62]);
+ 	a = FoscPitchSegment(#[60,61,62]);
  	a.hasDuplicates;
 
- 	a = FoscPitchSegment([60, 60, 61, 62]);
+ 	a = FoscPitchSegment(#[60,60,61,62]);
  	a.hasDuplicates;
 	-------------------------------------------------------------------------------------------------------- */
 	hasDuplicates {
 		^(FoscPitchSet(this.items).size < this.size);
-	}
-    /* --------------------------------------------------------------------------------------------------------
-    • midicps (abjad: hertz)
-	'''Gets hertz of pitches in pitch segment.
-	
-	Returns tuple.
-	'''
-	
-	a = FoscPitchSegment([60, 61, 62]);
-	a.midicps;
-	-------------------------------------------------------------------------------------------------------- */
-	midicps {
-		^this.items.collect { |each| each.midicps };
 	}
     /* --------------------------------------------------------------------------------------------------------
     • inflectionPointCount
@@ -252,12 +263,33 @@ FoscPitchSegment : FoscTypedList {
 
 	Returns nonnegative integer.
 	
-	a = FoscPitchSegment([60, 61, 62, 63, 64, 65, 66, 68, 81, 65, 59, 63, 84, 60]);
+	a = FoscPitchSegment(#[60,61,62,63,64,65,66,68,81,65,59,63,84,60]);
   	a.inflectionPointCount.postln;
 	-------------------------------------------------------------------------------------------------------- */
 	inflectionPointCount {
 		^(this.localMinima.size + this.localMaxima.size);
 	}
+	/* --------------------------------------------------------------------------------------------------------
+    • isEquivalentUnderTransposition
+
+	True if pitch set is equivalent to `expr` under transposition. Otherwise false.
+
+	Returns true or false.
+
+	a = FoscPitchSegment(#[60,61,62]);
+    b = FoscPitchSegment(#[61,62,63]);
+    c = FoscPitchSegment(#[60,64,67]);
+
+    a.isEquivalentUnderTransposition(b);
+    a.isEquivalentUnderTransposition(c);
+    a.isEquivalentUnderTransposition(a + 3);
+    a.isEquivalentUnderTransposition(a.reverse);
+	-------------------------------------------------------------------------------------------------------- */
+    isEquivalentUnderTransposition { |expr|
+    	if (expr.isKindOf(this.species).not) { ^false };
+    	if (this.size != expr.size) { ^false };
+    	^((this.midinotes - expr.midinotes).asSet.size == 1);
+    }
     /* --------------------------------------------------------------------------------------------------------
     • localMaxima
     
@@ -265,8 +297,8 @@ FoscPitchSegment : FoscTypedList {
 
 	Returns array.
 
-  	a = FoscPitchSegment([60, 61, 62, 63, 64, 65, 66, 68, 81, 65, 59, 63, 84, 60]);
-  	a.localMaxima.collect { |each| each.pitchNumber }.postln;
+  	a = FoscPitchSegment(#[60,61,62,63,64,65,66,68,81,65,59,63,84,60]);
+  	a.localMaxima.collect { |each| each.midinote }.postln;
 	-------------------------------------------------------------------------------------------------------- */
 	localMaxima {
 		var result, left, middle, right;
@@ -286,8 +318,8 @@ FoscPitchSegment : FoscTypedList {
 
  	Returns array;
 	
-	a = FoscPitchSegment([60, 61, 62, 63, 64, 65, 66, 68, 81, 65, 59, 63, 84, 60]);
-  	a.localMinima.collect { |each| each.pitchNumber }.postln;
+	a = FoscPitchSegment(#[60,61,62,63,64,65,66,68,81,65,59,63,84,60]);
+  	a.localMinima.collect { |each| each.midinote }.postln;
 	-------------------------------------------------------------------------------------------------------- */
 	localMinima {
 		var result, left, middle, right;
@@ -303,56 +335,46 @@ FoscPitchSegment : FoscTypedList {
 	/* --------------------------------------------------------------------------------------------------------
     • maxItem
 
-	a = FoscPitchSegment([60, 61, 62, 63, 64, 65, 66, 68, 81, 65, 59, 63, 84, 60]);
-  	a.maxItem.pitchNumber.postln;
+	a = FoscPitchSegment(#[60,61,62,63,64,65,66,68,81,65,59,63,84,60]);
+  	a.maxItem.midinote.postln;
 	-------------------------------------------------------------------------------------------------------- */
 	maxItem { |func|
 		^this.items.maxItem(func);
 	}
 	/* --------------------------------------------------------------------------------------------------------
+	• midinotes
+
+	m = FoscPitchSegment(#["cqs'", "cs'", "bqf'"]);
+    m.midinotes;
+	-------------------------------------------------------------------------------------------------------- */
+	midinotes {
+		^this.items.collect { |each| each.midinote };
+	}
+	/* --------------------------------------------------------------------------------------------------------
     • minItem
 
-	a = FoscPitchSegment([60, 61, 62, 63, 64, 65, 66, 68, 81, 65, 59, 63, 84, 60]);
-  	a.minItem.pitchNumber.postln;
+	a = FoscPitchSegment(#[60,61,62,63,64,65,66,68,81,65,59,63,84,60]);
+  	a.minItem.midinote.postln;
 	-------------------------------------------------------------------------------------------------------- */
 	minItem { |func|
 		^this.items.minItem(func);
 	}
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC METHODS: DISPLAY
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
-	• illustrate
+	• names
 
-    a = FoscPitchSegment([60, 61, 62, 63, 64, 65, 66, 68, 81, 65, 59, 63, 84, 60]);
-    a.illustrate.format;
-    a.show;
+	m = FoscPitchSegment(#["cqs'", "cs'", "bqf'"]);
+    m.names;
 	-------------------------------------------------------------------------------------------------------- */
- 	illustrate {
-        ^FoscLilypondFile.pitch([this]);
-    }
-	/* --------------------------------------------------------------------------------------------------------
-    • inspect
-	-------------------------------------------------------------------------------------------------------- */
-	// inspect {
-	// 	//^this.notYetImplemented(thisMethod);
-	// 	collection.do { |each| each.inspect };
-	// }
-	/* --------------------------------------------------------------------------------------------------------
-    • play
-	-------------------------------------------------------------------------------------------------------- */
-	play {
-		var selection;
-        selection = FoscLeafMaker().(this, [1/4]);
-        player = selection.play;
+	names {
+		^this.items.collect { |each| each.str };
 	}
 	/* --------------------------------------------------------------------------------------------------------
-    • show
+    • pitches
 
-    a = FoscPitchSegment([60, 61, 62, 63, 64, 65, 66, 68, 81, 65, 59, 63, 84, 60]);
-    a.show;
-	-------------------------------------------------------------------------------------------------------- */
-	// show {
-	// 	^this.illustrate.show;
-	// }
+    m = FoscPitchSegment(#["cqs'", "cs'", "bqf'"]);
+    m.pitches.do { |each| each.cs.postln };
+    -------------------------------------------------------------------------------------------------------- */
+    pitches {
+        ^this.items;
+    }
 }
