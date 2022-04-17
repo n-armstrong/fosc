@@ -302,9 +302,9 @@ a.show;
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: 1/8 ! 8, mask: #[-1,1,1,1,-1,1,1,1], pitches: (60..65));
-a = FoscStaff(b);
-a.doRuns { |run| if (run.size > 1) { run.slur } };
-a.show;
+c = FoscStaff(b);
+c.doRuns { |run| if (run.size > 1) { run.slur } };
+c.show;
 ```
 ![](./docs/img/iteration-2.png)
 
