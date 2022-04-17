@@ -1,7 +1,10 @@
 #(ly:set-option 'relative-includes #t)
 	
 \include "rhythm-maker-docs.ily"
-	
+
+\header {
+    tagline = ##f
+}	
 	
 \layout {
     \context {
