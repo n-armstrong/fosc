@@ -69,9 +69,7 @@ FoscConfiguration.lilypondVersionString;
 ```
 
 
-## <br>Basic usage
-
-### 1. Displaying music
+## <br>Creating score objects
 
 <br>Display a note.
 ```supercollider
@@ -93,14 +91,12 @@ a.show;
 a = FoscVoice([FoscNote(60, 1/4), FoscNote(62, 1/8)]);
 a.format;
 ```
-
 ```
 \new Voice {
     c'4
     d'8
 }
 ```
-
 
 <br>Display a score.
 ```supercollider
@@ -112,7 +108,7 @@ c.show;
 ![](./docs/img/displaying-music-3.png)
 
 
-### <br>2. Indicators
+## <br>Augmenting and tweaking score objects
 
 <br>Indicators attach to leaves.
 ```supercollider
@@ -123,9 +119,6 @@ a.show;
 ```
 ![](./docs/img/indicators-1.png)
 
-
-### <br>3. Spanners
-
 <br>Spanners attach to two or more contiguous leaves.
 ```supercollider
 a = FoscStaff(#[60,62,64,65].collect { |pitch| FoscNote(pitch, 1/8) });
@@ -134,9 +127,6 @@ a.selectLeaves.hairpin('p < f');
 a.show;
 ```
 ![](./docs/img/spanners-1.png)
-
-
-### <br>4. Overrides, settings
 
 <br>Override LilyPond Grob properties.
 ```supercollider
@@ -156,7 +146,7 @@ a.show;
 ![](./docs/img/overrides-settings-2.png)
 
 
-### <br>5. Generate music with FoscMusicMaker
+## <br>Creating music with FoscMusicMaker
 
 <br>Make music from 'durations' and 'pitches'.
 ```supercollider
@@ -231,7 +221,7 @@ b.show;
 ![](./docs/img/music-maker-9.png)
 
 
-### <br>6. Selections
+## <br>Selections
 
 <br>Select all score components.
 ```supercollider
@@ -283,7 +273,7 @@ a.show;
 ![](./docs/img/selections-1.png)
 
 
-### <br>7. Iteration
+## <br>Iteration
 
 <br>Iterate over all score components.
 ```supercollider
