@@ -289,7 +289,7 @@ FoscNote("g'", 1/8)
 ```
 
 
-<br>Iterate over notes, attach indicators.
+<br>Iterate over notes, attaching indicators.
 ```supercollider
 a = FoscStaff(FoscMusicMaker().(durations: 1/8 ! 4, mask: #[-1,1,1,1], pitches: #[60,61,62]));
 a.doComponents({ |note| note.attach(FoscArticulation('>')) }, prototype: FoscNote);
@@ -298,7 +298,7 @@ a.show;
 ![](./docs/img/iteration-1.png)
 
 
-<br>Iterate over runs, attach slurs.
+<br>Iterate over runs, attaching slurs.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: 1/8 ! 8, mask: #[-1,1,1,1,-1,1,1,1], pitches: (60..65));
