@@ -174,7 +174,7 @@ b.show;
 ```
 ![](./docs/img/music-maker-2.png)
 
-<br>Pitches are repeated cyclically when the length of 'pitches' is less than the length of 'durations'.
+<br>'pitches' are repeated cyclically when the length of 'pitches' is less than the length of 'durations'.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: [3/8,1/8,2/8,2/8], pitches: #[60,62]);
