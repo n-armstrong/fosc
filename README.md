@@ -20,7 +20,7 @@ __Fosc__ lets you:
 
 ## <br>Installation
 
-### 1. Install LilyPond
+### Install LilyPond
 
 [LilyPond][lilypond] is an open-source program that engraves music notation in an automated way. __Fosc__ uses LilyPond to produce notational output. It's recommended that you install the most recent version of LilyPond directly from the LilyPond website. After you install LilyPond, check to see if LilyPond is callable from your command line.
 
@@ -39,12 +39,12 @@ __Fosc__ lets you:
     information.
 
 
-### <br>2. Install Fosc
+### <br>Install Fosc
 
 Download the __fosc__ master branch and unzip. Rename the 'fosc-master' folder to 'fosc'. Move the 'fosc' folder to your SuperCollider Extensions directory. Information on installing SuperCollider extensions can be found here: https://doc.sccode.org/Guides/UsingExtensions.html. 
 
 
-### <br>3. Configure Fosc
+### <br>Configure Fosc
 
 In your sclang startup file, add code to allow __Fosc__ to communicate with LilyPond. __Note__: it's possible that your LilyPond binary may be installed somewhere different to the standard locations below.
 
@@ -63,7 +63,6 @@ FoscConfiguration.lilypondExecutablePath = "/usr/local/bin/lilypond";
 ```supercollider
 FoscConfiguration.lilypondVersionString;
 ```
-
 ```
 2.19.82
 ```
@@ -229,7 +228,6 @@ a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
 b = a.selectComponents;
 b.do { |each| each.cs.postln };
 ```
-
 ```
 FoscStaff([  ], Staff, false, nil)
 FoscRest(1/4)
@@ -237,26 +235,24 @@ FoscNote("c'", 1/4)
 FoscNote("d'", 1/4)
 ```
 
-<br>Select notes and rests only.
+<br>Select notes and rests.
 ```supercollider
 a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
 b = a.selectComponents(prototype: [FoscNote, FoscRest]);
 b.do { |each| each.cs.postln };
 ```
-
 ```
 FoscRest(1/4)
 FoscNote("c'", 1/4)
 FoscNote("d'", 1/4)
 ```
 
-<br>Select pitched leaves only.
+<br>Select pitched leaves.
 ```supercollider
 a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscChord(#[60,64,67], 1/4)]);
 b = a.selectLeaves(pitched: true);
 b.do { |each| each.cs.postln };
 ```
-
 ```
 FoscNote("c'", 1/4)
 FoscChord("c' e' g'", 1/4)
@@ -280,7 +276,6 @@ a.show;
 a = FoscStaff(FoscMusicMaker().(durations: 1/8 ! 8, pitches: (60..67)));
 a.doComponents({ |each| each.cs.postln });
 ```
-
 ```
 FoscStaff([  ], Staff, false, nil)
 FoscNote("c'", 1/8)
