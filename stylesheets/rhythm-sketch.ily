@@ -1,5 +1,5 @@
 #(ly:set-option 'relative-includes #t)
-	
+
 \include "rhythm-maker-docs.ily"
 
 \header {
@@ -23,8 +23,4 @@
         \override StaffSymbol.line-count = #1
 		\override Clef.stencil = ##f
     }
-    % \context {
-%         \RhythmicStaff
-%         \override StaffSymbol.line-count = #5
-%     }
 }

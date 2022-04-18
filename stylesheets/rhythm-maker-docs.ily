@@ -33,7 +33,7 @@
         \override TupletBracket.minimum-length = #3
         \override TupletBracket.padding = #2
         \override TupletBracket.springs-and-rods = #ly:spanner::set-spacing-rods
-        \override TupletNumber.text = #tuplet-number::calc-fraction-text
+        %\override TupletNumber.text = #tuplet-number::calc-fraction-text
         \override VerticalAxisGroup.staff-staff-spacing = #'(
             (basic-distance . 10)
             (minimum-distance . 10)
