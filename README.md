@@ -12,7 +12,7 @@ __Fosc__ lets you:
 
 
 * Create musical notation in an object-oriented way
-* Generate and transform complex musical materials
+* Generate and transform musical materials
 * Construct powerful component selectors and iterators for modifying musical objects in a score
 * Control all of the typographic details of music notation
 * Play musical scores through scsynth
