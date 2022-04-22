@@ -5,7 +5,7 @@ Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC CLASS METHODS: CONFIGURATION
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    classvar lilypondExecutablePath="lilypond";
+    classvar lilypondPath="lilypond";
     /* --------------------------------------------------------------------------------------------------------
     • *initClass
     -------------------------------------------------------------------------------------------------------- */
@@ -26,7 +26,7 @@ Fosc {
     -------------------------------------------------------------------------------------------------------- */
     *lilypondVersionString {
         var executablePath, str, versionString;
-        executablePath = this.lilypondExecutablePath;
+        executablePath = this.lilypondPath;
         ^versionString ?? {
             str = (executablePath + "--version").unixCmdGetStdOut;
             str.copyRange(*[str.findRegexp("\\s[0-9]")[0][0]+1, str.find("\n")-1]);
@@ -35,6 +35,19 @@ Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE CLASS PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • *lilypondPath
+
+    Fosc.lilypondPath;
+    -------------------------------------------------------------------------------------------------------- */ 
+    *lilypondPath {
+        if (lilypondPath.isNil || { File.exists(lilypondPath).not }) {
+            error("Lilypond executable not found at: %.".format(lilypondPath));
+            ^nil;
+        } {
+            ^lilypondPath;  
+        };
+    }
     /* --------------------------------------------------------------------------------------------------------
     • *outputDirectory
 
@@ -60,31 +73,18 @@ Fosc {
         ^"%/stylesheets".format(this.rootDirectory);
     }
     /* --------------------------------------------------------------------------------------------------------
-    • *lilypondExecutablePath
-
-    Fosc.lilypondExecutablePath;
-    -------------------------------------------------------------------------------------------------------- */ 
-    *lilypondExecutablePath {
-        if (lilypondExecutablePath.isNil || { File.exists(lilypondExecutablePath).not }) {
-            error("Lilypond executable not found at: %.".format(lilypondExecutablePath));
-            ^nil;
-        } {
-            ^lilypondExecutablePath;  
-        };
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • *lilypondExecutablePath_
+    • *lilypondPath_
 
     The executable path should be set in the user startup file, e.g.:
 
-    Fosc.lilypondExecutablePath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
+    Fosc.lilypondPath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
 
     or:
 
-    Fosc.lilypondExecutablePath = "/usr/local/bin/lilypond";
+    Fosc.lilypondPath = "/usr/local/bin/lilypond";
     -------------------------------------------------------------------------------------------------------- */ 
-    *lilypondExecutablePath_ { |path|
-        lilypondExecutablePath = path;
+    *lilypondPath_ { |path|
+        lilypondPath = path;
     }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC INSTANCE METHODS: SPECIAL METHODS

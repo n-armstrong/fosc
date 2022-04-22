@@ -112,7 +112,7 @@ FoscIOManager : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     *runLilypond { |lyPath, flags, outputPath, executablePath|
         var lilypondBase, command, exitCode, success;
-        executablePath = executablePath ?? { Fosc.lilypondExecutablePath };
+        executablePath = executablePath ?? { Fosc.lilypondPath };
         lilypondBase = lyPath.splitext[0].shellQuote;
         lyPath = lyPath.shellQuote;
         flags = flags ? "";
