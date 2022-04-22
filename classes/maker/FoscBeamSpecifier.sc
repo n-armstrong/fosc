@@ -82,13 +82,13 @@ FoscBeamSpecifier : Fosc {
 
         var beamSpanArgs, msg;
         
-        assert(beamEachDivision.isBoolean, thisMethod, 'beamEachDivision', beamEachDivision);
-        assert(beamEachRun.isBoolean, thisMethod, 'beamEachRun', beamEachRun);
-        assert(beamDivisionsTogether.isBoolean, thisMethod, 'beamDivisionsTogether', beamDivisionsTogether);
-        assert(beamRests.isBoolean, thisMethod, 'beamRests', beamRests);
-        assert(hideNibs.isBoolean, thisMethod, 'hideNibs', hideNibs);
+        assert(beamEachDivision.isKindOf(Boolean), thisMethod, 'beamEachDivision', beamEachDivision);
+        assert(beamEachRun.isKindOf(Boolean), thisMethod, 'beamEachRun', beamEachRun);
+        assert(beamDivisionsTogether.isKindOf(Boolean), thisMethod, 'beamDivisionsTogether', beamDivisionsTogether);
+        assert(beamRests.isKindOf(Boolean), thisMethod, 'beamRests', beamRests);
+        assert(hideNibs.isKindOf(Boolean), thisMethod, 'hideNibs', hideNibs);
         assert(stemletLength.isNumber || stemletLength.isNil, thisMethod, 'stemletLength', stemletLength);
-        assert(useFeatherBeams.isBoolean, thisMethod, 'useFeatherBeams', useFeatherBeams);
+        assert(useFeatherBeams.isKindOf(Boolean), thisMethod, 'useFeatherBeams', useFeatherBeams);
 
         beamSpanArgs = [beamEachDivision, beamEachRun, beamDivisionsTogether];
 

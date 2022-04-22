@@ -3,38 +3,20 @@
 ------------------------------------------------------------------------------------------------------------ */
 Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PUBLIC CLASS METHODS: CONFIGURATION
+    // PUBLIC CLASS PROPERTIES: CONFIGURATION
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    classvar lilypondPath="lilypond";
-    /* --------------------------------------------------------------------------------------------------------
-    • *initClass
-    -------------------------------------------------------------------------------------------------------- */
-    *initClass {
-        var stylesheetsDir, returnCode;
-
-        if (File.exists(this.outputDirectory).not) {
-            File.mkdir(this.outputDirectory);
-        };
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PUBLIC CLASS METHODS
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    classvar >lilypondPath="lilypond";
     /* --------------------------------------------------------------------------------------------------------
     • *lilypondVersion
     
     Fosc.lilypondVersion;
     -------------------------------------------------------------------------------------------------------- */
     *lilypondVersion {
-        var executablePath, str, versionString;
-        executablePath = this.lilypondPath;
-        ^versionString ?? {
-            str = (executablePath + "--version").unixCmdGetStdOut;
-            str.copyRange(*[str.findRegexp("\\s[0-9]")[0][0]+1, str.find("\n")-1]);
-        };
+        var str;
+        str = "% --version".format(this.lilypondPath).unixCmdGetStdOut;
+        str = str.copyRange(*[str.findRegexp("\\s[0-9]")[0][0]+1, str.find("\n") - 1]);
+        ^str;
     }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PRIVATE CLASS PROPERTIES
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • *lilypondPath
 
@@ -49,12 +31,22 @@ Fosc {
         };
     }
     /* --------------------------------------------------------------------------------------------------------
+    • *lilypondPath_
+
+    The executable path should be set in the user startup file, e.g.:
+
+    Fosc.lilypondPath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
+    -------------------------------------------------------------------------------------------------------- */ 
+    /* --------------------------------------------------------------------------------------------------------
     • *outputDirectory
 
     Fosc.outputDirectory;
     -------------------------------------------------------------------------------------------------------- */
     *outputDirectory {
-        ^"%/fosc-output".format(Platform.userConfigDir);
+        var dir;
+        dir = "%/fosc-output".format(Platform.userConfigDir);
+        if (File.exists(dir).not) { File.mkdir(dir) };
+        ^dir;
     }
     /* --------------------------------------------------------------------------------------------------------
     • *rootDirectory
@@ -71,20 +63,6 @@ Fosc {
     -------------------------------------------------------------------------------------------------------- */
     *stylesheetDirectory {
         ^"%/stylesheets".format(this.rootDirectory);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • *lilypondPath_
-
-    The executable path should be set in the user startup file, e.g.:
-
-    Fosc.lilypondPath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
-
-    or:
-
-    Fosc.lilypondPath = "/usr/local/bin/lilypond";
-    -------------------------------------------------------------------------------------------------------- */ 
-    *lilypondPath_ { |path|
-        lilypondPath = path;
     }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC INSTANCE METHODS: SPECIAL METHODS
