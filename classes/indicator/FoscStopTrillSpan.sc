@@ -126,9 +126,9 @@ FoscStopTrillSpan : Fosc {
         var bundle, localTweaks, string;
         bundle = FoscLilypondFormatBundle();
         string = "\\stopTrillSpan";
-        if (rightBroken) {
-            string = this.prTagHide([string])[0];
-        };
+        // if (rightBroken) {
+        //     string = this.prTagHide([string])[0];
+        // };
         if (leak) {
             string = "<> %".format(string);
             bundle.after.leaks.add(string);
@@ -136,18 +136,5 @@ FoscStopTrillSpan : Fosc {
             bundle.after.spannerStarts.add(string); 
         };
         ^bundle;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prTagHide
-    -------------------------------------------------------------------------------------------------------- */
-    prTagHide { |strings|
-        ^this.notYetImplemented(thisMethod);
-        // var abjadTags;
-        // abjadTags = FoscTags();
-        // ^FoscLilypondFormatManager.tag(
-        //     strings,
-        //     deactivate: false,
-        //     tag: abjadTags.'HIDE_TO_JOIN_BROKEN_SPANNERS'
-        // );
     }
 }

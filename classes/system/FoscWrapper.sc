@@ -7,11 +7,11 @@ FoscWrapper : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    var <component, <context, deactivate, <effectiveContext, <indicator, <annotation, <syntheticOffset, tag;
+    var <component, <context, deactivate, <effectiveContext, <indicator, <annotation, <syntheticOffset;
     *new { |component, context, deactivate=false, effectiveContext, indicator, annotation,
-        syntheticOffset, tag|
+        syntheticOffset|
         ^super.new.init(component, context, deactivate, effectiveContext, indicator, annotation,
-            syntheticOffset, tag);
+            syntheticOffset);
     }
     init { |argComponent, argContext, argDeactivate, argEffectiveContext, argIndicator,
         argAnnotation, argSyntheticOffset, argTag|
@@ -29,10 +29,6 @@ FoscWrapper : Fosc {
         deactivate = argDeactivate;
         indicator = argIndicator;
         if (argSyntheticOffset.notNil) { syntheticOffset = FoscOffset(argSyntheticOffset) };
-        if (argTag.notNil) {
-             assert([FoscTag, String, Symbol].any { |type| argTag.isKindOf(type) });
-        };
-        tag = FoscTag(tag); //!!!TODO: not yet implemented
         if (component.notNil) { this.prBindComponent(component) };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,24 +92,6 @@ FoscWrapper : Fosc {
 
     Returns offset or nil.
     -------------------------------------------------------------------------------------------------------- */
-    /* --------------------------------------------------------------------------------------------------------
-    • tag
-
-    Gets tag.
-    -------------------------------------------------------------------------------------------------------- */
-    tag {
-        assert(tag.isKindOf(FoscTag));
-        ^tag;
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • tag_
-    -------------------------------------------------------------------------------------------------------- */
-    tag_ { |argTag|
-        if ([FoscTag, String].any { |type| argTag.isKindOf(type) }.not) {
-            throw("%:%: must be a string or a FoscTag: %.".format(this.species, thisMethod.name, argTag));
-        };
-        tag = FoscTag(argTag);
-    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,8 +113,7 @@ FoscWrapper : Fosc {
             annotation: annotation,
             deactivate: deactivate,
             indicator: indicator.copy,
-            syntheticOffset: syntheticOffset,
-            tag: tag
+            syntheticOffset: syntheticOffset
         );
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -294,7 +271,7 @@ FoscWrapper : Fosc {
         };
         if (lilypondFormat.isString) { lilypondFormat = [lilypondFormat] };
         //!!!TODO: assert(lilypondFormat.isSequenceableCollection);
-        lilypondFormat = FoscLilypondFormatManager.tag(lilypondFormat, tag, deactivate: deactivate);
+        //lilypondFormat = FoscLilypondFormatManager.tag(lilypondFormat, tag, deactivate: deactivate);
         result = result.addAll(lilypondFormat);
         
         if (this.prGetEffectiveContext.notNil) { ^result };

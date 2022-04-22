@@ -198,21 +198,6 @@ FoscDynamicTrend : Fosc {
             value: "#abjad-flared-hairpin"
         );
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • *prTagHide
-
-    !!!TODO
-    -------------------------------------------------------------------------------------------------------- */
-    *prTagHide { |strings|
-        ^this.notYetImplemented(thisMethod);
-        // var abjadTags;
-        // abjadTags = FoscTags();
-        // ^FoscLilypondFormatManager.tag(
-        //     strings,
-        //     deactivate: false,
-        //     tag: 'HIDE_TO_JOIN_BROKEN_SPANNERS'
-        // );
-    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
