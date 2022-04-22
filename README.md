@@ -50,18 +50,18 @@ In your sclang startup file, add code to allow __Fosc__ to communicate with Lily
 
 __Mac OS X__
 ```supercollider
-FoscConfiguration.lilypondExecutablePath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
+Fosc.lilypondExecutablePath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
 ```
 
 __Linux__
 ```supercollider
-FoscConfiguration.lilypondExecutablePath = "/usr/local/bin/lilypond";
+Fosc.lilypondExecutablePath = "/usr/local/bin/lilypond";
 ```
 
 <br>Once you've saved your changes, recompile the SuperCollider class library and test that __Fosc__ is able to call LilyPond.
 
 ```supercollider
-FoscConfiguration.lilypondVersionString;
+Fosc.lilypondVersionString;
 ```
 ```
 2.19.82

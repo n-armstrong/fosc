@@ -13,7 +13,7 @@
 
 t = FoscTuning.et72;
 t.show; // examine the microtonal spellings and alterations
-FoscConfiguration.tuning_(t); // make this tuning current for Fosc notation
+Fosc.tuning_(t); // make this tuning current for Fosc notation
 
 // create music that uses the tuning
 a = FoscPitch("cfts'");
@@ -45,7 +45,7 @@ t = FoscTuning('foo', [
 ]);
 
 t.show; // examine the microtonal spellings and alterations
-FoscConfiguration.tuning_(t); // make this tuning current for Fosc notation
+Fosc.tuning_(t); // make this tuning current for Fosc notation
 
 // create music that uses the tuning
 a = FoscPitch("cfts'");
@@ -54,7 +54,7 @@ a.show;
 FoscTuning.current.show;
 FoscTuning.current.accidentalNames.includes("");
 ------------------------------------------------------------------------------------------------------------ */
-FoscTuning : FoscObject {
+FoscTuning : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ FoscTuning : FoscObject {
         lilypondFile = FoscLilypondFile(
             lilypondLanguageToken: "english",
             lilypondVersionToken: "2.20.0",
-            includes: ["%/noteheads.ily".format(FoscConfiguration.stylesheetDirectory)]
+            includes: ["%/noteheads.ily".format(Fosc.stylesheetDirectory)]
         );
 
         result = [];
@@ -150,7 +150,7 @@ FoscTuning : FoscObject {
 
         lilypondFile = FoscLilypondFile(
             lilypondLanguageToken: "english",
-            lilypondVersionToken: FoscConfiguration.lilypondVersionString,
+            lilypondVersionToken: Fosc.lilypondVersionString,
             includes: ["ekmel.ily"],
             isStylesheet: true
         );
@@ -169,7 +169,7 @@ FoscTuning : FoscObject {
     writeStylesheet {
         var path, lilypondFile;
 
-        path = FoscConfiguration.stylesheetDirectory;
+        path = Fosc.stylesheetDirectory;
         lilypondFile = this.illustrateStylesheet;
         lilypondFile.writeLY("%/%.ily".format(path, name));
     }
@@ -199,7 +199,7 @@ FoscTuning : FoscObject {
 
     t = FoscTuning.default;
     t.show;                         // examine the microtonal spellings and alterations
-    FoscConfiguration.tuning_(t);   // make this tuning current for Fosc notation
+    Fosc.tuning_(t);   // make this tuning current for Fosc notation
 
     a = FoscLeafMaker().((60, 60.5 .. 72), [1/4]);
     a = FoscPitchSegment(a);

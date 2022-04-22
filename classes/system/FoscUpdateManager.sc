@@ -12,7 +12,7 @@ a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
 a.prUpdateNow(offsets: true);
 a.doComponents { |each| [each, each.startOffset.str, each.stopOffset.str].postln };
 -------------------------------------------------------------------------------------------------------- */
-FoscUpdateManager : FoscObject {
+FoscUpdateManager : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE CLASS METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

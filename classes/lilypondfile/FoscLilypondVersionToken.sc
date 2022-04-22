@@ -8,7 +8,7 @@ FoscLilypondVersionToken('2.19.0').format;
 
 FoscLilypondVersionToken().format;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondVersionToken : FoscObject {
+FoscLilypondVersionToken : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ FoscLilypondVersionToken : FoscObject {
         ^super.new.init(versionString);
     }
     init { |argVersionString|
-        if (argVersionString.isNil) { argVersionString = FoscConfiguration.lilypondVersionString };
+        if (argVersionString.isNil) { argVersionString = Fosc.lilypondVersionString };
         versionString = argVersionString;
 
     }

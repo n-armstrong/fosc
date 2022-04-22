@@ -6,7 +6,7 @@ Transient class created to hold the collection of all format contributions gener
 a = FoscLilypondFormatBundle();
 a.prGetFormatSpecification;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondFormatBundle : FoscObject {
+FoscLilypondFormatBundle : Fosc {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////

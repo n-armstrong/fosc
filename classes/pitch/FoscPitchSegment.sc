@@ -141,7 +141,7 @@ FoscPitchSegment : FoscTypedList {
 
         staff = FoscStaff(FoscLeafMaker().(this.pitches, [1/8]));
         score = FoscScore.makePianoScore(staff);
-        includesPath = FoscConfiguration.stylesheetDirectory;
+        includesPath = Fosc.stylesheetDirectory;
         includes = includes ?? { ["%/noteheads.ily".format(includesPath)] };
         lilypondFile = score.illustrate(defaultPaperSize, globalStaffSize, includes);
         

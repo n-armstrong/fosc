@@ -644,10 +644,10 @@ FoscSelection : FoscSequence {
         }, pitched: true);
 
         if (isRhythmicTemplate) {
-            includes = ["%/rhythm-sketch.ily".format(FoscConfiguration.stylesheetDirectory)];
+            includes = ["%/rhythm-sketch.ily".format(Fosc.stylesheetDirectory)];
             template = FoscGroupedRhythmicStavesScoreTemplate(staffCount: 1);
         } {
-            includes = ["%/default.ily".format(FoscConfiguration.stylesheetDirectory)];
+            includes = ["%/default.ily".format(Fosc.stylesheetDirectory)];
             template = FoscStavesScoreTemplate(staffCount: 1); 
         };
         

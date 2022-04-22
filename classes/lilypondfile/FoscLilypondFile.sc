@@ -24,7 +24,7 @@ if (b.isNil) {
 set(b).proportionalNotationDuration = FoscSchemeMoment([1, 20]);
 f.show;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondFile : FoscObject {
+FoscLilypondFile : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ FoscLilypondFile : FoscObject {
         // tuning = FoscPitchManager.tuning;
         
         // if (isStylesheet.not && { tuning.notNil }) {
-        //     includes = includes.add("%/%.ily".format(FoscConfiguration.stylesheetDirectory, tuning.name));
+        //     includes = includes.add("%/%.ily".format(Fosc.stylesheetDirectory, tuning.name));
         // };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

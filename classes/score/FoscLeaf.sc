@@ -176,7 +176,7 @@ FoscLeaf : FoscComponent {
         if (afterGraceContainer.notNil) {
             ^this.detach(this.afterGraceContainer);
         };
-        ^nil; //!!!TODO: remove when FoscObject::detach is complete
+        ^nil; //!!!TODO: remove when Fosc::detach is complete
     }
     /* --------------------------------------------------------------------------------------------------------
     • prDetachGraceContainer
@@ -186,7 +186,7 @@ FoscLeaf : FoscComponent {
         if (this.graceContainer.notNil) {
             ^this.detach(this.graceContainer);
         };
-        ^nil; //!!!TODO: remove when FoscObject::detach is complete
+        ^nil; //!!!TODO: remove when Fosc::detach is complete
     }
     /* --------------------------------------------------------------------------------------------------------
     • prFormatAfterGraceBody

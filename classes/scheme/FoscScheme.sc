@@ -44,7 +44,7 @@ x = "(lambda (grob) (grob-interpret-markup grob' #{ \\markup \\musicglyph #\"not
 a = FoscScheme(x).isVerbatim_(true)
 a.format;
 ------------------------------------------------------------------------------------------------------------ */
-FoscScheme : FoscObject {
+FoscScheme : Fosc {
 	var <value, <quoting, <forceQuotes=false, <isVerbatim=false;
 	*new { |... args|
 		^super.new.init(args);

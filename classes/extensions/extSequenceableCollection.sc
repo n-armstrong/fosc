@@ -722,14 +722,14 @@
     /* --------------------------------------------------------------------------------------------------------
     • doLeaves
 
-    -- mirror selection and iteration methods in FoscObject
+    -- mirror selection and iteration methods in Fosc
 
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
     doLeaves { |function, prototype, pitched, graceNotes=false|
         var iterator;
         
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         
         iterator = FoscIteration(this).leaves(prototype: prototype, pitched: pitched, graceNotes: graceNotes);
 
@@ -738,7 +738,7 @@
     // doLeaves { |function, pitched, prototype, exclude, doNotIterateGraceContainers=false,
     //     graceNotes=false, reverse=false|
     //     var iterator;
-    //     FoscObject.prCheckIsIterable(this, thisMethod);
+    //     Fosc.prCheckIsIterable(this, thisMethod);
     //     iterator = FoscIteration(this).leaves(
     //         prototype: prototype,
     //         exclude: exclude,
@@ -752,11 +752,11 @@
     /* --------------------------------------------------------------------------------------------------------
     • selectComponents
    
-     -- mirror selection and iteration methods in FoscObject
+     -- mirror selection and iteration methods in Fosc
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
     selectComponents { |prototype, exclude, graceNotes=false, reverse=false|
-        FoscObject.prCheckIsIterable(this, thisMethod);  
+        Fosc.prCheckIsIterable(this, thisMethod);  
         ^FoscSelection(this).components(
             prototype: prototype,
             exclude: exclude,
@@ -767,11 +767,11 @@
     /* --------------------------------------------------------------------------------------------------------
     • selectLeaves
 
-    -- mirror selection and iteration methods in FoscObject
+    -- mirror selection and iteration methods in Fosc
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
     selectLeaves { |prototype, exclude, graceNotes=false, pitched, reverse=false|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         ^FoscSelection(this).leaves(
             prototype: prototype,
             exclude: exclude,
@@ -784,11 +784,11 @@
     /* --------------------------------------------------------------------------------------------------------
     • selectLogicalTies
 
-     -- mirror selection and iteration methods in FoscObject
+     -- mirror selection and iteration methods in Fosc
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
     selectLogicalTies { |exclude, graceNotes=false, nontrivial, pitched, reverse=false|
-        FoscObject.prCheckIsIterable(this, thisMethod);   
+        Fosc.prCheckIsIterable(this, thisMethod);   
         ^FoscSelection(this).logicalTies(
             exclude: exclude,
             graceNotes: graceNotes,
@@ -800,11 +800,11 @@
     /* --------------------------------------------------------------------------------------------------------
     • selectRuns
 
-    -- mirror selection and iteration methods in FoscObject
+    -- mirror selection and iteration methods in Fosc
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
     selectRuns { |exclude|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         ^FoscSelection(this).runs(exclude: exclude);
     }
     /* --------------------------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 - when 'tuning' is nil, default to et24 accidental spellings
 - see: https://abjad.github.io/_mothballed/pitch-conventions.html#default-accidental-spelling
 ------------------------------------------------------------------------------------------------------------ */
-FoscPitchManager : FoscObject {
+FoscPitchManager : Fosc {
 	classvar <tuning;
     classvar accidentalRegex, diatonicPitchClassRegex, octaveRegex, pitchClassRegex, pitchRegex;
     classvar diatonicPitchClassNameToDiatonicPitchClassNumber;

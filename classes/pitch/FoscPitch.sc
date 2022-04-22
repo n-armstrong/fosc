@@ -55,7 +55,7 @@ a.show;
 
 FoscOctave
 ------------------------------------------------------------------------------------------------------------ */
-FoscPitch : FoscObject {
+FoscPitch : Fosc {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ FoscPitch : FoscObject {
     n = b.midinote;
     m == n;
 
-    FoscObject
+    Fosc
     -------------------------------------------------------------------------------------------------------- */
     // == { |expr|
     //     ^this.midinote == FoscPitch(expr).midinote;
@@ -385,7 +385,7 @@ FoscPitch : FoscObject {
 
         note = FoscNote(this, 1/4);
         if (this < 55) { note.attach(FoscClef('bass')) };
-        includes = "%/noteheads.ily".format(FoscConfiguration.stylesheetDirectory);
+        includes = "%/noteheads.ily".format(Fosc.stylesheetDirectory);
         lilypondFile = FoscLilypondFile([note], includes: [includes]);
         
         ^lilypondFile;

@@ -1,7 +1,91 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscObject
+• Fosc
 ------------------------------------------------------------------------------------------------------------ */
-FoscObject {
+Fosc {
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC CLASS METHODS: CONFIGURATION
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    classvar lilypondExecutablePath="lilypond";
+    /* --------------------------------------------------------------------------------------------------------
+    • *initClass
+    -------------------------------------------------------------------------------------------------------- */
+    *initClass {
+        var stylesheetsDir, returnCode;
+
+        if (File.exists(this.outputDirectory).not) {
+            File.mkdir(this.outputDirectory);
+        };
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC CLASS METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • *lilypondVersionString
+    
+    Fosc.lilypondVersionString;
+    -------------------------------------------------------------------------------------------------------- */
+    *lilypondVersionString {
+        var executablePath, str, versionString;
+        executablePath = this.lilypondExecutablePath;
+        ^versionString ?? {
+            str = (executablePath + "--version").unixCmdGetStdOut;
+            str.copyRange(*[str.findRegexp("\\s[0-9]")[0][0]+1, str.find("\n")-1]);
+        };
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE CLASS PROPERTIES
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • *outputDirectory
+
+    Fosc.outputDirectory;
+    -------------------------------------------------------------------------------------------------------- */
+    *outputDirectory {
+        ^"%/fosc-output".format(Platform.userConfigDir);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *rootDirectory
+
+    Fosc.rootDirectory;
+    -------------------------------------------------------------------------------------------------------- */
+    *rootDirectory {
+        ^"%/fosc".format(Platform.userExtensionDir);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *stylesheetDirectory
+
+    Fosc.stylesheetDirectory;
+    -------------------------------------------------------------------------------------------------------- */
+    *stylesheetDirectory {
+        ^"%/stylesheets".format(this.rootDirectory);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *lilypondExecutablePath
+
+    Fosc.lilypondExecutablePath;
+    -------------------------------------------------------------------------------------------------------- */ 
+    *lilypondExecutablePath {
+        if (lilypondExecutablePath.isNil || { File.exists(lilypondExecutablePath).not }) {
+            error("Lilypond executable not found at: %.".format(lilypondExecutablePath));
+            ^nil;
+        } {
+            ^lilypondExecutablePath;  
+        };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *lilypondExecutablePath_
+
+    The executable path should be set in the user startup file, e.g.:
+
+    Fosc.lilypondExecutablePath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
+
+    or:
+
+    Fosc.lilypondExecutablePath = "/usr/local/bin/lilypond";
+    -------------------------------------------------------------------------------------------------------- */ 
+    *lilypondExecutablePath_ { |path|
+        lilypondExecutablePath = path;
+    }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC INSTANCE METHODS: SPECIAL METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +255,7 @@ FoscObject {
         if (success) { FoscIOManager.openFile(pdfPath) };
 	}
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // !!! TODO: move write methods out of FoscObject and into FoscComponent
+    // !!! TODO: move write methods out of Fosc and into FoscComponent
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • write
@@ -205,7 +289,7 @@ FoscObject {
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: FoscSelection / FoscComponent shared interface
-    // !!! TODO: move these out of FoscObject and into FoscSelection / FoscComponent
+    // !!! TODO: move these out of Fosc and into FoscSelection / FoscComponent
     // !!! NB: most of these methods are also implemented by SequenceableCollection
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
@@ -253,7 +337,7 @@ FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     doComponents { |function, prototype, exclude, doNotIterateGraceContainers=false, graceNotes=false,
         reverse=false|
-        FoscObject.prCheckIsIterable(this, thisMethod);        
+        Fosc.prCheckIsIterable(this, thisMethod);        
         FoscIteration(this).components(
             prototype, exclude, doNotIterateGraceContainers, graceNotes, reverse
         ).do(function);
@@ -286,7 +370,7 @@ FoscObject {
     a.doLeaves({ |each| each.cs.postln }, pitched: false);
     -------------------------------------------------------------------------------------------------------- */
     doLeaves { |function, prototype, pitched, graceNotes=false|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         FoscIteration(this).leaves(prototype, pitched, graceNotes).do(function);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -321,7 +405,7 @@ FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     doLogicalTies { |function, pitched, graceNotes=false|
         var iterator;
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         iterator = FoscIteration(this).logicalTies(pitched, graceNotes);
         iterator.do(function);
     }
@@ -339,7 +423,7 @@ FoscObject {
     b.show;
     -------------------------------------------------------------------------------------------------------- */
     doRuns { |function|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         ^this.selectRuns.do(function);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -379,7 +463,7 @@ FoscObject {
     c.show;
     -------------------------------------------------------------------------------------------------------- */
     doTimeline { |function, prototype, pitched|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         FoscIteration(this).timeline(prototype, pitched).do(function);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -402,7 +486,7 @@ FoscObject {
     c.show;
     -------------------------------------------------------------------------------------------------------- */
     doTimelineByLogicalTies { |function, pitched|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         FoscIteration(this).timelineByLogicalTies(pitched).do(function);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -472,7 +556,7 @@ FoscObject {
     b.do { |each| each.str.postln };
     -------------------------------------------------------------------------------------------------------- */
     selectComponents { |prototype, exclude, graceNotes=false, reverse=false|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
 
         ^FoscSelection(this).components(
             prototype: prototype,
@@ -512,7 +596,7 @@ FoscObject {
     b.do { |each| each.str.postln };
     -------------------------------------------------------------------------------------------------------- */
     selectLeaves { |prototype, pitched, graceNotes=false|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         ^FoscSelection(this).leaves(prototype, pitched, graceNotes);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -550,7 +634,7 @@ FoscObject {
     b.do { |each| each.items.collect { |each| each.cs }.postln };
     -------------------------------------------------------------------------------------------------------- */
     selectLogicalTies { |pitched, graceNotes=false|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         ^FoscSelection(this).logicalTies(pitched, graceNotes);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -569,7 +653,7 @@ FoscObject {
     b.show;
     -------------------------------------------------------------------------------------------------------- */
     selectRuns { |exclude|
-        FoscObject.prCheckIsIterable(this, thisMethod);
+        Fosc.prCheckIsIterable(this, thisMethod);
         ^FoscSelection(this).runs;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

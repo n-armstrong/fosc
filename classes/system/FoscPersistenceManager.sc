@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscPersistenceManager
 ------------------------------------------------------------------------------------------------------------ */
-FoscPersistenceManager : FoscObject {
+FoscPersistenceManager : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ FoscPersistenceManager : FoscObject {
         
         if (path.isNil) {
             lyFileName = FoscIOManager.nextOutputFileName;
-            path = FoscConfiguration.outputDirectory ++ "/" ++ lyFileName;
+            path = Fosc.outputDirectory ++ "/" ++ lyFileName;
         };
         
         lyFile = File(path, "w");
@@ -86,7 +86,7 @@ FoscPersistenceManager : FoscObject {
 
     a = FoscNote(60, 1/4);
     n = "basic-usage/images/002";
-    p = "%/docs/%".format(FoscConfiguration.rootDirectory, n);
+    p = "%/docs/%".format(Fosc.rootDirectory, n);
     f = a.writePNG("%.ly".format(p), p);
     unixCmd("open %".format(f[0]));
     -------------------------------------------------------------------------------------------------------- */

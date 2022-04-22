@@ -11,7 +11,7 @@ a = FoscOrdinalConstant('x', 0);
 b = FoscOrdinalConstant('y', 1);
 a < b;
 ------------------------------------------------------------------------------------------------------------ */
-FoscOrdinalConstant : FoscObject {
+FoscOrdinalConstant : Fosc {
 	var <dimension, <value, <representation;
 	*new { |dimension, value=0, representation|
 		^super.new.init(dimension, value, representation);

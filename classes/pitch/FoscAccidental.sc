@@ -10,7 +10,7 @@ a = FoscAccidental(-1.5);
 a.str;
 a.semitones;
 ------------------------------------------------------------------------------------------------------------ */
-FoscAccidental : FoscObject {
+FoscAccidental : Fosc {
 	var <name;
 	*new { |val|
 		case

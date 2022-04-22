@@ -3,7 +3,7 @@
 
 Manages Fosc IO.
 ------------------------------------------------------------------------------------------------------------ */
-FoscIOManager : FoscObject {
+FoscIOManager : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC CLASS METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ FoscIOManager : FoscObject {
 
     • Example 1
 
-    d = FoscConfiguration.outputDirectory;
+    d = Fosc.outputDirectory;
     FoscIOManager.lastOutputFileName("ly", d);
 
     FoscIOManager.lastOutputFileName;
@@ -39,7 +39,7 @@ FoscIOManager : FoscObject {
     *lastOutputFileName { |extension, outputDirectory|
         var pattern, allFileNames, allOutput, result;
         pattern = "\\d{4,4}.[a-z]{2,3}";
-        outputDirectory = outputDirectory ?? { FoscConfiguration.outputDirectory };
+        outputDirectory = outputDirectory ?? { Fosc.outputDirectory };
         if (File.exists(outputDirectory).not) { ^nil };
         allFileNames = "%/*".format(outputDirectory).pathMatch.collect { |each| each.basename };
         if (extension.notNil) {
@@ -112,7 +112,7 @@ FoscIOManager : FoscObject {
     -------------------------------------------------------------------------------------------------------- */
     *runLilypond { |lyPath, flags, outputPath, executablePath|
         var lilypondBase, command, exitCode, success;
-        executablePath = executablePath ?? { FoscConfiguration.lilypondExecutablePath };
+        executablePath = executablePath ?? { Fosc.lilypondExecutablePath };
         lilypondBase = lyPath.splitext[0].shellQuote;
         lyPath = lyPath.shellQuote;
         flags = flags ? "";

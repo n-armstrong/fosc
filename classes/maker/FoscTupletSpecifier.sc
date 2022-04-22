@@ -3,7 +3,7 @@
 
 Tuplet specifier.
 ------------------------------------------------------------------------------------------------------------ */
-FoscTupletSpecifier : FoscObject {
+FoscTupletSpecifier : Fosc {
     var <denominator, <isDiminution, <durationBracket, <extractTrivial, <forceFraction, <rewriteDots;
     var <rewriteRestFilled, <rewriteSustained, <trivialize;
     *new { |denominator, isDiminution, durationBracket=false, extractTrivial=false, forceFraction=false,

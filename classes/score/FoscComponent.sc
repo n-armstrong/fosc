@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscComponent
 ------------------------------------------------------------------------------------------------------------ */
-FoscComponent : FoscObject {
+FoscComponent : Fosc {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ FoscComponent : FoscObject {
     Include a path to include files (stylesheets, etc.)
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
-    p = "%/custom.ily".format(FoscConfiguration.stylesheetDirectory);
+    p = "%/custom.ily".format(Fosc.stylesheetDirectory);
     f = a.illustrate(includes: [p]);
     f.show;
     -------------------------------------------------------------------------------------------------------- */
@@ -212,7 +212,7 @@ FoscComponent : FoscObject {
         var lilypondFile;
         
         if (includes.isNil) {
-            includes = ["%/default.ily".format(FoscConfiguration.stylesheetDirectory)];
+            includes = ["%/default.ily".format(Fosc.stylesheetDirectory)];
         };
         
         // if (File.exists(stylesheetPath).not) {
