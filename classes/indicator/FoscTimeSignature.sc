@@ -34,7 +34,7 @@ Time signatures can be tagged.
 
 a = FoscStaff(FoscLeafMaker().(#[60,62,64], [1/8]));
 m = FoscTimeSignature(#[3,8]);
-a[0].attach(m, tag: "RED");
+a[0].attach(m);
 a.format;
 ------------------------------------------------------------------------------------------------------------ */
 FoscTimeSignature : Fosc {

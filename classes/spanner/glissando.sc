@@ -28,7 +28,7 @@ a.show;
 ------------------------------------------------------------------------------------------------------------ */
 + FoscSelection {
     glissando { |allowRepeats=false, allowTies=false, parenthesizeRepeats=false, stems=false,
-        rightBroken=false, tag, tweaks|
+        rightBroken=false, tweaks|
 
         var leaves, shouldAttachGlissando=false, deactivateGlissando, literal, strings, glissando;
 
@@ -51,7 +51,7 @@ a.show;
             { leaf == this.last } {
                 if (rightBroken) {
                     shouldAttachGlissando = true;
-                    tag = true;
+                    //tag = true;
                 };
             }
             { [FoscChord, FoscNote].every { |type| leaf.isKindOf(type).not } } {
@@ -85,7 +85,7 @@ a.show;
                         "\\override NoteHead.no-ledgers = ##t",
                     ];
                     literal = FoscLilypondLiteral(strings);
-                    leaf.attach(literal, tag: tag);
+                    leaf.attach(literal);
                 };
                 if (leaf == this.last) {
                     strings = #[
@@ -98,13 +98,11 @@ a.show;
                         deactivateGlissando = true;
                         literal = FoscLilypondLiteral(strings, 'after');
                         leaf.attach(literal, deactivate: true);
-                        //!!!TODO: leaf.attach(literal, deactivate: true, tag: abjad_tags.SHOW_TO_JOIN_BROKEN_SPANNERS);
                         literal = FoscLilypondLiteral(strings);
                         leaf.attach(literal, deactivate: false);
-                        //!!!TODO: leaf.attach(literal, deactivate: true, tag: abjad_tags.HIDE_TO_JOIN_BROKEN_SPANNERS);
                     } {
                         literal = FoscLilypondLiteral(strings);
-                        leaf.attach(literal, tag: tag);
+                        leaf.attach(literal);
                     };
                 };
             };
@@ -113,7 +111,7 @@ a.show;
                 glissando = FoscGlissando();
                 if (glissando.tweaks.notNil) { tweaks = glissando.tweaks.addAll(tweaks) };
                 FoscLilypondTweakManager.setTweaks(glissando, tweaks);
-                leaf.attach(glissando, deactivate: deactivateGlissando, tag: tag);
+                leaf.attach(glissando, deactivate: deactivateGlissando);
             };
         };
     }

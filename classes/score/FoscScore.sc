@@ -6,8 +6,8 @@ FoscScore : FoscContext {
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	var <defaultlilypondType='Staff';
-	*new { |music, lilypondType, name, tag, playbackManager|
-		^super.new(music, lilypondType='Score', true, name, tag, playbackManager);
+	*new { |music, lilypondType, name|
+		^super.new(music, lilypondType='Score', true, name);
 	}
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC CLASS METHODS

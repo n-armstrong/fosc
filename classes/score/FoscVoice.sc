@@ -13,8 +13,8 @@ FoscVoice : FoscContext {
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	var <defaultlilypondType='Voice';
-    *new { |music, lilypondType='Voice', name, tag, playbackManager|
-    	^super.new(music, lilypondType, false, name, tag, playbackManager);
+    *new { |music, lilypondType='Voice', name|
+    	^super.new(music, lilypondType, false, name);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE METHODS

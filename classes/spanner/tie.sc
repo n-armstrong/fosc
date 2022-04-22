@@ -48,7 +48,7 @@ a[0..].tie(tweaks: #[['color', 'blue']]);
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
 + FoscSelection {
-    tie { |direction, repeat=false, tag, tweaks|
+    tie { |direction, repeat=false, tweaks|
         var inequality, leaves, duration, tie;
         
         leaves = this.leaves;
@@ -64,18 +64,6 @@ a.show;
 
         leaves.doAdjacentPairs { |leafA, leafB|
             duration = leafA.prGetDuration;
-            //!!! TODO
-            // if inequality(duration):
-            //     detach(TieIndicator, current_leaf)
-            //     detach(RepeatTie, next_leaf)
-            //     repeat_tie = RepeatTie(direction=direction)
-            //     attach(repeat_tie, next_leaf, tag=tag)
-            // else:
-            //     detach(TieIndicator, current_leaf)
-            //     detach(RepeatTie, next_leaf)
-            //     tie = TieIndicator(direction=direction)
-            //     attach(tie, current_leaf, tag=tag)
-
             leafA.detach(FoscTie);
             //!!! leafB.detach(FoscRepeatTie);
             tie = FoscTie(direction: direction);

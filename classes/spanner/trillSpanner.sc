@@ -43,7 +43,7 @@ a.show;
 -------------------------------------------------------------------------------------------------------- */
 + FoscSelection {
     //!!!TODO: pitch and interval args not in abjad
-    trillSpanner { |startTrillSpan, stopTrillSpan, pitch, interval, tag, tweaks|
+    trillSpanner { |startTrillSpan, stopTrillSpan, pitch, interval, tweaks|
         var leaves, startLeaf, stopLeaf;
         startTrillSpan = startTrillSpan ?? { FoscStartTrillSpan(pitch: pitch, interval: interval) };
         stopTrillSpan = stopTrillSpan ?? { FoscStopTrillSpan() };
@@ -54,7 +54,7 @@ a.show;
         if (startTrillSpan.tweaks.notNil) { tweaks = startTrillSpan.tweaks.addAll(tweaks) };
         FoscLilypondTweakManager.setTweaks(startTrillSpan, tweaks);
         //!!!
-        startLeaf.attach(startTrillSpan, tag: tag);
-        stopLeaf.attach(stopTrillSpan, tag: tag);
+        startLeaf.attach(startTrillSpan);
+        stopLeaf.attach(stopTrillSpan);
     }
 }

@@ -170,14 +170,4 @@ FoscTie : Fosc {
         bundle.after.spannerStarts.addAll(strings);
         ^bundle;
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • prTagShow
-    -------------------------------------------------------------------------------------------------------- */
-    prTagShow { |strings|
-        ^FoscLilypondFormatManager.tag(
-            strings,
-            deactivate: true,
-            tag: 'SHOW_TO_JOIN_BROKEN_SPANNERS'
-        );
-    }
 }

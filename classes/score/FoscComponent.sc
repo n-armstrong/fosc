@@ -306,7 +306,7 @@ FoscComponent : Fosc {
     a[3].attach(FoscArticulation('>'));
     a.format;
     -------------------------------------------------------------------------------------------------------- */
-    attach { |attachment, context, deactivate, syntheticOffset, tag, wrapper=false|
+    attach { |attachment, context, deactivate, syntheticOffset, wrapper=false|
         var target, nonIndicatorPrototype, result, message, graceContainer, isAcceptable, component;
         var annotation, indicator, localWrapper;
 
@@ -373,7 +373,6 @@ FoscComponent : Fosc {
             context = context ?? { attachment.context };
             deactivate = deactivate ?? { attachment.deactivate };
             syntheticOffset = syntheticOffset ?? { attachment.syntheticOffset };
-            tag = tag ?? { attachment.tag };
             attachment.prDetach;
             attachment = attachment.indicator;
         };
@@ -388,8 +387,7 @@ FoscComponent : Fosc {
             context: context,
             deactivate: deactivate ? false,
             indicator: attachment,
-            syntheticOffset: syntheticOffset,
-            tag: tag
+            syntheticOffset: syntheticOffset
         );
 
         //localWrapper.prBindComponent(component);
@@ -936,8 +934,6 @@ FoscComponent : Fosc {
     a = FoscVoice([FoscNote(60, 1/4)]);
     a.add(FoscNote(67, 3/4));
     a.format
-
-    FoscParentage
     -------------------------------------------------------------------------------------------------------- */
     prCheckForCycles { |components|
         var parentage;

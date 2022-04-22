@@ -183,7 +183,7 @@ FoscNoteHead : Fosc {
             pieces[pieces.lastIndex] = pieces[pieces.lastIndex] ++ formattedDuration;
         };
         if (alternative.notNil) {
-            pieces = FoscLilypondFormatManager.tag(pieces, tag: alternative[2]);
+            pieces = FoscLilypondFormatManager.tag(pieces);
             pieces_ = alternative[0].prGetFormatPieces;
             if (formattedDuration.notNil) {
                 pieces_[pieces_.lastIndex] = pieces_[pieces_.lastIndex] ++ formattedDuration;

@@ -56,10 +56,10 @@ FoscWrapper : Fosc {
 
     Is true when wrapper deactivates tag.
     -------------------------------------------------------------------------------------------------------- */
-    deactivate {
-        assert([true, false, nil].includes(deactivate));
-        ^deactivate;
-    }
+    // deactivate {
+    //     assert([true, false, nil].includes(deactivate));
+    //     ^deactivate;
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • deactivate_
     -------------------------------------------------------------------------------------------------------- */

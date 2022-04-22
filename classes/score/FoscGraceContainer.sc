@@ -60,8 +60,8 @@ FoscGraceContainer : FoscContainer {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    *new { |components, slashed=false, slurred=false, tag|
-        ^super.new(components, tag: tag).initFoscGraceContainer(slashed, slurred);
+    *new { |components, slashed=false, slurred=false|
+        ^super.new(components).initFoscGraceContainer(slashed, slurred);
     }
     initFoscGraceContainer { |argSlashed, argSlurred|
         slashed = argSlashed;

@@ -6,8 +6,8 @@ FoscStaffGroup : FoscContext {
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	var <defaultlilypondType='StaffGroup';
-    *new { |music, lilypondType='StaffGroup', name, tag, playbackManager|
-		^super.new(music, lilypondType, true, name, tag, playbackManager);
+    *new { |music, lilypondType='StaffGroup', name|
+		^super.new(music, lilypondType, true, name);
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE METHODS

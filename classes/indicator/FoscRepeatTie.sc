@@ -90,18 +90,18 @@ FoscRepeatTie : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • *prTagShow
     -------------------------------------------------------------------------------------------------------- */
-    *prTagShow { |strings|
-        // return LilyPondFormatManager.tag(
-        //     strings,
-        //     deactivate=True,
-        //     tag=abjad_tags.SHOW_TO_JOIN_BROKEN_SPANNERS,
-        //     )  
-        ^FoscLilypondFormatManager.tag(
-            strings,
-            deactivate: true,
-            tag: 'SHOW_TO_JOIN_BROKEN_SPANNERS'
-        );
-    }
+    // *prTagShow { |strings|
+    //     // return LilyPondFormatManager.tag(
+    //     //     strings,
+    //     //     deactivate=True,
+    //     //     tag=abjad_tags.SHOW_TO_JOIN_BROKEN_SPANNERS,
+    //     //     )  
+    //     ^FoscLilypondFormatManager.tag(
+    //         strings,
+    //         deactivate: true,
+    //         tag: 'SHOW_TO_JOIN_BROKEN_SPANNERS'
+    //     );
+    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

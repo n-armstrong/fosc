@@ -21,7 +21,7 @@ Clefs can be tagged.
 
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
 m = FoscClef('bass');
-a[0].attach(m, tag: 'RED');
+a[0].attach(m);
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
 FoscClef : Fosc {

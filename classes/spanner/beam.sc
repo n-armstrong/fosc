@@ -53,8 +53,7 @@ m.do { |sel, i| sel.beam(durations: d[i], spanBeamCount: 1) };
 x.show;
 ------------------------------------------------------------------------------------------------------------ */
 + FoscSelection {
-    beam { |startBeam, stopBeam, beamLoneNotes=false, beamRests=true, durations, spanBeamCount, stemletLength,
-        tag, tweaks|
+    beam { |startBeam, stopBeam, beamLoneNotes=false, beamRests=true, durations, spanBeamCount, stemletLength, tweaks|
         var originalLeaves, silentPrototype, isBeamable, leaves, runs, run, thisIndex, thatIndex;
         var selection, selections, localRuns, startLeaf, stopLeaf, staff, lilypondType, string, literal;
         var leafNeighbors, previousLeaf, previous, nextLeaf, next, leafDurations, parts, partCounts;

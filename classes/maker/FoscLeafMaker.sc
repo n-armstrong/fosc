@@ -262,8 +262,7 @@ FoscLeafMaker {
                         forbiddenRestDuration: forbiddenRestDuration,
                         skipsInsteadOfRests: skipsInsteadOfRests,
                         repeatTies: repeatTies,
-                        useMultimeasureRests: useMultimeasureRests,
-                        tag: tag
+                        useMultimeasureRests: useMultimeasureRests
                     );
                     result = result.addAll(leaves.items);
                     //!!! result = result.addAll(leaves);
@@ -289,8 +288,7 @@ FoscLeafMaker {
                         increaseMonotonic: increaseMonotonic,
                         skipsInsteadOfRests: skipsInsteadOfRests,
                         repeatTies: repeatTies,
-                        useMultimeasureRests: useMultimeasureRests,
-                        tag: tag
+                        useMultimeasureRests: useMultimeasureRests
                     );
                     tupletLeaves = tupletLeaves.addAll(leaves.items);
                     //tupletLeaves = tupletLeaves.addAll(leaves);
@@ -326,8 +324,7 @@ FoscLeafMaker {
                 increaseMonotonic: increaseMonotonic,
                 forbiddenDuration: forbiddenNoteDuration,
                 pitches: pitch,
-                repeatTies: repeatTies,
-                tag: tag
+                repeatTies: repeatTies
             );
         }
         { chordPrototype.any { |prototype| pitch.isKindOf(prototype) } } {
@@ -337,8 +334,7 @@ FoscLeafMaker {
                 increaseMonotonic: increaseMonotonic,
                 forbiddenDuration: forbiddenNoteDuration,
                 pitches: pitch,
-                repeatTies: repeatTies,
-                tag: tag
+                repeatTies: repeatTies
             );
         }
         { restPrototype.any { |prototype| pitch.isKindOf(prototype) } && skipsInsteadOfRests } {
@@ -347,8 +343,7 @@ FoscLeafMaker {
                 duration: duration,
                 increaseMonotonic: increaseMonotonic,
                 forbiddenDuration: forbiddenRestDuration,
-                repeatTies: repeatTies,
-                tag: tag
+                repeatTies: repeatTies
             );
         }
         { restPrototype.any { |prototype| pitch.isKindOf(prototype) } && useMultimeasureRests.not } {
@@ -357,8 +352,7 @@ FoscLeafMaker {
                 duration: duration,
                 increaseMonotonic: increaseMonotonic,
                 forbiddenDuration: forbiddenRestDuration,
-                repeatTies: repeatTies,
-                tag: tag
+                repeatTies: repeatTies
             );
         }
         { restPrototype.any { |prototype| pitch.isKindOf(prototype) } && useMultimeasureRests } {

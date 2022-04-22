@@ -43,7 +43,7 @@ a[0..].hairpin('sfz > p', tweaks: #[['color', 'blue']]);
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
 + FoscSelection {
-    hairpin { |descriptor, tag, tweaks|
+    hairpin { |descriptor, tweaks|
         var indicators, knownShapes, dynamicTrend, dynamic, startDynamic, stopDynamic;
         var leaves, startLeaf, stopLeaf;
 
@@ -100,8 +100,8 @@ a.show;
         FoscLilypondTweakManager.setTweaks(dynamicTrend, tweaks);
         //!!!
 
-        if (startDynamic.notNil) { startLeaf.attach(startDynamic, tag: tag) };
-        if (dynamicTrend.notNil) { startLeaf.attach(dynamicTrend, tag: tag) };
-        if (stopDynamic.notNil) { stopLeaf.attach(stopDynamic, tag: tag) };
+        if (startDynamic.notNil) { startLeaf.attach(startDynamic) };
+        if (dynamicTrend.notNil) { startLeaf.attach(dynamicTrend) };
+        if (stopDynamic.notNil) { stopLeaf.attach(stopDynamic) };
     }
 }

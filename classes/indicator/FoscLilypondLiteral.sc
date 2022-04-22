@@ -36,7 +36,7 @@ a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/8]));
 m = FoscSlur();
 a[0..].attach(m);
 l = FoscLilypondLiteral("\\slurDotted");
-a[0].attach(l, tag: 'RED');
+a[0].attach(l);
 a.format;
 
 

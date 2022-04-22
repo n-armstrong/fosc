@@ -259,33 +259,32 @@ FoscLilypondFormatManager : Fosc {
 
     Tags 'strings' with 'tag'.
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
-    *tag { |strings, tag, deactivate=false|
-        var length, localStrings, pad, localTag;
+    // *tag { |strings, tag, deactivate=false|
+    //     var length, localStrings, pad, localTag;
 
-        if (tag.isNil) { ^strings };
-        if (strings.isNil) { ^strings };
-        assert(deactivate.isKindOf(Boolean));
-        length = strings.collect { |string| string.size }.maxItem;
-        localStrings = [];
+    //     if (tag.isNil) { ^strings };
+    //     if (strings.isNil) { ^strings };
+    //     assert(deactivate.isKindOf(Boolean));
+    //     length = strings.collect { |string| string.size }.maxItem;
+    //     localStrings = [];
         
-        strings.do { |string|
-            if (string.contains("%!").not) {
-                pad = length - string.size;
-            } {
-                pad = 0;
-            };
-            localTag = (" " ! pad) ++ " " ++ "%!" ++ " " ++ (tag.asString);
-            string = string ++ localTag;
-            localStrings = localStrings.add(string);
-        };
+    //     strings.do { |string|
+    //         if (string.contains("%!").not) {
+    //             pad = length - string.size;
+    //         } {
+    //             pad = 0;
+    //         };
+    //         localTag = (" " ! pad) ++ " " ++ "%!" ++ " " ++ (tag.asString);
+    //         string = string ++ localTag;
+    //         localStrings = localStrings.add(string);
+    //     };
         
-        if (deactivate) {
-            localStrings = localStrings.collect { |string| "%@%" ++ string };
-        };
+    //     if (deactivate) {
+    //         localStrings = localStrings.collect { |string| "%@%" ++ string };
+    //     };
         
-        ^localStrings;
-    }
+    //     ^localStrings;
+    // }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PRIVATE CLASS METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -482,11 +481,11 @@ FoscLilypondFormatManager : Fosc {
                     markup = wrapper.indicator;
                 };
                 formatPieces = markup.prGetFormatPieces;
-                formatPieces = FoscLilypondFormatManager.tag(
-                    formatPieces,
-                    //!!!TODO: wrapper.tag,
-                    deactivate: wrapper.deactivate
-                );
+                // formatPieces = FoscLilypondFormatManager.tag(
+                //     formatPieces,
+                //     //!!!TODO: wrapper.tag,
+                //     deactivate: wrapper.deactivate
+                // );
                 bundle.after.markup.addAll(formatPieces);
             };
         };

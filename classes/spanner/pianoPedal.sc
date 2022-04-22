@@ -40,7 +40,7 @@ a.show;
 + FoscSelection {
     //!!!TODO: remove startPianoPedal and stopPianoPedal arguments, just use 'type'
     // NB: 'type' argument not in abjad
-    pianoPedal { |startPianoPedal, stopPianoPedal, type='sustain', tag, tweaks|
+    pianoPedal { |startPianoPedal, stopPianoPedal, type='sustain', tweaks|
         var leaves, startLeaf, stopLeaf;
         startPianoPedal = startPianoPedal ?? { FoscStartPianoPedal(type) };
         stopPianoPedal = stopPianoPedal ?? { FoscStopPianoPedal(type) };
@@ -51,7 +51,7 @@ a.show;
         if (startPianoPedal.tweaks.notNil) { tweaks = startPianoPedal.tweaks.addAll(tweaks) };
         FoscLilypondTweakManager.setTweaks(startPianoPedal, tweaks);
         //!!!
-        startLeaf.attach(startPianoPedal, tag: tag);
-        stopLeaf.attach(stopPianoPedal, tag: tag);
+        startLeaf.attach(startPianoPedal);
+        stopLeaf.attach(stopPianoPedal);
     }
 }

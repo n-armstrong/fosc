@@ -20,7 +20,7 @@ a[0..].slur(tweaks: #[['color', 'blue']]);
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
 + FoscSelection {
-    slur { |startSlur, stopSlur, tag, tweaks|
+    slur { |startSlur, stopSlur, tweaks|
         var leaves, startLeaf, stopLeaf;
         startSlur = startSlur ?? { FoscStartSlur() };
         stopSlur = stopSlur ?? { FoscStopSlur() };
@@ -31,7 +31,7 @@ a.show;
         if (startSlur.tweaks.notNil) { tweaks = startSlur.tweaks.addAll(tweaks) };
         FoscLilypondTweakManager.setTweaks(startSlur, tweaks);
         //!!!
-        startLeaf.attach(startSlur, tag: tag);
-        stopLeaf.attach(stopSlur, tag: tag);
+        startLeaf.attach(startSlur);
+        stopLeaf.attach(stopSlur);
     }
 }

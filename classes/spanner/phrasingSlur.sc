@@ -20,7 +20,7 @@ a[0..].phrasingSlur(tweaks: #[['color', 'blue']]);
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
 + FoscSelection {
-    phrasingSlur { |startPhrasingSlur, stopPhrasingSlur, tag, tweaks|
+    phrasingSlur { |startPhrasingSlur, stopPhrasingSlur, tweaks|
         var leaves, startLeaf, stopLeaf;
         startPhrasingSlur = startPhrasingSlur ?? { FoscStartPhrasingSlur() };
         stopPhrasingSlur = stopPhrasingSlur ?? { FoscStopPhrasingSlur() };
@@ -31,7 +31,7 @@ a.show;
         if (startPhrasingSlur.tweaks.notNil) { tweaks = startPhrasingSlur.tweaks.addAll(tweaks) };
         FoscLilypondTweakManager.setTweaks(startPhrasingSlur, tweaks);
         //!!!
-        startLeaf.attach(startPhrasingSlur, tag: tag);
-        stopLeaf.attach(stopPhrasingSlur, tag: tag);
+        startLeaf.attach(startPhrasingSlur);
+        stopLeaf.attach(stopPhrasingSlur);
     }
 }
