@@ -150,7 +150,7 @@ FoscTuning : Fosc {
 
         lilypondFile = FoscLilypondFile(
             lilypondLanguageToken: "english",
-            lilypondVersionToken: Fosc.lilypondVersionString,
+            lilypondVersionToken: Fosc.lilypondVersion,
             includes: ["ekmel.ily"],
             isStylesheet: true
         );

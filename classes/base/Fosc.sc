@@ -20,11 +20,11 @@ Fosc {
     // PUBLIC CLASS METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • *lilypondVersionString
+    • *lilypondVersion
     
-    Fosc.lilypondVersionString;
+    Fosc.lilypondVersion;
     -------------------------------------------------------------------------------------------------------- */
-    *lilypondVersionString {
+    *lilypondVersion {
         var executablePath, str, versionString;
         executablePath = this.lilypondPath;
         ^versionString ?? {
