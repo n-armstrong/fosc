@@ -189,10 +189,6 @@ Fosc {
     • format
 
     !!!TODO: For deprecation
-    
-    Formats component.
-
-    Returns string.
     -------------------------------------------------------------------------------------------------------- */
     format {
         ^this.lilypond;
@@ -240,19 +236,6 @@ Fosc {
     a = FoscNote(60, 1/4);
     a.show(staffSize: 10);
     -------------------------------------------------------------------------------------------------------- */
-	// show { |path|
-	// 	var result, pdfPath, success;
-        
-    //     if (this.respondsTo('illustrate').not) {
-    //         throw("% does not respond to 'illustrate' and can't be shown.".format(this));
-    //     };
-        
-    //     //if (args.notEmpty) { path = args[0] };
-    //     result = FoscPersistenceManager(this).asPDF(path);
-    //     # pdfPath, success = result;
-        
-    //     if (success) { FoscIOManager.openFile(pdfPath) };
-	// }
     show { |paperSize, staffSize, includes|
         var illustrateEnvir, result, pdfPath, success;
         
@@ -268,7 +251,7 @@ Fosc {
         if (success) { FoscIOManager.openFile(pdfPath) };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // !!! TODO: move write methods out of Fosc and into FoscComponent
+    // !!! TODO: move write methods into FoscComponent
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • write
@@ -278,27 +261,51 @@ Fosc {
 	}
     /* --------------------------------------------------------------------------------------------------------
     • writeLY
+
+    • Example 1
+
+    a = FoscNote(60, 1/4);
+    b = a.writeLY(staffSize: 10);
+    unixCmd("open " ++ b.shellQuote);
     -------------------------------------------------------------------------------------------------------- */
-    writeLY { |path|
-        ^FoscPersistenceManager(this).asLY(path);
+    writeLY { |path, paperSize, staffSize, includes|
+        var illustrateEnvir;
+        illustrateEnvir = (paperSize: paperSize, staffSize: staffSize, includes: includes);
+        ^this.write.asLY(path, illustrateEnvir: illustrateEnvir);
     }
     /* --------------------------------------------------------------------------------------------------------
     • writeMIDI
     -------------------------------------------------------------------------------------------------------- */
     writeMIDI { |path|
-        ^FoscPersistenceManager(this).asMIDI(path);
+        ^this.write.asMIDI(path);
     }
     /* --------------------------------------------------------------------------------------------------------
     • writePDF
+
+     • Example 1
+
+    a = FoscNote(60, 1/4);
+    b = a.writePDF(staffSize: 10);
+    unixCmd("open " ++ b[0].shellQuote);
     -------------------------------------------------------------------------------------------------------- */
-    writePDF { |path|
-        ^FoscPersistenceManager(this).asPDF(path);
+    writePDF { |path, paperSize, staffSize, includes|
+        var illustrateEnvir;
+        illustrateEnvir = (paperSize: paperSize, staffSize: staffSize, includes: includes);
+        ^this.write.asPDF(path, illustrateEnvir: illustrateEnvir);
     }
     /* --------------------------------------------------------------------------------------------------------
     • writePNG
+
+    • Example 1
+
+    a = FoscNote(60, 1/4);
+    b = a.writePNG(resolution: 300);
+    unixCmd("open " ++ b[0]);
     -------------------------------------------------------------------------------------------------------- */
-    writePNG { |path, resolution=100|
-        ^FoscPersistenceManager(this).asPNG(path, resolution: resolution);
+    writePNG { |path, staffSize, includes, resolution=300|
+        var illustrateEnvir;
+        illustrateEnvir = (staffSize: staffSize, includes: includes);
+        ^this.write.asPNG(path, illustrateEnvir: illustrateEnvir, resolution: resolution);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: FoscSelection / FoscComponent shared interface
@@ -350,7 +357,9 @@ Fosc {
     -------------------------------------------------------------------------------------------------------- */
     doComponents { |function, prototype, exclude, doNotIterateGraceContainers=false, graceNotes=false,
         reverse=false|
+        
         Fosc.prCheckIsIterable(this, thisMethod);        
+        
         FoscIteration(this).components(
             prototype, exclude, doNotIterateGraceContainers, graceNotes, reverse
         ).do(function);
@@ -734,15 +743,17 @@ Fosc {
         if (this.respondsTo('player')) { this.player.stop };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PRIVATE INSTANCE METHODS
+    // PRIVATE CLASS METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • *prCheckIsIterable
     -------------------------------------------------------------------------------------------------------- */
     *prCheckIsIterable { |object, method|
         var prototype, isIterable;
+        
         prototype = [FoscComponent, FoscSelection, SequenceableCollection];
         isIterable = prototype.any { |type| object.isKindOf(type) };
+        
         if (isIterable.not) {
             throw("%: receiver is not iterable: %.".format(method.name, object));
         };

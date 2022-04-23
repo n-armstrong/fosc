@@ -6,7 +6,6 @@ FoscPersistenceManager : Fosc {
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     var <client;
-    var pngPagePattern=".+page(\\d+)\.png";
     *new { |client|
         ^super.new.init(client);
     }
@@ -32,14 +31,13 @@ FoscPersistenceManager : Fosc {
     a = FoscNote(60, 1/8);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-    asLY { |path, illustrateEnvir ... args|
+    asLY { |path, illustrateEnvir|
         var illustration, lyFileName, lyFile;
 
         if (illustrateEnvir.isNil) {
-            illustration = client.illustrate.format;
+            illustration = client.illustrate.lilypond;
         } {
-            illustration = client.performWithEnvir('illustrate', illustrateEnvir);
-            illustration = illustration.format;
+            illustration = client.performWithEnvir('illustrate', illustrateEnvir).lilypond;
         };
         
         if (path.isNil) {
@@ -53,26 +51,6 @@ FoscPersistenceManager : Fosc {
         
         ^path;
     }
-    // asLY { |path, illustrateFunction ... args|
-    //     var illustration, lyFileName, lyFile;
-        
-    //     if (illustrateFunction.isNil) {
-    //         illustrateFunction = client.illustrate;
-    //     };
-        
-    //     illustration = illustrateFunction.format; //!!!TODO: temporary
-        
-    //     if (path.isNil) {
-    //         lyFileName = FoscIOManager.nextOutputFileName;
-    //         path = Fosc.outputDirectory ++ "/" ++ lyFileName;
-    //     };
-        
-    //     lyFile = File(path, "w");
-    //     lyFile.write(illustration);
-    //     lyFile.close;
-        
-    //     ^path;
-    // }
     /* --------------------------------------------------------------------------------------------------------
     • asMIDI
     -------------------------------------------------------------------------------------------------------- */
@@ -94,11 +72,11 @@ FoscPersistenceManager : Fosc {
     a = FoscNote(60, 1/4);
     b = a.write.asPDF;
     -------------------------------------------------------------------------------------------------------- */
-    asPDF { |lyPath, outputPath, illustrateEnvir, flags, clean=false ... args|
+    asPDF { |lyPath, outputPath, illustrateEnvir, flags, clean=false|
         var success;
         
         if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
-        lyPath = this.asLY(lyPath, illustrateEnvir, *args);
+        lyPath = this.asLY(lyPath, illustrateEnvir);
         outputPath = outputPath ?? { lyPath.splitext[0] };
         success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
         if (success && clean) { File.delete(lyPath) };
@@ -113,16 +91,14 @@ FoscPersistenceManager : Fosc {
     • Example 1
 
     a = FoscNote(60, 1/4);
-    n = "basic-usage/images/002";
-    p = "%/docs/%".format(Fosc.rootDirectory, n);
-    f = a.writePNG("%.ly".format(p), p);
-    unixCmd("open %".format(f[0]));
+    b = a.write.asPNG(resolution: 300);
+    unixCmd("open " ++ b[0]);
     -------------------------------------------------------------------------------------------------------- */
-    asPNG { |lyPath, outputPath, illustrateEnvir, resolution=100, clean=true ... args|
+    asPNG { |lyPath, outputPath, illustrateEnvir, resolution=300, clean=true|
         var flags, success;
         
         if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
-        lyPath = this.asLY(lyPath, illustrateEnvir, *args);
+        lyPath = this.asLY(lyPath, illustrateEnvir);
         outputPath = outputPath ?? { lyPath.splitext[0] };
         flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png".format(resolution);
         success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
@@ -146,10 +122,10 @@ FoscPersistenceManager : Fosc {
 
     lilypond -dbackend=svg -dcrop file.ly
     -------------------------------------------------------------------------------------------------------- */
-    asSVG { |lyPath, outputPath, illustrateEnvir, crop=true, clean=true ... args|
-        // if (crop) { add "-dcrop" to flags string };
-        ^this.notYetImplemented(thisMethod);
-    }
+    // asSVG { |lyPath, outputPath, illustrateEnvir, crop=true, clean=true|
+    //     // if (crop) { add "-dcrop" to flags string };
+    //     ^this.notYetImplemented(thisMethod);
+    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

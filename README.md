@@ -147,7 +147,7 @@ a.show;
 
 ## <br>Creating music with FoscMusicMaker
 
-<br>Make music from 'durations' and 'pitches'.
+<br>Make music from *durations* and *pitches*.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: 1/4 ! 4, pitches: #[60,62,64,65]);
@@ -163,7 +163,7 @@ b.show;
 ```
 ![](./docs/img/music-maker-2.png)
 
-<br>'pitches' are repeated cyclically when the length of 'pitches' is less than the length of 'durations'.
+<br>Pitches are repeated cyclically when the length of *pitches* is less than the length of *durations*.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: [3/8,1/8,2/8,2/8], pitches: #[60,62]);
@@ -171,7 +171,7 @@ b.show;
 ```
 ![](./docs/img/music-maker-3.png)
 
-<br>'divisions' embed into 'durations' as rhythmic proportions.
+<br>*divisions* embed into *durations* as rhythmic proportions.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: [2/16,3/16,5/16], divisions: #[[3,1],[3,2],[4,3]]);
@@ -179,7 +179,7 @@ b.show;
 ```
 ![](./docs/img/music-maker-4.png)
 
-<br>Negative 'divisions' are rests.
+<br>Negative *divisions* are rests.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: [2/16,3/16,5/16], divisions: #[[-3,1],[3,2],[4,-3]]);
@@ -187,7 +187,7 @@ b.show;
 ```
 ![](./docs/img/music-maker-5.png)
 
-<br>Rhythm cells are repeated cyclically when the length of 'durations' is less than the length of 'divisions'.
+<br>Rhythm cells are repeated cyclically when the length of *durations* is less than the length of *divisions*.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: [1/4], divisions: #[1,1,1,1,1] ! 4);
@@ -195,7 +195,7 @@ b.show;
 ```
 ![](./docs/img/music-maker-6.png)
 
-<br>Rhythm cells are repeated cyclically when the length of 'divisions' is less than the length of 'durations'.
+<br>Rhythm cells are repeated cyclically when the length of *divisions* is less than the length of *durations*.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: 1/4 ! 4, divisions: #[1,1,1,1,1]);
@@ -203,7 +203,7 @@ b.show;
 ```
 ![](./docs/img/music-maker-7.png)
 
-<br>Apply a 'mask' to fuse contiguous musical events. Mask patterns repeat cyclically. 'pitches' are added after a 'mask' is applied.
+<br>Apply a *mask* to fuse contiguous musical events. Mask patterns repeat cyclically. *pitches* are added after a *mask* is applied.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: 1/4 ! 4, divisions: #[1,1,1,1,1], mask: #[2,1], pitches: #[60,62]);
@@ -211,7 +211,7 @@ b.show;
 ```
 ![](./docs/img/music-maker-8.png)
 
-<br>Negative 'mask' values are interpreted as rests.
+<br>Negative *mask* values are rests.
 ```supercollider
 a = FoscMusicMaker();
 b = a.(durations: 1/4 ! 4, divisions: #[1,1,1,1,1], mask: #[2,-1], pitches: #[60,62]);
