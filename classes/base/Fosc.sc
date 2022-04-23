@@ -169,18 +169,33 @@ Fosc {
     // PUBLIC INSTANCE METHODS: TOP LEVEL
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
+    • lilypond
+    
+    Formats lilypond string.
+
+    Returns string.
+
+    a = FoscNote(60, 1/4);
+    a.lilypond;
+    -------------------------------------------------------------------------------------------------------- */
+    lilypond {
+        if (this.respondsTo('prGetLilypondFormat').not) {
+            throw("% does not respond to 'prGetLilypondFormat'.".format(this));
+        };
+
+        ^this.prGetLilypondFormat;
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • format
+
+    !!!TODO: For deprecation
     
     Formats component.
 
     Returns string.
     -------------------------------------------------------------------------------------------------------- */
     format {
-        if (this.respondsTo('prGetLilypondFormat').not) {
-            throw("% does not respond to 'prGetLilypondFormat'.".format(this));
-        };
-
-        ^this.prGetLilypondFormat;
+        ^this.lilypond;
     }
     /* --------------------------------------------------------------------------------------------------------
     • iterate
@@ -239,15 +254,15 @@ Fosc {
     //     if (success) { FoscIOManager.openFile(pdfPath) };
 	// }
     show { |paperSize, staffSize, includes|
-        var illustrateFunction, result, pdfPath, success;
+        var illustrateEnvir, result, pdfPath, success;
         
         if (this.respondsTo('illustrate').not) {
             throw("% does not respond to 'illustrate' and can't be shown.".format(this));
         };
 
         if (includes.notNil && { includes.isSequenceableCollection.not }) { includes = [includes] };
-        illustrateFunction = (paperSize: paperSize, staffSize: staffSize, includes: includes);
-        result = FoscPersistenceManager(this).asPDF(illustrateFunction: illustrateFunction);
+        illustrateEnvir = (paperSize: paperSize, staffSize: staffSize, includes: includes);
+        result = FoscPersistenceManager(this).asPDF(illustrateEnvir: illustrateEnvir);
         # pdfPath, success = result;
         
         if (success) { FoscIOManager.openFile(pdfPath) };

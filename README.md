@@ -88,7 +88,7 @@ a.show;
 <br>View LilyPond output in the Post window.
 ```supercollider
 a = FoscVoice([FoscNote(60, 1/4), FoscNote(62, 1/8)]);
-a.format;
+a.lilypond;
 ```
 ```
 \new Voice {

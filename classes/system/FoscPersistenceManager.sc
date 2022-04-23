@@ -32,19 +32,19 @@ FoscPersistenceManager : Fosc {
     a = FoscNote(60, 1/8);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-    asLY { |path, illustrateFunction ... args|
+    asLY { |path, illustrateEnvir ... args|
         var illustration, lyFileName, lyFile;
 
-        if (illustrateFunction.isNil) {
+        if (illustrateEnvir.isNil) {
             illustration = client.illustrate.format;
         } {
-            illustration = client.performWithEnvir('illustrate', illustrateFunction);
+            illustration = client.performWithEnvir('illustrate', illustrateEnvir);
             illustration = illustration.format;
         };
         
         if (path.isNil) {
             lyFileName = FoscIOManager.nextOutputFileName;
-            path = Fosc.outputDirectory ++ "/" ++ lyFileName;
+            path = "%/%".format(Fosc.outputDirectory, lyFileName);
         };
         
         lyFile = File(path, "w");
@@ -94,11 +94,11 @@ FoscPersistenceManager : Fosc {
     a = FoscNote(60, 1/4);
     b = a.write.asPDF;
     -------------------------------------------------------------------------------------------------------- */
-    asPDF { |lyPath, outputPath, illustrateFunction, flags, clean=false ... args|
+    asPDF { |lyPath, outputPath, illustrateEnvir, flags, clean=false ... args|
         var success;
         
-        if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
-        lyPath = this.asLY(lyPath, illustrateFunction, *args);
+        if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
+        lyPath = this.asLY(lyPath, illustrateEnvir, *args);
         outputPath = outputPath ?? { lyPath.splitext[0] };
         success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
         if (success && clean) { File.delete(lyPath) };
@@ -118,11 +118,11 @@ FoscPersistenceManager : Fosc {
     f = a.writePNG("%.ly".format(p), p);
     unixCmd("open %".format(f[0]));
     -------------------------------------------------------------------------------------------------------- */
-    asPNG { |lyPath, outputPath, illustrateFunction, resolution=100, clean=true ... args|
+    asPNG { |lyPath, outputPath, illustrateEnvir, resolution=100, clean=true ... args|
         var flags, success;
         
-        if (illustrateFunction.isNil) { assert(client.respondsTo('illustrate')) };
-        lyPath = this.asLY(lyPath, illustrateFunction, *args);
+        if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
+        lyPath = this.asLY(lyPath, illustrateEnvir, *args);
         outputPath = outputPath ?? { lyPath.splitext[0] };
         flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png".format(resolution);
         success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
@@ -146,7 +146,7 @@ FoscPersistenceManager : Fosc {
 
     lilypond -dbackend=svg -dcrop file.ly
     -------------------------------------------------------------------------------------------------------- */
-    asSVG { |lyPath, outputPath, illustrateFunction, crop=true, clean=true ... args|
+    asSVG { |lyPath, outputPath, illustrateEnvir, crop=true, clean=true ... args|
         // if (crop) { add "-dcrop" to flags string };
         ^this.notYetImplemented(thisMethod);
     }
