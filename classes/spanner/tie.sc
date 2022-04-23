@@ -70,7 +70,7 @@ a.show;
             leafA.attach(tie);
             //!!! not in abjad
             if (tie.tweaks.notNil) { tweaks = tie.tweaks.addAll(tweaks) };
-            FoscLilypondTweakManager.setTweaks(tie, tweaks);
+            FoscLilyPondTweakManager.setTweaks(tie, tweaks);
             //!! 
         };
     }

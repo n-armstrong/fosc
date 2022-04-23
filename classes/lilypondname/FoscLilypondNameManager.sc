@@ -1,11 +1,11 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondNameManager (abjad 3.0)
+• FoscLilyPondNameManager (abjad 3.0)
 
 LilyPond name manager.
     
 Base class from which grob, setting and tweak managers inherit.
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondNameManager {
+FoscLilyPondNameManager {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,12 +32,12 @@ FoscLilypondNameManager {
     /* --------------------------------------------------------------------------------------------------------
     • doesNotUnderstand
 
-    This allows for putting and accessing of attributes in vars through method calls to a FoscLilypondNameManager.
+    This allows for putting and accessing of attributes in vars through method calls to a FoscLilyPondNameManager.
 
 
     • Example 1
 
-    a = FoscLilypondNameManager();
+    a = FoscLilyPondNameManager();
     a.color = 'red';
     a.size = 12;
     a.color;
@@ -56,7 +56,7 @@ FoscLilypondNameManager {
         if (item.isNil) {
             cachedSelector = selector;
             if (vars[cachedSelector].isNil) {
-                this.prSetState(((cachedSelector): FoscLilypondNameManager()));
+                this.prSetState(((cachedSelector): FoscLilyPondNameManager()));
             };
         } {
             selector = selector.asString.strip("_").asSymbol;
@@ -77,8 +77,8 @@ FoscLilypondNameManager {
 
 	Returns true or false.
     
-    m = FoscLilypondNameManager().prSetState((foo: 1, bar: 2));
-    n = FoscLilypondNameManager().prSetState((foo: 1, bar: 2));
+    m = FoscLilyPondNameManager().prSetState((foo: 1, bar: 2));
+    n = FoscLilyPondNameManager().prSetState((foo: 1, bar: 2));
     m == n;
     -------------------------------------------------------------------------------------------------------- */
     == { |expr|
@@ -97,7 +97,7 @@ FoscLilypondNameManager {
 
     • Example 1
     
-    m = FoscLilypondNameManager();
+    m = FoscLilyPondNameManager();
     m.prSetState((foo: 1, bar: 2));
     m.asCompileString;
     -------------------------------------------------------------------------------------------------------- */
@@ -118,7 +118,7 @@ FoscLilypondNameManager {
     -------------------------------------------------------------------------------------------------------- */
     put { |name, value|
         //!!!TODO: assert attribute name is valid grob name before setting value
-        if (vars[value].isKindOf(FoscLilypondNameManager)) {
+        if (vars[value].isKindOf(FoscLilyPondNameManager)) {
             vars[name].prSetState(value.vars);
         } {
             vars[name] = value;
@@ -145,7 +145,7 @@ FoscLilypondNameManager {
 
     Sets object state.
     
-    m = FoscLilypondNameManager();
+    m = FoscLilyPondNameManager();
     m.prSetState((foo: 1, bar: 2));
     m.prGetAttributePairs;
     -------------------------------------------------------------------------------------------------------- */

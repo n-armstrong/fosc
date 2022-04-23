@@ -48,11 +48,11 @@ FoscContextBlock : FoscBlock {
         var indent, result, string, manager, pieces, overrides, settingContributions, settingContribution;
         var key, val;
         
-        indent = FoscLilypondFormatManager.indent;
+        indent = FoscLilyPondFormatManager.indent;
         result = [];
         string = "% {".format(escapedName);
         result = result.add(string);
-        manager = FoscLilypondFormatManager;
+        manager = FoscLilyPondFormatManager;
 
         if (sourceLilypondType.notNil) {
             string = indent ++ "\\" ++ sourceLilypondType;

@@ -99,7 +99,7 @@ FoscStopPhrasingSlur {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         string = "\\)";
         if (leak) {
             string = "<> %".format(string);

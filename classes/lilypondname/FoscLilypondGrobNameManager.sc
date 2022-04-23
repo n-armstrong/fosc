@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondGrobNameManager (abjad 3.0)
+• FoscLilyPondGrobNameManager (abjad 3.0)
 
 LilyPond grob name manager.
 
@@ -25,7 +25,7 @@ m.noteHead.fontSize = 4;
 a.format;
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondGrobNameManager : FoscLilypondNameManager {
+FoscLilyPondGrobNameManager : FoscLilyPondNameManager {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC INSTANCE METHODS: SPECIAL METHODS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ FoscLilypondGrobNameManager : FoscLilypondNameManager {
         var context, contextProxy, quadruple;
         result = [];
         vars.keysValuesDo { |name, val|
-            if (val.isMemberOf(FoscLilypondNameManager)) {
+            if (val.isMemberOf(FoscLilyPondNameManager)) {
                 # grob, grobProxy = [name, val];
                 pairs = grobProxy.prGetAttributePairs;
                 pairs.do { |pair|
@@ -105,7 +105,7 @@ FoscLilypondGrobNameManager : FoscLilypondNameManager {
             throw("%:% % is not a valid contributionType."
                 .format(this.species, thisMethod.name, contributionType))
         };
-        manager = FoscLilypondFormatManager;
+        manager = FoscLilyPondFormatManager;
         result = [];
         this.prAttributeTuples.do { |attributeTuple|
             case

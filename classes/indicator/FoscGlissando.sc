@@ -68,7 +68,7 @@ FoscGlissando : Fosc {
         if (style.notNil) { assert(style.isString, receiver: this, method: thisMethod) };
         rightBroken = argRightBroken;
         //startCommand = "\\glissando";
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -308,7 +308,7 @@ FoscGlissando : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |leaf|
         var bundle, localTweaks, strings;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;
             bundle.after.spannerStarts.addAll(localTweaks);

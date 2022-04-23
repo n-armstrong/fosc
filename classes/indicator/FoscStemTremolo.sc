@@ -97,7 +97,7 @@ FoscStemTremolo : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         bundle.after.stemTremolos.add(this.prGetLilypondFormat);
         ^bundle;
     }

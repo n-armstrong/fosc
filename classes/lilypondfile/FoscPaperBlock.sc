@@ -4,8 +4,8 @@
 A LilyPond file paper block.
 
 a = FoscBlock(name: 'paper');
-a.leftMargin = FoscLilypondDimension(2, 'cm');
-a.rightMargin = FoscLilypondDimension(2, 'cm');
+a.leftMargin = FoscLilyPondDimension(2, 'cm');
+a.rightMargin = FoscLilyPondDimension(2, 'cm');
 a.format;
 
 \paper {

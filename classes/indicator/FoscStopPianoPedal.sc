@@ -25,7 +25,7 @@ FoscStopPianoPedal : Fosc {
     init { |argKind, argLeak, argTweaks|
         type = argKind;
         leak = argLeak;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -134,7 +134,7 @@ FoscStopPianoPedal : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, strings, localTweaks, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         strings = [];
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;

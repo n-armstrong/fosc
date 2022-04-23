@@ -64,7 +64,7 @@ FoscRehearsalMark : Fosc {
     init { |argNumber, argMarkup, argTweaks|
         number = argNumber;
         markup = argMarkup;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -124,7 +124,7 @@ FoscRehearsalMark : Fosc {
     copy {
         var new;
         new = this.species.new(this);
-        FoscLilypondTweakManager.setTweaks(new, tweaks.copy);
+        FoscLilyPondTweakManager.setTweaks(new, tweaks.copy);
         ^new;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ FoscRehearsalMark : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions(directed: false);
             bundle.opening.commands.addAll(localTweaks);

@@ -107,7 +107,7 @@ FoscStartTextSpan : Fosc {
         concatHspaceRight = argConcatHspaceRight;
         leftBrokenText = argLeftBrokenText;
         rightPadding = argRightPadding;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -203,7 +203,7 @@ FoscStartTextSpan : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prLeftBrokenTextTweak {
         var override, string;
-        override = FoscLilypondGrobOverride(
+        override = FoscLilyPondGrobOverride(
             grobName: "TextSpanner",
             propertyPath: #['bound-details', 'left-broken', 'text'],
             value: leftBrokenText
@@ -216,14 +216,14 @@ FoscStartTextSpan : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prLeftTextTweak {
         var markup, concatHspaceLeftMarkup, markupList, override, string;
-        if (leftText.isKindOf(FoscLilypondLiteral)) {
+        if (leftText.isKindOf(FoscLilyPondLiteral)) {
             markup = leftText;
         } {
             concatHspaceLeftMarkup = FoscMarkup.hspace(concatHspaceLeft);
             markupList = [leftText, concatHspaceLeftMarkup];
             markup = FoscMarkup.concat(markupList);
         }; 
-        override = FoscLilypondGrobOverride(
+        override = FoscLilyPondGrobOverride(
             grobName: "TextSpanner",
             propertyPath: #['bound-details', 'left', 'text'],
             value: markup
@@ -236,7 +236,7 @@ FoscStartTextSpan : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, string, localTweaks;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (style.notNil) {
             string = this.prStyleTweak(style);
             bundle.after.spannerStarts.add(string);
@@ -271,7 +271,7 @@ FoscStartTextSpan : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prRightPaddingTweak {
         var override, string;
-        override = FoscLilypondGrobOverride(
+        override = FoscLilyPondGrobOverride(
             grobName: "TextSpanner",
             propertyPath: #['bound-details', 'right', 'padding'],
             value: rightPadding
@@ -292,7 +292,7 @@ FoscStartTextSpan : Fosc {
         } {
             markup = rightText;
         };
-        override = FoscLilypondGrobOverride(
+        override = FoscLilyPondGrobOverride(
             grobName: "TextSpanner",
             propertyPath: #['bound-details', 'right', 'text'],
             value: markup

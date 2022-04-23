@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondFile
+• FoscLilyPondFile
 
 
 A Lilypond file.
@@ -8,14 +8,14 @@ A Lilypond file.
 • Example 1
 
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
-f = FoscLilypondFile(a);
+f = FoscLilyPondFile(a);
 f.show;
 
 
 • Example 2: Set proportional notation duration.
 
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
-f = FoscLilypondFile(a);
+f = FoscLilyPondFile(a);
 b = f.layoutBlock['Score'];
 if (b.isNil) {
     b = FoscContextBlock(sourceLilypondType: 'Score');
@@ -24,7 +24,7 @@ if (b.isNil) {
 set(b).proportionalNotationDuration = FoscSchemeMoment([1, 20]);
 f.show;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondFile : Fosc {
+FoscLilyPondFile : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,11 +61,11 @@ FoscLilypondFile : Fosc {
         if (includes.notEmpty) { includes = includes.collect { |each| each.asString } };
         staffSize = argStaffSize;
         lilypondLanguageToken = argLilypondLanguageToken;
-        lilypondLanguageToken = lilypondLanguageToken ?? { FoscLilypondLanguageToken() };
-        lilypondLanguageToken = FoscLilypondLanguageToken(lilypondLanguageToken);
+        lilypondLanguageToken = lilypondLanguageToken ?? { FoscLilyPondLanguageToken() };
+        lilypondLanguageToken = FoscLilyPondLanguageToken(lilypondLanguageToken);
         lilypondVersionToken = argLilypondVersionToken;
-        lilypondVersionToken = lilypondVersionToken ?? { FoscLilypondVersionToken() };
-        lilypondVersionToken = FoscLilypondVersionToken(lilypondVersionToken);
+        lilypondVersionToken = lilypondVersionToken ?? { FoscLilyPondVersionToken() };
+        lilypondVersionToken = FoscLilyPondVersionToken(lilypondVersionToken);
         useRelativeIncludes = argUseRelativeIncludes;
         isStylesheet = argIsStylesheet;
 
@@ -83,7 +83,7 @@ FoscLilypondFile : Fosc {
     
     Gets comments of Lilypond file.
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.comments;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ FoscLilypondFile : Fosc {
     
     Gets date-time token.
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.dateTimeToken;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ FoscLilypondFile : Fosc {
 
     Gets default paper size of Lilypond file. Set to pair or nil. Defaults to nil.
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.paperSize;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ FoscLilypondFile : Fosc {
 
     Gets global staff size of Lilypond file. Set to number or nil. Defaults to nil.
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.staffSize;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ FoscLilypondFile : Fosc {
 
     Returns block or nil.
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.headerBlock.name;
     -------------------------------------------------------------------------------------------------------- */
     // headerBlock {
@@ -131,7 +131,7 @@ FoscLilypondFile : Fosc {
 
     Gets includes of Lilypond file.
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.includes;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -139,7 +139,7 @@ FoscLilypondFile : Fosc {
 
     Gets items in Lilypond file.
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.items;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ FoscLilypondFile : Fosc {
     Returns block or nil.
 
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.layoutBlock.name;
     -------------------------------------------------------------------------------------------------------- */
     // layoutBlock {
@@ -164,7 +164,7 @@ FoscLilypondFile : Fosc {
 
     Gets Lilypond language token.
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.lilypondLanguageToken;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -172,7 +172,7 @@ FoscLilypondFile : Fosc {
 
     Gets Lilypond version token.
 
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.lilypondVersionToken;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -183,7 +183,7 @@ FoscLilypondFile : Fosc {
     Returns block or nil.
 
     
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.paperBlock.name;
     -------------------------------------------------------------------------------------------------------- */
     // paperBlock {
@@ -200,7 +200,7 @@ FoscLilypondFile : Fosc {
     Returns block or nil.
     
 
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.scoreBlock.name;
     -------------------------------------------------------------------------------------------------------- */
     // scoreBlock {
@@ -214,7 +214,7 @@ FoscLilypondFile : Fosc {
 
     Is true when Lilypond file should use relative includes.
 
-    a = FoscLilypondFile();
+    a = FoscLilyPondFile();
     a.useRelativeIncludes;
     -------------------------------------------------------------------------------------------------------- */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -270,7 +270,7 @@ FoscLilypondFile : Fosc {
     
     c = ["File construct as an example.", "Second comment."];
     i = ["external-settings-file-1.ly", "external-settings-file-2.ly"];
-    a = FoscLilypondFile(comments: c, includes: i, staffSize: 16);
+    a = FoscLilyPondFile(comments: c, includes: i, staffSize: 16);
     a.format;
     -------------------------------------------------------------------------------------------------------- */
     prGetFormatPieces { |tag|
@@ -312,7 +312,7 @@ FoscLilypondFile : Fosc {
     • prGetFormattedBlocks
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
-    f = FoscLilypondFile(a);
+    f = FoscLilyPondFile(a);
     f.prGetFormattedBlocks;
 
     a = FoscContext([FoscNote(60, 1/4)]);
@@ -352,7 +352,7 @@ FoscLilypondFile : Fosc {
    • prGetFormattedComments
 
     c = ["File construct as an example.", "A second comment on a new line."];
-    a = FoscLilypondFile(comments: c);
+    a = FoscLilyPondFile(comments: c);
     a.prGetFormattedComments;
     -------------------------------------------------------------------------------------------------------- */
     prGetFormattedComments {
@@ -377,7 +377,7 @@ FoscLilypondFile : Fosc {
         "external-settings-file-1.ly",
         "external-settings-file-2.ly"
     ];
-    a = FoscLilypondFile(includes: i);
+    a = FoscLilyPondFile(includes: i);
     a.prGetFormattedIncludes;
     -------------------------------------------------------------------------------------------------------- */
     prGetFormattedIncludes {
@@ -399,7 +399,7 @@ FoscLilypondFile : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • prGetFormattedSchemeSettings
 
-    a = FoscLilypondFile(paperSize: #['a5', 'portrait'], staffSize: 16);
+    a = FoscLilyPondFile(paperSize: #['a5', 'portrait'], staffSize: 16);
     a.paperSize;
     a.prGetFormattedSchemeSettings;
     -------------------------------------------------------------------------------------------------------- */

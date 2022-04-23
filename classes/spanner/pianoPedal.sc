@@ -49,7 +49,7 @@ a.show;
         stopLeaf = leaves.last;
         //!!! not in abjad
         if (startPianoPedal.tweaks.notNil) { tweaks = startPianoPedal.tweaks.addAll(tweaks) };
-        FoscLilypondTweakManager.setTweaks(startPianoPedal, tweaks);
+        FoscLilyPondTweakManager.setTweaks(startPianoPedal, tweaks);
         //!!!
         startLeaf.attach(startPianoPedal);
         stopLeaf.attach(stopPianoPedal);

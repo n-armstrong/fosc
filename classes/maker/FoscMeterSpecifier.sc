@@ -47,7 +47,7 @@ m = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true, rewriteRes
 FoscBeamSpecifier().(m);
 m = FoscMeterSpecifier(t).(m);
 m.do { |sel, i| sel.leafAt(0).attach(FoscTimeSignature(t[i])) };
-FoscLilypondFile.rhythm(m).show;
+FoscLilyPondFile.rhythm(m).show;
 
 
 • Example 5

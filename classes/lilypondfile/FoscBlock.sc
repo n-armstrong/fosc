@@ -6,8 +6,8 @@
 A LilyPond file block.
 
 a = FoscBlock(name: 'paper');
-a.leftMargin = FoscLilypondDimension(2, 'cm');
-a.rightMargin = FoscLilypondDimension(2, 'cm');
+a.leftMargin = FoscLilyPondDimension(2, 'cm');
+a.rightMargin = FoscLilyPondDimension(2, 'cm');
 a.format;
 
 
@@ -95,7 +95,7 @@ FoscBlock : Fosc {
     // abjad 3.0
     prFormatItem { |item, depth=1|
         var indent, result, string, pieces;
-        indent = FoscLilypondFormatManager.indent.ditto(depth);
+        indent = FoscLilyPondFormatManager.indent.ditto(depth);
         result = [];
         case
         { item.isSequenceableCollection && { item.isString.not } } {
@@ -125,7 +125,7 @@ FoscBlock : Fosc {
     prGetFormatPieces { |tag|
         var indent, result, string, prototype, formattedAttributes, formattedContextBlocks;
         
-        indent = FoscLilypondFormatManager.indent;
+        indent = FoscLilyPondFormatManager.indent;
         result = [];
         
         if (
@@ -179,7 +179,7 @@ FoscBlock : Fosc {
                 result = result.add(each.format('lilypond'));
             };
         };
-        prototype = [FoscLilypondDimension, FoscScheme];
+        prototype = [FoscLilyPondDimension, FoscScheme];
         //!!!TODO
         // for key in self._public_attribute_names:
         //     assert not key.startswith('_'), repr(key)
@@ -218,23 +218,23 @@ FoscBlock : Fosc {
     // WORKING   
     a = FoscBlock("score");
     a.title = FoscMarkup("Mass in C Minor");
-    a.leftMargin = FoscLilypondDimension(2, 'cm');
+    a.leftMargin = FoscLilyPondDimension(2, 'cm');
     a.maxSystemsPerPage = 1;
     a.raggedBottom = false;
     a.format;
 
     // BROKEN
     a = FoscBlock("score");
-    a.accidentalStyle = FoscLilypondLiteral("modern-cautionary");
+    a.accidentalStyle = FoscLilyPondLiteral("modern-cautionary");
     a.override.metronomeMark.xOffset = -2.2;
     override(a).proportionalNotationDuration_(FoscSchemeMoment(1, 28));
     a.format;
 
     abj: set_(score).proportional_notation_duration = schemetools.SchemeMoment(1, 16)
 
-    a.items.add(FoscLilypondLiteral("\\accidentalStyle modern-cautionary"));
-    a.items.add(FoscLilypondLiteral("\\override MetronomeMark.X-offset = -2.2"));
-    a.items.add(FoscLilypondLiteral("\\proportionalNotationDuration = #(ly:make-moment 1 28)")); //!!! NO
+    a.items.add(FoscLilyPondLiteral("\\accidentalStyle modern-cautionary"));
+    a.items.add(FoscLilyPondLiteral("\\override MetronomeMark.X-offset = -2.2"));
+    a.items.add(FoscLilyPondLiteral("\\proportionalNotationDuration = #(ly:make-moment 1 28)")); //!!! NO
 
     // SHOULD PRODUCE:
     \accidentalStyle modern-cautionary // abj: a.items.append(LilyPondCommand('accidentalStyle modern-cautionary'))

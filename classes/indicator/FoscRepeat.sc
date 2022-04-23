@@ -118,7 +118,7 @@ FoscRepeat : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         bundle.before.commands.add(this.prGetLilypondFormat);
         ^bundle;
     }

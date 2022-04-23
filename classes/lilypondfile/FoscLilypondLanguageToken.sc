@@ -1,12 +1,12 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondLanguageToken
+• FoscLilyPondLanguageToken
 
 A LilyPond file \language token.
 
-a = FoscLilypondLanguageToken();
+a = FoscLilyPondLanguageToken();
 a.format;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondLanguageToken : Fosc {
+FoscLilyPondLanguageToken : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ FoscLilypondLanguageToken : Fosc {
             return systemtools.StorageFormatAgent(self).get_storage_format()
         return str(self)
     
-    a = FoscLilypondLanguageToken();
+    a = FoscLilyPondLanguageToken();
     a.format;
     -------------------------------------------------------------------------------------------------------- */
     format {
@@ -44,7 +44,7 @@ FoscLilypondLanguageToken : Fosc {
     def __repr__(self):
         return '{}()'.format(type(self).__name__)
 
-    a = FoscLilypondLanguageToken();
+    a = FoscLilyPondLanguageToken();
     a.asCompileString;
     -------------------------------------------------------------------------------------------------------- */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

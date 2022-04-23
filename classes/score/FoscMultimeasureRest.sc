@@ -18,10 +18,10 @@ a.show;
 
 • Example 3
 
-Use a FoscLilypondLiteral to compress full-bar rests;
+Use a FoscLilyPondLiteral to compress full-bar rests;
 
 a = FoscStaff([FoscMultimeasureRest(4/4, multiplier: 4)]);
-a.leafAt(0).attach(FoscLilypondLiteral("\\compressFullBarRests"));
+a.leafAt(0).attach(FoscLilyPondLiteral("\\compressFullBarRests"));
 a.show;
 --------------------------------------------------------------------------------------------------------- */
 FoscMultimeasureRest : FoscLeaf {

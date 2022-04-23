@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondTweakManager (abjad 3.0)
+• FoscLilyPondTweakManager (abjad 3.0)
 
 LilyPond tweak manager.
 
@@ -71,12 +71,12 @@ a.consistsCommands.add('Horizontal_bracket_engraver');
 b = FoscHorizontalBracketSpanner();
 a[0..].attach(b);
 // override(b).staffPadding = 4;
-c = FoscLilypondTweakManager();
+c = FoscLilyPondTweakManager();
 c.setTweaks(b, #[['color', 'red']]);
 a.show;
 a.format;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondTweakManager : FoscLilypondNameManager {
+FoscLilyPondTweakManager : FoscLilyPondNameManager {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ FoscLilypondTweakManager : FoscLilypondNameManager {
         var result, grob, grobProxy, pairs, attribute, triple;
         result = [];
         vars.keysValuesDo { |name, value|
-            if (value.isMemberOf(FoscLilypondNameManager)) {
+            if (value.isMemberOf(FoscLilyPondNameManager)) {
                 grob = name;
                 grobProxy = value;
                 pairs.do { |pair|
@@ -137,7 +137,7 @@ FoscLilypondTweakManager : FoscLilypondNameManager {
                 throw("%:%: invalid attribute tuple: %."
                     .format(this.species, thisMethod.name, attributeTuple));
             };
-            string = FoscLilypondFormatManager.makeLilypondTweakString(attribute, value, directed, grob);
+            string = FoscLilyPondFormatManager.makeLilypondTweakString(attribute, value, directed, grob);
             result = result.add(string);
         };
         result = result.sort;
@@ -151,12 +151,12 @@ FoscLilypondTweakManager : FoscLilypondNameManager {
 
     Sets 'tweaks' on 'object'.
 
-    l = FoscLilypondLiteral("\\f", 'after', directed: true);
-    FoscLilypondTweakManager.setTweaks(l, #[['color', 'blue']]);
+    l = FoscLilyPondLiteral("\\f", 'after', directed: true);
+    FoscLilyPondTweakManager.setTweaks(l, #[['color', 'blue']]);
     l.tweaks.prListFormatContributions;
 
-    l = FoscLilypondLiteral("\\f", 'after', directed: true);
-    FoscLilypondTweakManager.setTweaks(l, #['color', 'blue', size, 12]);
+    l = FoscLilyPondLiteral("\\f", 'after', directed: true);
+    FoscLilyPondTweakManager.setTweaks(l, #['color', 'blue', size, 12]);
     l.tweaks.prListFormatContributions;    
     -------------------------------------------------------------------------------------------------------- */
     // abjad 3.0
@@ -168,7 +168,7 @@ FoscLilypondTweakManager : FoscLilypondNameManager {
         if (tweaks.isNil) {
             ^nil;
         };
-        if (tweaks.isKindOf(FoscLilypondTweakManager)) {
+        if (tweaks.isKindOf(FoscLilyPondTweakManager)) {
             tweaks = tweaks.prAttributeTuples;
         };
         if (tweaks.isSequenceableCollection.not) {
@@ -177,11 +177,11 @@ FoscLilypondTweakManager : FoscLilypondNameManager {
         };
         //!!!TODO: deprecate
         // if (object.tweaks.isNil) {
-        //     object.prTweaks_(FoscLilypondTweakManager());
+        //     object.prTweaks_(FoscLilyPondTweakManager());
         // };
         //!!!TODO: assert all(isinstance(_, tuple) for _ in tweaks), repr(tweaks)
         if (object.tweaks.isNil) {
-            object.instVarPut('tweaks', FoscLilypondTweakManager());
+            object.instVarPut('tweaks', FoscLilyPondTweakManager());
         };
         manager = object.tweaks;
         if (tweaks.rank == 1) { tweaks = tweaks.clump(2) }; // allow array of key/value pairs

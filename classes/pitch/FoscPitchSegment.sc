@@ -2,7 +2,7 @@
 • FoscPitchSegment
 
 !!! TODO: lilypond chord notation
-!!! TODO: file.layoutBlock.items.add(FoscLilypondLiteral("\\accidentalStyle dodecaphonic"));
+!!! TODO: file.layoutBlock.items.add(FoscLilyPondLiteral("\\accidentalStyle dodecaphonic"));
 !!! TODO: 'clumps' (or 'groupBySizes(sizes, annotate: true)')
 !!! TODO: 'prAnnotatePartitions('horizontalBracket'/'slur'/'beam')'
 !!! TODO: basic combinatorial methods: permutations, combinations, compositions, partitions, cartesianProduct

@@ -73,7 +73,7 @@ FoscFermata : Fosc {
     }
     init { |argCommand, argTweaks|
         command = argCommand;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -142,7 +142,7 @@ FoscFermata : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;
             bundle.after.articulations.addAll(localTweaks);

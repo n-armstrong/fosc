@@ -76,7 +76,7 @@ FoscContext : FoscContainer {
      • prFormatClosingSlot
  	
     a = FoscVoice([FoscNote(60, 1/4)]);
-    b = FoscLilypondFormatManager.bundleFormatContributions(a);
+    b = FoscLilyPondFormatManager.bundleFormatContributions(a);
     a.prFormatClosingSlot(b);
     -------------------------------------------------------------------------------------------------------- */
 	prFormatClosingSlot { |bundle|
@@ -135,7 +135,7 @@ FoscContext : FoscContainer {
         var indent, result, bracketsOpen, removeCommands, consistsCommands, overrides, settings;
         var contribution, contributions, identifierPair;
         
-        indent = FoscLilypondFormatManager.indent;
+        indent = FoscLilyPondFormatManager.indent;
         result = [];
         bracketsOpen = if (this.isSimultaneous) { #["<<"] } { #["{"] };
         removeCommands = this.prFormatRemoveCommands;
@@ -288,7 +288,7 @@ FoscContext : FoscContainer {
 
     Gets LilyPondContext associated with context.
     
-    Returns FoscLilypondContext instance.
+    Returns FoscLilyPondContext instance.
     
     a = FoscStaff([]);
     a.lilypondContext.name;
@@ -297,9 +297,9 @@ FoscContext : FoscContainer {
         var lilypondContext;
         
         try {
-            lilypondContext = FoscLilypondContext(lilypondType);
+            lilypondContext = FoscLilyPondContext(lilypondType);
         } {
-            lilypondContext = FoscLilypondContext(this.defaultlilypondType);
+            lilypondContext = FoscLilyPondContext(this.defaultlilypondType);
         };
         
         ^lilypondContext;

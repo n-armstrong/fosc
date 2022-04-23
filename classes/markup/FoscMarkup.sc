@@ -105,7 +105,7 @@ FoscMarkup : Fosc {
         contents = argContents;
         direction = argDirection;
         literal = argLiteral;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -222,7 +222,7 @@ FoscMarkup : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     illustrate {
     	var lilypondFile, markup;
-        lilypondFile = FoscLilypondFile();
+        lilypondFile = FoscLilyPondFile();
         lilypondFile.headerBlock.tagline = false;
         markup = this.species.new(this);
         lilypondFile.items.add(markup.format);
@@ -288,7 +288,7 @@ FoscMarkup : Fosc {
         
         if (tweaks.notNil) { localTweaks = tweaks.prListFormatContributions };
         
-        indent = FoscLilypondFormatManager.indent;
+        indent = FoscLilyPondFormatManager.indent;
         
         if (direction.notNil) { localDirection = direction.asSymbol.toTridirectionalLilypondSymbol };
         

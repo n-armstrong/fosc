@@ -1,12 +1,12 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondContextSetting (abjad 3.0)
+• FoscLilyPondContextSetting (abjad 3.0)
 
 LilyPond context setting.
 
 
 • Example 1
 
-a = FoscLilypondContextSetting('Score', 'autoBeaming', value: true);
+a = FoscLilyPondContextSetting('Score', 'autoBeaming', value: true);
 a.formatPieces.join("\n");
 
 
@@ -20,7 +20,7 @@ a.show;
 
 z.prAttributeTuples;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondContextSetting : Fosc {
+FoscLilyPondContextSetting : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ FoscLilypondContextSetting : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle {
         var bundle, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         string = this.formatPieces.join("\n");
         bundle.contextSettings.add(string);
         ^bundle;

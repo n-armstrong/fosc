@@ -80,7 +80,7 @@ FoscBarLine : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle {
         var bundle;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         bundle.after.commands.add(this.prGetLilypondFormat);
         ^bundle;
     }

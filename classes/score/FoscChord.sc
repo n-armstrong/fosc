@@ -196,7 +196,7 @@ FoscChord : FoscLeaf {
         var indent, result, currentFormat, formatList;
         var reAttackDuration, durationString, duratedPitches, duratedPitch, tremolo;
         
-        indent = FoscLilypondFormatManager.indent;
+        indent = FoscLilyPondFormatManager.indent;
         result = [];
         
         case

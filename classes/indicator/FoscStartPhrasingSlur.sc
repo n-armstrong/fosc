@@ -13,7 +13,7 @@ FoscStartPhrasingSlur : Fosc {
     }
     init { |argDirection, argTweaks|
         direction = argDirection;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -151,7 +151,7 @@ FoscStartPhrasingSlur : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;
             bundle.after.spannerStarts.addAll(localTweaks);

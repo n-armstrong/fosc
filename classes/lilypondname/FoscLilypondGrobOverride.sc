@@ -1,9 +1,9 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondGrobOverride (abjad 3.0)
+• FoscLilyPondGrobOverride (abjad 3.0)
 
 LilyPond grob override.
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondGrobOverride : Fosc {
+FoscLilyPondGrobOverride : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride(grobName: 'Glissando');
+    a = FoscLilyPondGrobOverride(grobName: 'Glissando');
     a.grobName;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -50,13 +50,13 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride("Staff", "NoteHead", isOnce: true);
+    a = FoscLilyPondGrobOverride("Staff", "NoteHead", isOnce: true);
     a.isOnce;
 
 
     • Example 2
 
-    a = FoscLilypondGrobOverride(grobName: 'Glissando', isOnce: false);
+    a = FoscLilyPondGrobOverride(grobName: 'Glissando', isOnce: false);
     a.isOnce;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -69,13 +69,13 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride("Staff", "NoteHead", isRevert: true);
+    a = FoscLilyPondGrobOverride("Staff", "NoteHead", isRevert: true);
     a.isRevert;
 
 
     • Example 2
 
-    a = FoscLilypondGrobOverride(grobName: 'Glissando', isRevert: false);
+    a = FoscLilyPondGrobOverride(grobName: 'Glissando', isRevert: false);
     a.isRevert;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -88,13 +88,13 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride("Staff", "NoteHead", true, false, 'color', 'red');
+    a = FoscLilyPondGrobOverride("Staff", "NoteHead", true, false, 'color', 'red');
     a.lilypondType;
 
 
     • Example 2
 
-    a = FoscLilypondGrobOverride(grobName: 'Glissando');
+    a = FoscLilyPondGrobOverride(grobName: 'Glissando');
     a.lilypondType == nil;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride(
+    a = FoscLilyPondGrobOverride(
         lilypondType: "Staff",
         grobName: "TextSpanner",
         isOnce: true,
@@ -140,7 +140,7 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride(
+    a = FoscLilyPondGrobOverride(
         grobName: "Glissando",
         propertyPath: 'style',
         value: FoscSchemeSymbol('zigzag')
@@ -160,7 +160,7 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride(
+    a = FoscLilyPondGrobOverride(
         lilypondType: "Staff",
         grobName: "TextSpanner",
         isOnce: true,
@@ -179,7 +179,7 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride(
+    a = FoscLilyPondGrobOverride(
         grobName: "Glissando",
         propertyPath: 'style',
         value: FoscSchemeSymbol('zigzag')
@@ -201,7 +201,7 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride(
+    a = FoscLilyPondGrobOverride(
         grobName: "Glissando",
         propertyPath: 'style',
         value: FoscSchemeSymbol('zigzag')
@@ -221,7 +221,7 @@ FoscLilypondGrobOverride : Fosc {
     
     • Example 1
 
-    a = FoscLilypondGrobOverride(
+    a = FoscLilyPondGrobOverride(
         lilypondType: "Staff",
         grobName: "TextSpanner",
         isOnce: true,
@@ -239,7 +239,7 @@ FoscLilypondGrobOverride : Fosc {
 
     • Example 1
 
-    a = FoscLilypondGrobOverride(
+    a = FoscLilyPondGrobOverride(
         grobName: "Glissando",
         propertyPath: 'style',
         value: FoscSchemeSymbol('zigzag')
@@ -249,7 +249,7 @@ FoscLilypondGrobOverride : Fosc {
 
     • Example 2
 
-    a = FoscLilypondGrobOverride(
+    a = FoscLilyPondGrobOverride(
         grobName: "RehearsalMark",
         propertyPath: 'color',
         value: 'red'
@@ -261,10 +261,10 @@ FoscLilypondGrobOverride : Fosc {
 
     Lilypond literals are allowed.
 
-    a = FoscLilypondGrobOverride(
+    a = FoscLilyPondGrobOverride(
         grobName: "TextSpan",
         propertyPath: #['bound-details', 'left-broken', 'text'],
-        value: FoscLilypondLiteral("\\markup \\upright pont.")
+        value: FoscLilyPondLiteral("\\markup \\upright pont.")
     );
     a.tweakString;
     -------------------------------------------------------------------------------------------------------- */
@@ -282,7 +282,7 @@ FoscLilypondGrobOverride : Fosc {
         string = propertyPath.join(".");
         result = result.add(string);
         
-        if (value.isKindOf(FoscLilypondLiteral)) {
+        if (value.isKindOf(FoscLilyPondLiteral)) {
             value.name.class.postln;
             assert(
                 [String, Symbol].any { |type| value.name.isKindOf(type) },
@@ -304,20 +304,20 @@ FoscLilypondGrobOverride : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • ==
 
-    Is true when 'object' is a FoscLilypondGrobOverride with equivalent instance variable values.
+    Is true when 'object' is a FoscLilyPondGrobOverride with equivalent instance variable values.
     
 
     • Example 1
 
-    a = FoscLilypondGrobOverride("Staff", "NoteHead", true, false, 'color', 'red');
-    b = FoscLilypondGrobOverride("Staff", "NoteHead", true, false, 'color', 'red');
+    a = FoscLilyPondGrobOverride("Staff", "NoteHead", true, false, 'color', 'red');
+    b = FoscLilyPondGrobOverride("Staff", "NoteHead", true, false, 'color', 'red');
     a == b;
 
 
     • Example 2
 
-    a = FoscLilypondGrobOverride("Staff", "NoteHead", true, false, 'color', 'red');
-    b = FoscLilypondGrobOverride("Voice", "NoteHead", true, false, 'color', 'red');
+    a = FoscLilyPondGrobOverride("Staff", "NoteHead", true, false, 'color', 'red');
+    b = FoscLilyPondGrobOverride("Voice", "NoteHead", true, false, 'color', 'red');
     a == b;
     -------------------------------------------------------------------------------------------------------- */
     == { |object|
@@ -333,7 +333,7 @@ FoscLilypondGrobOverride : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, revertFormat, overrideFormat;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (isOnce.not) {
             revertFormat = this.revertFormatPieces.join("\n");
             bundle.grobReverts.add(revertFormat);

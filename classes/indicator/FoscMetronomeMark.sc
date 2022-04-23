@@ -297,7 +297,7 @@ FoscMetronomeMark : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle {
         var bundle;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (hide.not) {
             bundle.before.commands.add(this.prGetLilypondFormat);
         };

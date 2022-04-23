@@ -46,7 +46,7 @@ FoscBendAfter : Fosc {
     }
     init { |argBendAmount, argTweaks|
         bendAmount = argBendAmount.asFloat;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -105,7 +105,7 @@ FoscBendAfter : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;
             bundle.after.articulations.addAll(localTweaks);

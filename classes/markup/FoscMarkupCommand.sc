@@ -120,7 +120,7 @@ FoscMarkupCommand : Fosc {
             };
             result.collect { |each| "%%".format(indent, each) };
         };
-        indent = FoscLilypondFormatManager.indent;
+        indent = FoscLilyPondFormatManager.indent;
         parts = ["\\" ++ "%".format(command)];
         parts = parts.addAll(recurse.(args));
         ^parts;

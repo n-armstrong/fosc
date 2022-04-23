@@ -129,7 +129,7 @@ FoscOttava : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         //!!! tweaks not in abjad
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;

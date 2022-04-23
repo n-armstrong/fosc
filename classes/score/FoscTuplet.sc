@@ -44,7 +44,7 @@ FoscTuplet : FoscContainer {
         denominator = argDenominator;
         forceFraction = argForceFraction;
         isHidden = argHide;
-        FoscLilypondTweakManager.setTweaks(this, tweaks);
+        FoscLilyPondTweakManager.setTweaks(this, tweaks);
     }
     /* --------------------------------------------------------------------------------------------------------
     • *newFromDuration

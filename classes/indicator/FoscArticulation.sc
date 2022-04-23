@@ -134,7 +134,7 @@ FoscArticulation : Fosc {
         name = argName;
         direction = argDirection;
         formatSlot = 'after';
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
@@ -159,7 +159,7 @@ FoscArticulation : Fosc {
         note = FoscNote(60, 1/4);
         articulation = this.copy;
         note.attach(articulation);
-        lilypondFile = FoscLilypondFile(note);
+        lilypondFile = FoscLilyPondFile(note);
         ^lilypondFile;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ FoscArticulation : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;
             bundle.after.articulations.addAll(localTweaks);

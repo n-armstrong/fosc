@@ -115,7 +115,7 @@ FoscStaffChange : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle {
         var bundle;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         bundle.opening.commands.add(this.prGetLilypondFormat);
         ^bundle;
     }

@@ -16,7 +16,7 @@ FoscRepeatTie : Fosc {
     init { |argDirection, argLeftBroken, tweaks|
         direction = argDirection;
         leftBroken = argLeftBroken;
-        FoscLilypondTweakManager.setTweaks(this, tweaks);
+        FoscLilyPondTweakManager.setTweaks(this, tweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -96,7 +96,7 @@ FoscRepeatTie : Fosc {
     //     //     deactivate=True,
     //     //     tag=abjad_tags.SHOW_TO_JOIN_BROKEN_SPANNERS,
     //     //     )  
-    //     ^FoscLilypondFormatManager.tag(
+    //     ^FoscLilyPondFormatManager.tag(
     //         strings,
     //         deactivate: true,
     //         tag: 'SHOW_TO_JOIN_BROKEN_SPANNERS'
@@ -125,7 +125,7 @@ FoscRepeatTie : Fosc {
         // bundle.after.spanners.extend(strings)
         // return bundle
         var bundle, strings, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             strings = tweaks.prListFormatContributions;
             if (leftBroken) { strings = FoscRepeatTie.prTagShow(strings) };

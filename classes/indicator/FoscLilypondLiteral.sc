@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondLiteral (abjad 3.0)
+• FoscLilyPondLiteral (abjad 3.0)
 
 LilyPond literal.
 
@@ -11,7 +11,7 @@ Dotted slur.
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/8]));
 m = FoscSlur();
 a[0..].attach(m);
-l = FoscLilypondLiteral("\\slurDotted");
+l = FoscLilyPondLiteral("\\slurDotted");
 a[0].attach(l);
 a.show;
 
@@ -21,9 +21,9 @@ a.show;
 Use the absolute before and absolute after format slots like this.
 
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/8]));
-l = FoscLilypondLiteral("% before all formatting", formatSlot: 'absoluteBefore');
+l = FoscLilyPondLiteral("% before all formatting", formatSlot: 'absoluteBefore');
 a[0].attach(l);
-l = FoscLilypondLiteral("% after all formatting", formatSlot: 'absoluteAfter');
+l = FoscLilyPondLiteral("% after all formatting", formatSlot: 'absoluteAfter');
 a[3].attach(l);
 a.format;
 
@@ -35,7 +35,7 @@ Lilypond literas can be tagged.
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/8]));
 m = FoscSlur();
 a[0..].attach(m);
-l = FoscLilypondLiteral("\\slurDotted");
+l = FoscLilyPondLiteral("\\slurDotted");
 a[0].attach(l);
 a.format;
 
@@ -45,7 +45,7 @@ a.format;
 Multi-line input is allowed.
 
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/8]));
-l = FoscLilypondLiteral(#[
+l = FoscLilyPondLiteral(#[
     "\\stopStaff",
     "\\startStaff",
     "\\once \\override Staff.StaffSymbol.transparent = ##t"
@@ -53,7 +53,7 @@ l = FoscLilypondLiteral(#[
 a[2].attach(l);
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondLiteral : Fosc {
+FoscLilyPondLiteral : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,15 +74,15 @@ FoscLilypondLiteral : Fosc {
     *new { |string, formatSlot='opening', directed, tweaks|
         assert(
             [Symbol, String, SequenceableCollection].any { |type| string.isKindOf(type) },
-            "FoscLilypondLiteral:new: string is not valid: %.".format(string);
+            "FoscLilyPondLiteral:new: string is not valid: %.".format(string);
         );
         assert(
             allowableFormatSlots.includes(formatSlot),
-            "FoscLilypondLiteral:new: format slot is not valid: %.".format(formatSlot);
+            "FoscLilyPondLiteral:new: format slot is not valid: %.".format(formatSlot);
         );
         assert(
-            [FoscLilypondTweakManager, SequenceableCollection, Nil].any { |type| tweaks.isKindOf(type) },
-            "FoscLilypondLiteral:new: tweaks must be a FoscLilypondTweakManager or Array: %.".format(tweaks);
+            [FoscLilyPondTweakManager, SequenceableCollection, Nil].any { |type| tweaks.isKindOf(type) },
+            "FoscLilyPondLiteral:new: tweaks must be a FoscLilyPondTweakManager or Array: %.".format(tweaks);
         );
         ^super.new.init(string, formatSlot, directed, tweaks);
     }
@@ -90,7 +90,7 @@ FoscLilypondLiteral : Fosc {
         string = argObject;
         formatSlot = argFormatSlot;
         directed = argDirected;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC CLASS METHODS
@@ -100,7 +100,7 @@ FoscLilypondLiteral : Fosc {
 
     Lists allowable format slots.
     
-    FoscLilypondLiteral.allowableFormatSlots;
+    FoscLilyPondLiteral.allowableFormatSlots;
     -------------------------------------------------------------------------------------------------------- */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -115,7 +115,7 @@ FoscLilypondLiteral : Fosc {
 
     Directed literal.
 
-    l = FoscLilypondLiteral("\\f", 'after', directed: true);
+    l = FoscLilyPondLiteral("\\f", 'after', directed: true);
     l.directed;
 
 
@@ -123,7 +123,7 @@ FoscLilypondLiteral : Fosc {
 
     Nondirected literal.
 
-    l = FoscLilypondLiteral("\\breathe", 'after', directed: false);
+    l = FoscLilyPondLiteral("\\breathe", 'after', directed: false);
     l.directed;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ FoscLilypondLiteral : Fosc {
     
     • Example 1
     
-    a = FoscLilypondLiteral(\slurDotted);
+    a = FoscLilyPondLiteral(\slurDotted);
     a.formatSlot;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ FoscLilypondLiteral : Fosc {
 
     • Example 1
 
-    l = FoscLilypondLiteral("\\slurDotted");
+    l = FoscLilyPondLiteral("\\slurDotted");
     l.string;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ FoscLilypondLiteral : Fosc {
     • Example 1
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
-    l = FoscLilypondLiteral("\\f", 'after', directed: true, tweaks: #[['color', 'red']]);
+    l = FoscLilyPondLiteral("\\f", 'after', directed: true, tweaks: #[['color', 'red']]);
     a[0].attach(l);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
@@ -190,7 +190,7 @@ FoscLilypondLiteral : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle {
         var bundle, formatSlot, localTweaks, pieces;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         formatSlot = bundle.perform(this.formatSlot);
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions(directed: directed);

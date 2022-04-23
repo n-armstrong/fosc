@@ -65,7 +65,7 @@ FoscStopTextSpan : Fosc {
         //     bundle.after.spanner_stops.append(string)
         // return bundle
         var bundle, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         string = command;
         if (leak) {
             string = "<> %".format(string);

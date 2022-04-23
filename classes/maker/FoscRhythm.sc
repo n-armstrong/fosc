@@ -119,7 +119,7 @@ FoscRhythm : FoscTreeContainer {
         selection = this.value.copy;
         selections = selection.leaves.groupBy { |a, b| a.parent != b.parent };
         selections.do { |each| each.beam(beamRests: false) };
-        ^FoscLilypondFile.rhythm([selection]);
+        ^FoscLilyPondFile.rhythm([selection]);
     }
     /* --------------------------------------------------------------------------------------------------------
     • inspect

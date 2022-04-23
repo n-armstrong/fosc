@@ -386,7 +386,7 @@ FoscPitch : Fosc {
         note = FoscNote(this, 1/4);
         if (this < 55) { note.attach(FoscClef('bass')) };
         includes = "%/noteheads.ily".format(Fosc.stylesheetDirectory);
-        lilypondFile = FoscLilypondFile([note], includes: [includes]);
+        lilypondFile = FoscLilyPondFile([note], includes: [includes]);
         
         ^lilypondFile;
     }

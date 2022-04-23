@@ -702,7 +702,7 @@ FoscContainer : FoscComponent {
     prFormatContentPieces {
         var indent, result;
         
-        indent = FoscLilypondFormatManager.indent;
+        indent = FoscLilyPondFormatManager.indent;
         result = [];
         
         components.do { |component|
@@ -756,7 +756,7 @@ FoscContainer : FoscComponent {
     prFormatSlotContributionsWithIndent { |slot|
         var indent, result, contributor, contributions;
         
-        indent = FoscLilypondFormatManager.indent;
+        indent = FoscLilyPondFormatManager.indent;
         result = [];
         
         slot.do { |each|

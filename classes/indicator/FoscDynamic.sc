@@ -47,8 +47,8 @@ Simultaneous dynamics in a single staff.
 
 a = FoscVoice(FoscLeafMaker().(#[62,67,64,69], 1/8));
 b = FoscVoice([FoscNote(60, 2/4)]);
-a[0].attach(FoscLilypondLiteral("\\voiceOne"));
-b[0].attach(FoscLilypondLiteral("\\voiceTwo"));
+a[0].attach(FoscLilyPondLiteral("\\voiceOne"));
+b[0].attach(FoscLilyPondLiteral("\\voiceTwo"));
 a[0].attach(FoscDynamic('f'));
 override(a).dynamicLineSpanner.direction = 'up';
 b[0].attach(FoscDynamic('p'));
@@ -239,7 +239,7 @@ FoscDynamic : Fosc {
         nameIsTextual = argNameIsTextual;
         ordinal = argOrdinal;
         sforzando = argSforzando;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -622,7 +622,7 @@ FoscDynamic : Fosc {
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks, string;
         
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;

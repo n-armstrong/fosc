@@ -124,7 +124,7 @@ FoscStopTrillSpan : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         string = "\\stopTrillSpan";
         // if (rightBroken) {
         //     string = this.prTagHide([string])[0];

@@ -1,14 +1,14 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondDimension
+• FoscLilyPondDimension
 
 A LilyPond file \paper block dimension.
 
 Use for LilyPond file \paper block attributes.
 
-a = FoscLilypondDimension(2, 'in');
+a = FoscLilyPondDimension(2, 'in');
 a.format;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondDimension : Fosc {
+FoscLilyPondDimension : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ FoscLilypondDimension : Fosc {
             return systemtools.StorageFormatAgent(self).get_storage_format()
         return str(self)
     
-    a = FoscLilypondDimension(2, 'in');
+    a = FoscLilyPondDimension(2, 'in');
     a.format;
     -------------------------------------------------------------------------------------------------------- */
     format {
@@ -99,7 +99,7 @@ FoscLilypondDimension : Fosc {
     def unit(self):
         return self._unit
     
-    a = FoscLilypondDimension(2, 'in');
+    a = FoscLilyPondDimension(2, 'in');
     a.unit;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ FoscLilypondDimension : Fosc {
     def value(self):
         return self._value
     
-    a = FoscLilypondDimension(2, "in");
+    a = FoscLilyPondDimension(2, "in");
     a.value;
     -------------------------------------------------------------------------------------------------------- */
 }

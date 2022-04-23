@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondComment (abjad 3.0)
+• FoscLilyPondComment (abjad 3.0)
 
 LilyPond comment.
 
@@ -7,11 +7,11 @@ LilyPond comment.
 • Example 1
 
 a = FoscNote(60, 1/4);
-m = FoscLilypondComment("a comment");
+m = FoscLilyPondComment("a comment");
 a.attach(m);
 a.format;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondComment : Fosc {
+FoscLilyPondComment : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@ FoscLilypondComment : Fosc {
         allowableFormatSlots = #['after', 'before', 'closing', 'opening'];
     }
     *new { |string, formatSlot='before'|
-        if (string.isKindOf(FoscLilypondComment)) {
+        if (string.isKindOf(FoscLilyPondComment)) {
             string = string.contentsString;
             formatSlot = string.contentsString;
         } {
@@ -52,7 +52,7 @@ FoscLilypondComment : Fosc {
 
     • Example 1
 
-    m = FoscLilypondComment("a comment");
+    m = FoscLilyPondComment("a comment");
     m.formatSlot;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ FoscLilypondComment : Fosc {
 
     • Example 1
 
-    m = FoscLilypondComment("a comment");
+    m = FoscLilyPondComment("a comment");
     m.string;
     -------------------------------------------------------------------------------------------------------- */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ FoscLilypondComment : Fosc {
 
     • Example 1
 
-    m = FoscLilypondComment("a comment");
+    m = FoscLilyPondComment("a comment");
     m.str;
     -------------------------------------------------------------------------------------------------------- */
     str {
@@ -97,7 +97,7 @@ FoscLilypondComment : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, formatSlot;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         formatSlot = bundle.perform(this.formatSlot);
         formatSlot.comments.add(this.prGetLilypondFormat);
         ^bundle;  

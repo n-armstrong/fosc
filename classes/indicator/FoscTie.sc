@@ -15,7 +15,7 @@ FoscTie : Fosc {
     initFoscTie { |argDirection, argRightBroken, argTweaks|
         direction = argDirection;
         rightBroken = argRightBroken;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -158,7 +158,7 @@ FoscTie : Fosc {
     prGetLilypondFormatBundle { |component|
         var bundle, strings, string;
         strings = [];
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             strings = tweaks.prListFormatContributions;
             //!!!TODO if (rightBroken) { strings = this.prTagShow(strings) };

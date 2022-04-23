@@ -1,20 +1,20 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondVersionToken
+• FoscLilyPondVersionToken
 
 A LilyPond file \version token.
 
 
-FoscLilypondVersionToken('2.19.0').format;
+FoscLilyPondVersionToken('2.19.0').format;
 
-FoscLilypondVersionToken().format;
+FoscLilyPondVersionToken().format;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondVersionToken : Fosc {
+FoscLilyPondVersionToken : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     var <versionString;
     *new { |versionString|
-        if (versionString.isKindOf(FoscLilypondVersionToken)) {
+        if (versionString.isKindOf(FoscLilyPondVersionToken)) {
             versionString = versionString.versionString;
         };
         ^super.new.init(versionString);
@@ -42,8 +42,8 @@ FoscLilypondVersionToken : Fosc {
             return systemtools.StorageFormatAgent(self).get_storage_format()
         return str(self)
 
-    FoscLilypondVersionToken('2.19.0').format;
-    FoscLilypondVersionToken().format;
+    FoscLilyPondVersionToken('2.19.0').format;
+    FoscLilyPondVersionToken().format;
     -------------------------------------------------------------------------------------------------------- */
     format {
         ^this.prGetLilypondFormat;
@@ -85,18 +85,18 @@ FoscLilypondVersionToken : Fosc {
     def version_string(self):
         return self._version_string
     
-    a = FoscLilypondVersionToken();
+    a = FoscLilyPondVersionToken();
     a.versionString;
 
             
     Gets version string from install environment:
 
-    a = FoscLilypondVersionToken();
+    a = FoscLilyPondVersionToken();
     a.versionString;
 
     Gets version string from explicit input:
     
-    a = FoscLilypondVersionToken("2.19.0");
+    a = FoscLilyPondVersionToken("2.19.0");
     a.versionString;
     -------------------------------------------------------------------------------------------------------- */
 }

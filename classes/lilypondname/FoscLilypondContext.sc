@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondContext
+• FoscLilyPondContext
 
 LilyPond context.
 
@@ -59,7 +59,7 @@ lilypondnametools.LilyPondContext(
 [ ] [ ] [ ] [ ] [X] VaticanaVoice
 [ ] [ ] [ ] [ ] [X] Voice
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondContext : Fosc {
+FoscLilyPondContext : Fosc {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,10 +84,10 @@ FoscLilypondContext : Fosc {
         assert name in contexts
         self._name = name
     
-    a = FoscLilypondContext('Staff');
+    a = FoscLilyPondContext('Staff');
     a.name;
-    a = FoscLilypondContext('blerk');       // throw exception
-    FoscLilypondContext.listAllContexts;
+    a = FoscLilyPondContext('blerk');       // throw exception
+    FoscLilyPondContext.listAllContexts;
     -------------------------------------------------------------------------------------------------------- */
     *new { |name='Voice'|
     	^super.new.init(name);
@@ -151,10 +151,10 @@ FoscLilypondContext : Fosc {
         from abjad.ly import contexts
         return tuple(LilyPondContext(name=name) for name in sorted(contexts))
     
-	FoscLilypondContext.listAllContexts.do { |each| each.name.postln };
+	FoscLilyPondContext.listAllContexts.do { |each| each.name.postln };
     -------------------------------------------------------------------------------------------------------- */
     *listAllContexts {
-    	^LilypondContexts.list.collect { |each| FoscLilypondContext(each) };
+    	^LilypondContexts.list.collect { |each| FoscLilyPondContext(each) };
     }
     /* --------------------------------------------------------------------------------------------------------
     •

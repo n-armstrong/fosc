@@ -60,13 +60,13 @@ a.show;
             text = FoscMarkup(text);
 
             tweaks = tweaks.addAll([
-                [FoscLilypondLiteral("HorizontalBracketText.text"), text],
-                [FoscLilypondLiteral("HorizontalBracketText.parent-alignment-X"), textAlign]
+                [FoscLilyPondLiteral("HorizontalBracketText.text"), text],
+                [FoscLilyPondLiteral("HorizontalBracketText.parent-alignment-X"), textAlign]
             ]);
         };
 
         if (startGroup.tweaks.notNil) { tweaks = startGroup.tweaks.addAll(tweaks) };
-        FoscLilypondTweakManager.setTweaks(startGroup, tweaks);
+        FoscLilyPondTweakManager.setTweaks(startGroup, tweaks);
         
         startLeaf.attach(startGroup);
         stopLeaf.attach(stopGroup);

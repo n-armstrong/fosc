@@ -251,7 +251,7 @@ FoscClef : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle {
     	var bundle;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (hide.not) {
             bundle.opening.commands.add(this.prGetLilypondFormat);
         };

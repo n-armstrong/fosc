@@ -15,7 +15,7 @@ FoscStartTrillSpan : Fosc {
     init { |argInterval, argPitch, argTweaks|
         interval = argInterval;
         pitch = argPitch;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -156,7 +156,7 @@ FoscStartTrillSpan : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks, string, localPitch;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;
             bundle.after.spannerStarts.addAll(localTweaks);

@@ -295,7 +295,7 @@ FoscLeaf : FoscComponent {
     // abjad 3.0
     prFormatLeafBody { |bundle|
         var result;
-        //!!!TODO: REMOVE: indent = FoscLilypondFormatManager.indent;
+        //!!!TODO: REMOVE: indent = FoscLilyPondFormatManager.indent;
         result = this.prFormatLeafNucleus[1];
         ^['selfBody', result];
     }
@@ -532,7 +532,7 @@ FoscLeaf : FoscComponent {
     // abjad 3.0
     prProcessContributionPacket { |contributionPacket|
         var result, manager, indent, contributor, contributions;
-        manager = FoscLilypondFormatManager;
+        manager = FoscLilyPondFormatManager;
         indent = manager.indent;
         result = "";
         contributionPacket.do { |each|

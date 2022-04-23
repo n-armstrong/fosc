@@ -84,7 +84,7 @@ a.show;
                         "\\hide NoteHead",
                         "\\override NoteHead.no-ledgers = ##t",
                     ];
-                    literal = FoscLilypondLiteral(strings);
+                    literal = FoscLilyPondLiteral(strings);
                     leaf.attach(literal);
                 };
                 if (leaf == this.last) {
@@ -96,12 +96,12 @@ a.show;
                     ];
                     if (rightBroken) {
                         deactivateGlissando = true;
-                        literal = FoscLilypondLiteral(strings, 'after');
+                        literal = FoscLilyPondLiteral(strings, 'after');
                         leaf.attach(literal, deactivate: true);
-                        literal = FoscLilypondLiteral(strings);
+                        literal = FoscLilyPondLiteral(strings);
                         leaf.attach(literal, deactivate: false);
                     } {
-                        literal = FoscLilypondLiteral(strings);
+                        literal = FoscLilyPondLiteral(strings);
                         leaf.attach(literal);
                     };
                 };
@@ -110,7 +110,7 @@ a.show;
             if (shouldAttachGlissando) {
                 glissando = FoscGlissando();
                 if (glissando.tweaks.notNil) { tweaks = glissando.tweaks.addAll(tweaks) };
-                FoscLilypondTweakManager.setTweaks(glissando, tweaks);
+                FoscLilyPondTweakManager.setTweaks(glissando, tweaks);
                 leaf.attach(glissando, deactivate: deactivateGlissando);
             };
         };

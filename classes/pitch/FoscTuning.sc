@@ -112,7 +112,7 @@ FoscTuning : Fosc {
     illustrate {
         var lilypondFile, result, accidentalTags, str, markup, ratio;
 
-        lilypondFile = FoscLilypondFile(
+        lilypondFile = FoscLilyPondFile(
             lilypondLanguageToken: "english",
             lilypondVersionToken: "2.20.0",
             includes: ["%/noteheads.ily".format(Fosc.stylesheetDirectory)]
@@ -148,7 +148,7 @@ FoscTuning : Fosc {
     illustrateStylesheet {
         var lilypondFile;
 
-        lilypondFile = FoscLilypondFile(
+        lilypondFile = FoscLilyPondFile(
             lilypondLanguageToken: "english",
             lilypondVersionToken: Fosc.lilypondVersion,
             includes: ["ekmel.ily"],
@@ -278,7 +278,7 @@ FoscTuning : Fosc {
     prFormatStylesheetHeader {
         var result;
 
-        result = FoscLilypondLiteral(#["ekmelicFont = \"Bravura\""]);
+        result = FoscLilyPondLiteral(#["ekmelicFont = \"Bravura\""]);
         result = result.prGetFormatPieces.join("\n");
 
         ^result;

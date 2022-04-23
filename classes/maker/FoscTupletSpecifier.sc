@@ -49,7 +49,7 @@ FoscTupletSpecifier : Fosc {
 
     m = FoscTupletMaker().([1/4], #[[2,1],[1],[1,3]]); 
     m = FoscTupletSpecifier(denominator: 4).(m);
-    FoscLilypondFile.rhythm(m).show;
+    FoscLilyPondFile.rhythm(m).show;
     -------------------------------------------------------------------------------------------------------- */
     prApplyDenominator { |selections, divisions|
         var tuplets, localDenominator, division, unitDuration, duration, denominator_, nonreducedFraction;
@@ -91,7 +91,7 @@ FoscTupletSpecifier : Fosc {
     
     m = FoscTupletMaker().([1/4], #[[2,1],[1],[1,3]]); 
     m = FoscTupletSpecifier(extractTrivial: true).(m);
-    FoscLilypondFile.rhythm(m).show;
+    FoscLilyPondFile.rhythm(m).show;
     -------------------------------------------------------------------------------------------------------- */
     prExtractTrivial { |selections|
         var newSelections, newSelection, tuplet, contents;
@@ -122,7 +122,7 @@ FoscTupletSpecifier : Fosc {
 
     m = FoscTupletMaker().([1/4], #[[2,1],[1],[1,3]]); 
     m = FoscTupletSpecifier(forceFraction: true).(m);
-    FoscLilypondFile.rhythm(m).show;
+    FoscLilyPondFile.rhythm(m).show;
     -------------------------------------------------------------------------------------------------------- */
     prForceFraction { |selections|
         if (forceFraction.not) { ^this };
@@ -135,7 +135,7 @@ FoscTupletSpecifier : Fosc {
 
     m = FoscTupletMaker().([1/4], #[[2,1],[1],[1,3]]); 
     m = FoscTupletSpecifier(rewriteDots: true).(m);
-    FoscLilypondFile.rhythm(m).show;
+    FoscLilyPondFile.rhythm(m).show;
     -------------------------------------------------------------------------------------------------------- */
     prRewriteDots { |selections|
         if (rewriteDots.not) { ^this };
@@ -150,16 +150,16 @@ FoscTupletSpecifier : Fosc {
     • rewrite rest-filled
 
     m = FoscTupletMaker().([1/4], #[[-2,-1],[1],[-1,-3]]);
-    // FoscLilypondFile.rhythm(m).show;
+    // FoscLilyPondFile.rhythm(m).show;
     m = FoscTupletSpecifier(rewriteRestFilled: true).(m);
-    FoscLilypondFile.rhythm(m).show;
+    FoscLilyPondFile.rhythm(m).show;
 
 
     • rewrite rest-filled and extract trivial
 
     m = FoscTupletMaker().([1/4], #[[-2,-1],[1],[-1,-4]]);
     m = FoscTupletSpecifier(extractTrivial: true, rewriteRestFilled: true).(m);
-    FoscLilypondFile.rhythm(m).show;
+    FoscLilyPondFile.rhythm(m).show;
     -------------------------------------------------------------------------------------------------------- */
     prRewriteRestFilled { |selections|
         var newSelections, newSelection, maker, duration, rests;
@@ -195,9 +195,9 @@ FoscTupletSpecifier : Fosc {
 
     m = FoscTupletMaker().([1/4], #[[4,1],[4,1],[4,1],[4,1]]);
     FoscSelection(m).leaves[1..6].tie;
-    // FoscLilypondFile.rhythm(m).show;
+    // FoscLilyPondFile.rhythm(m).show;
     m = FoscTupletSpecifier(rewriteSustained: true).(m);
-    FoscLilypondFile.rhythm(m).show;
+    FoscLilyPondFile.rhythm(m).show;
 
 
     • rewrite sustained and extract trivial
@@ -205,7 +205,7 @@ FoscTupletSpecifier : Fosc {
     m = FoscTupletMaker().([1/4], #[[4,1],[4,1],[4,1],[4,1]]);
     FoscSelection(m).leaves[1..7].tie;
     m = FoscTupletSpecifier(extractTrivial: true, rewriteSustained: true).(m);
-    FoscLilypondFile.rhythm(m).show;
+    FoscLilyPondFile.rhythm(m).show;
     -------------------------------------------------------------------------------------------------------- */
     prRewriteSustained { |selections|
         var newSelections, newSelection, tuplet, duration, leaves, hasTie;
@@ -242,7 +242,7 @@ FoscTupletSpecifier : Fosc {
 
     m = FoscTupletMaker().([1/4], #[[2,1],[4,1],[2,3]]);
     m = FoscTupletSpecifier(isDiminution: false).(m);
-    FoscLilypondFile.rhythm(m).show;
+    FoscLilyPondFile.rhythm(m).show;
     -------------------------------------------------------------------------------------------------------- */
     prToggleProlation { |selections|
         if (isDiminution.isNil) { ^this };

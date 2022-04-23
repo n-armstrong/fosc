@@ -99,7 +99,7 @@ FoscDynamicTrend : Fosc {
     init { |argShape, argLeftBroken, argTweaks|
         shape = argShape;
         leftBroken = argLeftBroken;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
@@ -169,7 +169,7 @@ FoscDynamicTrend : Fosc {
     • *prConstanteHairpin
     -------------------------------------------------------------------------------------------------------- */
     *prConstanteHairpin {
-        ^FoscLilypondGrobOverride(
+        ^FoscLilyPondGrobOverride(
             grobName: "Hairpin",
             isOnce: true,
             propertyPath: "stencil",
@@ -180,7 +180,7 @@ FoscDynamicTrend : Fosc {
     • *prCircledTip
     -------------------------------------------------------------------------------------------------------- */
     *prCircledTip {
-        ^FoscLilypondGrobOverride(
+        ^FoscLilyPondGrobOverride(
             grobName: "Hairpin",
             isOnce: true,
             propertyPath: "circled-tip",
@@ -191,7 +191,7 @@ FoscDynamicTrend : Fosc {
     • *prFlaredHairpin
     -------------------------------------------------------------------------------------------------------- */
     *prFlaredHairpin {
-        ^FoscLilypondGrobOverride(
+        ^FoscLilyPondGrobOverride(
             grobName: "Hairpin",
             isOnce: true,
             propertyPath: "stencil",
@@ -239,7 +239,7 @@ FoscDynamicTrend : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle {
         var bundle, localTweaks, strings;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;
             bundle.after.spanners.addAll(localTweaks);

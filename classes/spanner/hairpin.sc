@@ -97,7 +97,7 @@ a.show;
 
         //!!! not in abjad
         if (dynamicTrend.tweaks.notNil) { tweaks = dynamicTrend.tweaks.addAll(tweaks) };
-        FoscLilypondTweakManager.setTweaks(dynamicTrend, tweaks);
+        FoscLilyPondTweakManager.setTweaks(dynamicTrend, tweaks);
         //!!!
 
         if (startDynamic.notNil) { startLeaf.attach(startDynamic) };

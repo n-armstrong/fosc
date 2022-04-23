@@ -48,7 +48,7 @@ FoscBeamCount {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         string = "\\set stemLeftBeamCount = %".format(left);
         bundle.before.commands.add(string);
         string = "\\set stemRightBeamCount = %".format(right);

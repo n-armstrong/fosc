@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondSettingNameManager (abjad 3.0)
+• FoscLilyPondSettingNameManager (abjad 3.0)
 
 LilyPond setting name manager.
 
@@ -7,9 +7,9 @@ LilyPond setting name manager.
 • Example 1
 
 a = FoscNote(60, 1/4);
-set(a);             // a FoscLilypondSettingNameManager
+set(a);             // a FoscLilyPondSettingNameManager
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondSettingNameManager : FoscLilypondNameManager {
+FoscLilyPondSettingNameManager : FoscLilyPondNameManager {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ FoscLilypondSettingNameManager : FoscLilypondNameManager {
         //     try {
         //         ^vars[("_" ++ name).asSymbol];
         //     } {
-        //         context = FoscLilypondManager();
+        //         context = FoscLilyPondManager();
         //         vars[("_" ++ name).asSymbol] = context;
         //         ^context;
         //     };
@@ -58,7 +58,7 @@ FoscLilypondSettingNameManager : FoscLilypondNameManager {
         var attributeName, attributeValue;
         result = [];
         vars.keysValuesDo { |name, val|
-            if (val.isMemberOf(FoscLilypondNameManager)) {
+            if (val.isMemberOf(FoscLilyPondNameManager)) {
                 prefixedContextName = name;
                 lilypondType = prefixedContextName.asString.strip("_");
                 contextProxy = val;

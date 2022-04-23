@@ -221,7 +221,7 @@ FoscComponent : Fosc {
         //     includes = [stylesheetPath];
         // };
         
-        lilypondFile = FoscLilypondFile(
+        lilypondFile = FoscLilyPondFile(
             this,
             paperSize: paperSize,
             includes: includes,
@@ -463,6 +463,7 @@ FoscComponent : Fosc {
             {
                 assert(target.respondsTo('wrappers'));
                 result = [];
+                
                 target.wrappers.do { |wrapper|
                     if (wrapper === object) {
                         wrapper.prDetach;
@@ -478,6 +479,7 @@ FoscComponent : Fosc {
                         };
                     };
                 };
+
                 ^result;
             };
         };
@@ -485,9 +487,11 @@ FoscComponent : Fosc {
         result = [];
         if (afterGraceContainer.notNil) { result = result.add(afterGraceContainer) };
         if (graceContainer.notNil) { result = result.add(graceContainer) };
+        
         if (byID) {
             result = result.select { |each| each.hash == object.hash };
         };
+        
         result.do { |each| each.prDetach };
         ^result;
 
@@ -500,16 +504,18 @@ FoscComponent : Fosc {
 
     a = FoscNote(60, 1/4);
     override(a).noteHead.color = 'red';
-    override(a).noteHead.size = 12;
-    a.format;
+    override(a).noteHead.fontSize = 4;
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
     override {
         if (this.respondsTo('overrides').not) {
             throw("%: does not respond to override.".format(this.species));
         };
+
         if (this.overrides.isNil) {
-            this.instVarPut('overrides', FoscLilypondGrobNameManager());
+            this.instVarPut('overrides', FoscLilyPondGrobNameManager());
         };
+
         ^this.overrides;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -523,9 +529,11 @@ FoscComponent : Fosc {
         if (this.respondsTo('lilypondSettingNameManager').not) {
             throw("%: does not respond to set.".format(this.species));
         };
+
         if (this.lilypondSettingNameManager.isNil) {
-            this.instVarPut('lilypondSettingNameManager', FoscLilypondSettingNameManager());
+            this.instVarPut('lilypondSettingNameManager', FoscLilyPondSettingNameManager());
         };
+
         ^this.lilypondSettingNameManager;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -702,7 +710,7 @@ FoscComponent : Fosc {
     • Example X
 
     a = FoscHairpin('p < f');
-    b = FoscLilypondTweakManager();
+    b = FoscLilyPondTweakManager();
     b.setTweaks(a, #[['dynamicLineSpanner', 5]]);
     a.tweaks;
     a.tweaks.prGetAttributePairs;
@@ -725,13 +733,13 @@ FoscComponent : Fosc {
         prototype = [Boolean, SimpleNumber, String, SequenceableCollection, FoscScheme];
         
         if (constants.includes(this) || { prototype.any { |type| this.isKindOf(type) } }) {
-            manager = FoscLilypondTweakManager();
+            manager = FoscLilyPondTweakManager();
             manager.pendingValue_(this);
             ^manager;
         };
         
         if (this.tweaks.isNil) {
-            this.instVarPut('tweaks', FoscLilypondTweakManager());
+            this.instVarPut('tweaks', FoscLilyPondTweakManager());
         };
         
         ^this.tweaks;
@@ -916,16 +924,20 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prCacheNamedChildren {
         var nameDictionary;
+        
         nameDictionary = ();
+        
         if (this.respondsTo('namedChildren') && { this.namedChildren.notNil }) {
             this.namedChildren.keysValuesDo { |name, children|
                 nameDictionary[name] = children.copy;
             };
         };
+        
         if (this.respondsTo('name') && { this.name.notNil }) {
             if (nameDictionary.keys.includes(this.name).not) { nameDictionary[this.name] = [] };
             nameDictionary[this.name] = nameDictionary[this.name].add(this);
         };
+        
         ^nameDictionary;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -948,14 +960,18 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prExtract { |scaleContents=false|
         var selection, parent, start, stop, components;
+        
         if (scaleContents) { this.prScaleContents(this.multiplier) };
         selection = FoscSelection([this]);
         # parent, start, stop = selection.prGetParentAndStartStopIndices;
+        
         if (parent.isNil) {
             throw("%:%: can't extract a component without a parent.".format(this.species, thisMethod.name));
         };
+        
         components = if (this.respondsTo('components')) { this.components } { [] };
         parent.prSetItem((start..(stop + 1)), components);
+        
         ^this;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1022,7 +1038,7 @@ FoscComponent : Fosc {
         
         result = [];
         contributions = [];
-        bundle = FoscLilypondFormatManager.bundleFormatContributions(this);
+        bundle = FoscLilyPondFormatManager.bundleFormatContributions(this);
         
         result = result.addAll(this.prFormatAbsoluteBeforeSlot(bundle));
         result = result.addAll(this.prFormatBeforeSlot(bundle));
@@ -1049,7 +1065,7 @@ FoscComponent : Fosc {
     //     var result, manager, slotNames, slotIndex, slotName, methodName, method;
     //     result = [];
     //     if (bundle.isNil) {
-    //         manager = FoscLilypondFormatManager;
+    //         manager = FoscLilyPondFormatManager;
     //         bundle = manager.bundleFormatContributions(this);
     //     };
     //     slotNames = #[
@@ -1104,10 +1120,13 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetContents {
         var result;
+        
         result = [this];
+        
         if (this.respondsTo('components') && { this.components.notNil }) {
             result = result.addAll(this.components);
         };
+        
         result = FoscSelection(result);
         ^result;
     }
@@ -1116,7 +1135,9 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetDescendantsStartingWith {
         var result;
+        
         result = [this];
+        
         if (this.isKindOf(FoscContainer)) {
             if (this.isSimultaneous) {
                 this.do { |each| result = result ++ each.prGetDescendantsStartingWith };
@@ -1124,6 +1145,7 @@ FoscComponent : Fosc {
                 result = result ++ this[0].prGetDescendantsStartingWith;
             };
         };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1131,7 +1153,9 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetDescendantsStoppingWith {
         var result;
+        
         result = [this];
+        
         if (this.isKindOf(FoscContainer)) {
             if (this.isSimultaneous) {
                 this.do { |each| result = result ++ each.prGetDescendantsStoppingWith };
@@ -1139,6 +1163,7 @@ FoscComponent : Fosc {
                 result = result ++ this[this.size - 1].prGetDescendantsStoppingWith;
             };
         };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1280,13 +1305,16 @@ FoscComponent : Fosc {
         allOffsets = candidateWrappers.keys.as(Array).sort;
         startOffset = this.prGetTimespan.startOffset;
         index = allOffsets.bisect(startOffset) - 1 + (n.asInteger);
+        
         if (index < 0) {
             ^nil;
         } {
             if (candidateWrappers.size <= index) { ^nil };
         };
+        
         wrapper = candidateWrappers[allOffsets[index]][0];
         if (unwrap) { ^wrapper.indicator };
+        
         ^wrapper;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1297,12 +1325,15 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetEffectiveStaff {
         var staffChange, effectiveStaff;
+        
         staffChange = this.prGetEffective(FoscStaffChange);
+        
         if (staffChange.notNil) {
             effectiveStaff = staffChange.staff;
         } {
             effectiveStaff = this.prGetParentage.firstInstanceOf(FoscStaff);
         };
+        
         ^effectiveStaff;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1344,7 +1375,9 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetIndicator { |prototype, attributes, unwrap=true|
         var indicators;
+        
         indicators = this.prGetIndicators(prototype, attributes, unwrap);
+        
         case 
         { indicators.isEmpty } {
             ^nil;
@@ -1373,6 +1406,7 @@ FoscComponent : Fosc {
         if (prototype.isSequenceableCollection.not) { prototype = [prototype] };
         prototypeObjects = [];
         prototypeClasses = [];
+        
         prototype.do { |indicatorPrototype|
             if (prototype.any { |type| indicatorPrototype.isKindOf(Class) }) {
                 prototypeClasses = prototypeClasses.add(indicatorPrototype);
@@ -1404,6 +1438,7 @@ FoscComponent : Fosc {
 
         if (attributes.notNil) {
             newResult = [];
+            
             result.do { |wrapper|
                 attributes.vars.keysValuesDo { |key, val|
                     block { |break|
@@ -1412,8 +1447,10 @@ FoscComponent : Fosc {
                         };
                     };
                 };
+
                 newResult = newResult.add(wrapper);
             };
+            
             result = newResult;
         };
 
@@ -1443,10 +1480,13 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetMarkup { |direction|
         var markup;
+        
         markup = this.prGetIndicators(FoscMarkup);
+        
         case
         { direction == 'up' } { ^markup.select { |each| each.direction == 'up' } }
         { direction == 'down' } { ^markup.select { |each| each.direction == 'down' } };
+        
         ^markup;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1468,9 +1508,11 @@ FoscComponent : Fosc {
     prGetTimespan { |inSeconds=false|
         if (inSeconds) {
             this.prUpdateNow(offsetsInSeconds: true);
+            
             if (startOffsetInSeconds.isNil) {
                 throw("%:%: missing metronome mark.".format(this.species, thisMethod.name));
             };
+            
             ^FoscTimespan(startOffsetInSeconds, stopOffsetInSeconds);
         } {
             this.prUpdateNow(offsets: true);
@@ -1517,8 +1559,10 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prImmediatelyPrecedes { |component|
         var successors, current, sibling;
+        
         successors = [];
         current = this;
+        
         block { |break|
             while { current.notNil } {
                 sibling = current.prSibling(1);
@@ -1531,6 +1575,7 @@ FoscComponent : Fosc {
                 };
             };
         };
+        
         ^successors.includes(component);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1568,15 +1613,15 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prRemoveFromParent {
         this.prUpdateLater(offsets: true);
+        
         this.prGetParentage[1..].do { |component|
             if (component.isKindOf(FoscContext)) {
                 component.dependentWrappers.do { |wrapper|
-                    if (wrapper.component == this) {
-                        component.dependentWrappers.remove(wrapper);
-                    };
+                    if (wrapper.component == this) { component.dependentWrappers.remove(wrapper) };
                 };
             };
         };
+        
         if (parent.notNil) { parent.components.remove(this) };
         parent = nil;
     }
@@ -1585,9 +1630,11 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prRemoveNamedChildrenFromParentage { |nameDictionary|
         var namedChildren;
+        
         if (parent.notNil && nameDictionary.notNil) {
             this.prGetParentage[1..].do { |parent|
                 namedChildren = parent.namedChildren;
+                
                 nameDictionary.keys.do { |name|
                     nameDictionary[name].do { |component| namedChildren[name].remove(component) };
                     if (namedChildren[name].isEmpty) { namedChildren.removeAt(name) };
@@ -1600,9 +1647,11 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prRestoreNamedChildrenToParentage { |nameDictionary|
         var namedChildren;
+        
         if (nameDictionary.notEmpty) {
             this.prGetParentage[1..].do { |parent|
                 namedChildren = parent.namedChildren;
+                
                 nameDictionary.keys.do { |name|
                     if (namedChildren[name].notNil) {
                         namedChildren[name] = namedChildren[name].union(nameDictionary[name]);
@@ -1618,6 +1667,7 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prSetParent { |newParent|
         var namedChildren;
+        
         namedChildren = this.prCacheNamedChildren;
         this.prRemoveNamedChildrenFromParentage(namedChildren);
         this.prRemoveFromParent;
@@ -1672,6 +1722,7 @@ FoscComponent : Fosc {
             throw("%:%: either offsets or offsetsInSeconds must be true."
                 .format(this.species, thisMethod.name))
         };
+        
         this.prGetParentage.do { |component|
             case
             { offsets } {

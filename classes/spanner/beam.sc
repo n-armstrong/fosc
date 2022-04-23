@@ -136,7 +136,7 @@ x.show;
                     staff = startLeaf.prGetParentage.firstInstanceOf(FoscStaff);
                     lilypondType = try { staff.lilypondType } { 'Staff' };
                     string = "\\override %.Stem.stemlet-length = %".format(lilypondType, stemletLength);
-                    literal = FoscLilypondLiteral(string);
+                    literal = FoscLilyPondLiteral(string);
                     
                     block { |break|
                         startLeaf.prGetIndicators.do { |indicator|
@@ -149,7 +149,7 @@ x.show;
                     staff = stopLeaf.prGetParentage.firstInstanceOf(FoscStaff);
                     lilypondType = try { staff.lilypondType } { 'Staff' };
                     string = "\\revert %.Stem.stemlet-length".format(lilypondType);
-                    literal = FoscLilypondLiteral(string, formatSlot: 'after');
+                    literal = FoscLilyPondLiteral(string, formatSlot: 'after');
                     
                     block { |break|
                         stopLeaf.prGetIndicators.do { |indicator|

@@ -25,7 +25,7 @@ Attach after grace containers to notes, rests or chords.
 After grace notes.
 
 a = FoscLeafMaker().("C4 D4 E4 F4", [1/4]);
-l = FoscLilypondLiteral("#(define afterGraceFraction (cons 15 16))");
+l = FoscLilyPondLiteral("#(define afterGraceFraction (cons 15 16))");
 a[0].attach(l);
 c = FoscAfterGraceContainer([FoscNote("C4", 1/16), FoscNote("D4", 1/16)]);
 a[1].attach(c);

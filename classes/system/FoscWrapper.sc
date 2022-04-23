@@ -246,7 +246,7 @@ FoscWrapper : Fosc {
 
     FoscComponent
     FoscLeaf
-    FoscLilypondFormatBundle
+    FoscLilyPondFormatBundle
 
     "context: ".post; [indicator, correctEffectiveContext].postln;
 
@@ -271,7 +271,7 @@ FoscWrapper : Fosc {
         };
         if (lilypondFormat.isString) { lilypondFormat = [lilypondFormat] };
         //!!!TODO: assert(lilypondFormat.isSequenceableCollection);
-        //lilypondFormat = FoscLilypondFormatManager.tag(lilypondFormat, tag, deactivate: deactivate);
+        //lilypondFormat = FoscLilyPondFormatManager.tag(lilypondFormat, tag, deactivate: deactivate);
         result = result.addAll(lilypondFormat);
         
         if (this.prGetEffectiveContext.notNil) { ^result };

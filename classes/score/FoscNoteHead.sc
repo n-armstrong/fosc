@@ -33,7 +33,7 @@ FoscNoteHead : Fosc {
         isCautionary = argIsCautionary;
         isForced = argIsForced;
         isParenthesized = argIsParenthesized;
-        FoscLilypondTweakManager.setTweaks(this, argTweaks);
+        FoscLilyPondTweakManager.setTweaks(this, argTweaks);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC METHODS: SPECIAL METHODS
@@ -183,12 +183,12 @@ FoscNoteHead : Fosc {
             pieces[pieces.lastIndex] = pieces[pieces.lastIndex] ++ formattedDuration;
         };
         if (alternative.notNil) {
-            pieces = FoscLilypondFormatManager.tag(pieces);
+            pieces = FoscLilyPondFormatManager.tag(pieces);
             pieces_ = alternative[0].prGetFormatPieces;
             if (formattedDuration.notNil) {
                 pieces_[pieces_.lastIndex] = pieces_[pieces_.lastIndex] ++ formattedDuration;
             };
-            pieces_ = FoscLilypondFormatManager.tag(pieces_, deactivate: true, tag: alternative[1]);
+            pieces_ = FoscLilyPondFormatManager.tag(pieces_, deactivate: true, tag: alternative[1]);
             pieces = pieces.addAll(pieces_);
         };  
         result = pieces.join("\n");

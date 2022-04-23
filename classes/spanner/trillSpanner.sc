@@ -52,7 +52,7 @@ a.show;
         stopLeaf = leaves.last;
         //!!! not in abjad
         if (startTrillSpan.tweaks.notNil) { tweaks = startTrillSpan.tweaks.addAll(tweaks) };
-        FoscLilypondTweakManager.setTweaks(startTrillSpan, tweaks);
+        FoscLilyPondTweakManager.setTweaks(startTrillSpan, tweaks);
         //!!!
         startLeaf.attach(startTrillSpan);
         stopLeaf.attach(stopTrillSpan);

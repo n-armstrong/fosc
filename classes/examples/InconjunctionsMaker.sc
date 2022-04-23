@@ -25,22 +25,16 @@
         "gqs aqf d' g' af' bqs'"
     ],
     // hairpins: per voice, repeating cyclically at each segment
-    hairpin: 'fff > f',
+    hairpins: #['fff > f'],
     // articulations: per voice, applied cyclically to the first event in each segment
     articulations: #['>'],
-    // finalize: ad hoc per voice formatting
+    // finalize: ad hoc per voice modifications
     finalize: { |sel, i|
         // override default spelling of tuplet ratio
         sel.selectComponents(FoscTuplet).do { |tuplet|
             tuplet.denominator = 4;
             tuplet.forceFraction = true;
         };
-
-        #[
-            "\\accidentalStyle dodecaphonic",
-            "\\override Stem.direction = #DOWN",
-            "\\override TupletBracket.direction = #UP"
-        ].do { |str| sel[0].attach(FoscLilypondLiteral(str)) };
     };
 );
 
@@ -59,7 +53,7 @@ InconjunctionsMaker {
     /* --------------------------------------------------------------------------------------------------------
     • value
     -------------------------------------------------------------------------------------------------------- */
-    value { |durations, divisions, groupSizes, pitches, hairpin, articulations, finalize|
+    value { |durations, divisions, groupSizes, pitches, hairpins, articulations, finalize|
         var maker, selections, selection;
 
         maker = FoscMusicMaker();
@@ -71,7 +65,7 @@ InconjunctionsMaker {
             selection.logicalTies.groupBySizes(sizes).do { |group, j|
                 if (group.size > 1) {
                     group.beam;
-                    if (hairpin.notNil) { group.hairpin(hairpin) };
+                    if (hairpins.notNil) { group.hairpin(hairpins.wrapAt(i)) };
                 };
 
                 if (articulations.notNil) {
@@ -80,6 +74,13 @@ InconjunctionsMaker {
 
                 if (pitches.notNil) { mutate(group).rewritePitches(pitches.wrapAt(i)) };
             };
+
+            #[
+                // lilypond formatting
+                "\\accidentalStyle dodecaphonic",
+                "\\override Stem.direction = #DOWN",
+                "\\override TupletBracket.direction = #UP"
+            ].do { |str| selection[0].attach(FoscLilyPondLiteral(str)) };
 
             selections = selections.add(selection);
         };

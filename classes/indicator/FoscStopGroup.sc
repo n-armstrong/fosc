@@ -65,7 +65,7 @@ FoscStopGroup : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks, string;
-        bundle = FoscLilypondFormatBundle();
+        bundle = FoscLilyPondFormatBundle();
         string = "\\stopGroup";
         if (leak) {
             string = "<> %".format(string);

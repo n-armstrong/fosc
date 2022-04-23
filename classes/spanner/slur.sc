@@ -29,7 +29,7 @@ a.show;
         stopLeaf = leaves.last;
         //!!! not in abjad
         if (startSlur.tweaks.notNil) { tweaks = startSlur.tweaks.addAll(tweaks) };
-        FoscLilypondTweakManager.setTweaks(startSlur, tweaks);
+        FoscLilyPondTweakManager.setTweaks(startSlur, tweaks);
         //!!!
         startLeaf.attach(startSlur);
         stopLeaf.attach(stopSlur);

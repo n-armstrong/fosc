@@ -1,12 +1,12 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscLilypondFormatBundle (abjad 3.0)
+• FoscLilyPondFormatBundle (abjad 3.0)
 
 Transient class created to hold the collection of all format contributions generated on behalf of a single Component.
 
-a = FoscLilypondFormatBundle();
+a = FoscLilyPondFormatBundle();
 a.prGetFormatSpecification;
 ------------------------------------------------------------------------------------------------------------ */
-FoscLilypondFormatBundle : Fosc {
+FoscLilyPondFormatBundle : Fosc {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INIT
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ FoscLilypondFormatBundle : Fosc {
 	/* --------------------------------------------------------------------------------------------------------
 	• prGetFormatSpecification
 
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.prGetFormatSpecification;
 	-------------------------------------------------------------------------------------------------------- */
 	// abjad 3.0 - TODO
@@ -55,7 +55,7 @@ FoscLilypondFormatBundle : Fosc {
 
 	Returns format contributions object or list.
 	
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.get('before');
 	a.get('grobReverts');
 	-------------------------------------------------------------------------------------------------------- */
@@ -78,7 +78,7 @@ FoscLilypondFormatBundle : Fosc {
 
 	Returns nil.
 
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.update(a.copy);
 	-------------------------------------------------------------------------------------------------------- */
 	update { |formatBundle|
@@ -86,8 +86,8 @@ FoscLilypondFormatBundle : Fosc {
 			formatBundle = formatBundle.prGetLilypondFormatBundle;
 		};
 		assert(
-			formatBundle.isKindOf(FoscLilypondFormatBundle),
-			"%:%: argument must be a FoscLilypondFormatBundle: %."
+			formatBundle.isKindOf(FoscLilyPondFormatBundle),
+			"%:%: argument must be a FoscLilyPondFormatBundle: %."
 				.format(this.species, thisMethod.name, formatBundle);
 		);
 		absoluteBefore = absoluteBefore.update(formatBundle.absoluteBefore);
@@ -124,7 +124,7 @@ FoscLilypondFormatBundle : Fosc {
 
 	Returns slot contributions object.
 	
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.after;
 	-------------------------------------------------------------------------------------------------------- */
 	/* --------------------------------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ FoscLilypondFormatBundle : Fosc {
 
 	Returns slot contributions object.
 	
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.before;
 	-------------------------------------------------------------------------------------------------------- */
 	/* --------------------------------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ FoscLilypondFormatBundle : Fosc {
 
 	Returns slot contributions object.
 	
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.closing;
 	-------------------------------------------------------------------------------------------------------- */
 	/* --------------------------------------------------------------------------------------------------------
@@ -154,7 +154,7 @@ FoscLilypondFormatBundle : Fosc {
 
 	Returns array.
 	
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.contextSettings;
 	-------------------------------------------------------------------------------------------------------- */
 	/* --------------------------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ FoscLilypondFormatBundle : Fosc {
 	
 	Returns array.
 	
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.grobOverrides;
 	-------------------------------------------------------------------------------------------------------- */
 	/* --------------------------------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ FoscLilypondFormatBundle : Fosc {
 
 	Returns array.
 	
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.grobReverts;
 	-------------------------------------------------------------------------------------------------------- */
 	/* --------------------------------------------------------------------------------------------------------
@@ -184,7 +184,7 @@ FoscLilypondFormatBundle : Fosc {
 	
 	Returns slot contributions object.
 	
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.opening;
 	-------------------------------------------------------------------------------------------------------- */
 	/* --------------------------------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ FoscLilypondFormatBundle : Fosc {
 
 	Returns slot contributions object.
 	
-	a = FoscLilypondFormatBundle();
+	a = FoscLilyPondFormatBundle();
 	a.right;
 	-------------------------------------------------------------------------------------------------------- */
 }
