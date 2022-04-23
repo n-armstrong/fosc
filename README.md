@@ -261,10 +261,11 @@ FoscChord("c' e' g'", 1/4)
 
 <br>Attach indicators to all leaves in a selection.
 ```supercollider
-a = FoscStaff(FoscMusicMaker().(durations: 1/8 ! 8, pitches: (60..67)));
-b = a.selectLeaves(pitched: true);
-b.do { |each| each.attach(FoscArticulation('>')) };
-a.show;
+a = FoscMusicMaker();
+b = a.(durations: 1/8 ! 8, pitches: (60..67));
+c = FoscStaff(b);
+c.selectLeaves(pitched: true).do { |each| each.attach(FoscArticulation('>')) };
+c.show;
 ```
 ![](./docs/img/selections-1.png)
 
@@ -273,8 +274,10 @@ a.show;
 
 <br>Iterate over all score components.
 ```supercollider
-a = FoscStaff(FoscMusicMaker().(durations: 1/8 ! 8, pitches: (60..67)));
-a.doComponents({ |each| each.cs.postln });
+a = FoscMusicMaker();
+b = a.(durations: 1/8 ! 8, pitches: (60..67));
+c = FoscStaff(b);
+c.doComponents({ |each| each.cs.postln });
 ```
 ```
 FoscStaff([  ], Staff, false, nil)
@@ -291,9 +294,11 @@ FoscNote("g'", 1/8)
 
 <br>Iterate over notes, attaching indicators.
 ```supercollider
-a = FoscStaff(FoscMusicMaker().(durations: 1/8 ! 4, mask: #[-1,1,1,1], pitches: #[60,61,62]));
-a.doComponents({ |note| note.attach(FoscArticulation('>')) }, prototype: FoscNote);
-a.show;
+a = FoscMusicMaker();
+b = a.(durations: 1/8 ! 4, mask: #[-1,1,1,1], pitches: #[60,61,62]);
+c = FoscStaff(b);
+c.doComponents({ |note| note.attach(FoscArticulation('>')) }, prototype: FoscNote);
+c.show;
 ```
 ![](./docs/img/iteration-1.png)
 
