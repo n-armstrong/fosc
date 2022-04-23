@@ -479,11 +479,11 @@ FoscSieve {
     p.getMatchingItems(a);
     -------------------------------------------------------------------------------------------------------- */
     getMatchingItems { |object|
-        var prototype, size, items, item;
+        var type, size, items, item;
         
-        prototype = [FoscContainer, FoscSelection, SequenceableCollection];
+        type = [FoscContainer, FoscSelection, SequenceableCollection];
         
-        if (prototype.any { |type| object.isKindOf(type) }.not) {
+        if (type.any { |type| object.isKindOf(type) }.not) {
             throw("%:%: argument must be a FoscContainer, FoscSelection or SequenceableCollection: %."
                 .format(this.species, thisMethod.name, object));
         };

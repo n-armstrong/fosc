@@ -302,7 +302,7 @@ FoscMusicMaker : Fosc {
         };
 
         // validate tuplets
-        FoscIteration(selections).components(prototype: FoscTuplet).do { |tuplet|
+        FoscIteration(selections).components(type: FoscTuplet).do { |tuplet|
             if (tuplet.multiplier.isNormalized.not) {
                 throw("%:%: tuplet multiplier is not normalized: %."
                     .format(this.species, thisMethod.name, tuplet.multiplier.str));

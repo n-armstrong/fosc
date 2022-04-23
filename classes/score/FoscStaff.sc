@@ -24,11 +24,11 @@ FoscStaff : FoscContext {
     a.append('blerk');      // raise exception
     -------------------------------------------------------------------------------------------------------- */
     prOnInsertionCheck { |index, node|
-        var prototype;
+        var type;
         
-        prototype = [FoscVoice, FoscRhythm, FoscLeaf, FoscSelection];
+        type = [FoscVoice, FoscRhythm, FoscLeaf, FoscSelection];
         
-        if (prototype.any { |type| node.isKindOf(type) }.not) {
+        if (type.any { |type| node.isKindOf(type) }.not) {
             throw("%: can't insert a % in this container.".format(this.species, node.species)); 
         };
         

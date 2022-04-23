@@ -52,7 +52,7 @@ a.show;
         var inequality, leaves, duration, tie;
         
         leaves = this.leaves;
-        //!!!TODO: leaves = this.byLeaf(doNotIterateGraceContainer: true);
+        //!!!TODO: leaves = this.leaves(doNotIterateGraceContainer: true);
         
         if (leaves.size < 2) { throw("Tie selection must contain two or more notes.") };
 

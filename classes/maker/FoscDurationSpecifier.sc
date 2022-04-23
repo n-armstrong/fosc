@@ -212,12 +212,12 @@ FoscDurationSpecifier : Fosc {
     FoscStaff(a).show;
     -------------------------------------------------------------------------------------------------------- */
     *prRewriteRestFilled { |selections, multimeasureRests=false|
-        var localSelections, maker, prototype, duration, multiplier, rest, rests;
+        var localSelections, maker, type, duration, multiplier, rest, rests;
         localSelections = [];
         maker = FoscLeafMaker();
-        prototype = [FoscMultimeasureRest, FoscRest];
+        type = [FoscMultimeasureRest, FoscRest];
         selections.do { |selection|
-            if (selection.every { |each| prototype.any { |type| each.isKindOf(type) }}.not) {
+            if (selection.every { |each| type.any { |type| each.isKindOf(type) }}.not) {
                 localSelections = localSelections.add(selection);
             } {
                 duration = selection.duration;

@@ -920,9 +920,9 @@ FoscWellformednessManager : Fosc {
             import abjad
             violators = []
             all_spanners = set()
-            prototype = abjad.OctavationSpanner
+            type = abjad.OctavationSpanner
             for leaf in abjad.iterate(argument).by_leaf():
-                spanners = abjad.inspect(leaf).get_spanners(prototype)
+                spanners = abjad.inspect(leaf).get_spanners(type)
                 all_spanners.update(spanners)
                 if 1 < len(spanners):
                     for spanner in spanners:

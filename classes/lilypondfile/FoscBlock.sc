@@ -123,7 +123,7 @@ FoscBlock : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     // abjad 3.0 !!!TODO: add tag stuff
     prGetFormatPieces { |tag|
-        var indent, result, string, prototype, formattedAttributes, formattedContextBlocks;
+        var indent, result, string, type, formattedAttributes, formattedContextBlocks;
         
         indent = FoscLilyPondFormatManager.indent;
         result = [];
@@ -142,11 +142,11 @@ FoscBlock : Fosc {
         
         string = "% {".format(escapedName);
         result = result.add(string);
-        prototype = [FoscLeaf, FoscMarkup];
+        type = [FoscLeaf, FoscMarkup];
         
         items.do { |item|
             if (item.isKindOf(FoscContextBlock).not) {
-                if (prototype.any { |type| item.isKindOf(type) }) { item = [item] };
+                if (type.any { |type| item.isKindOf(type) }) { item = [item] };
                 result = result.addAll(this.prFormatItem(item));
             };
         };
@@ -172,14 +172,14 @@ FoscBlock : Fosc {
     • prGetFormattedUserAttributes
     -------------------------------------------------------------------------------------------------------- */
     prGetFormattedUserAttributes {
-        var result, prototype, key, val, formattedKey, prGetFormattedValue, setting;
+        var result, type, key, val, formattedKey, prGetFormattedValue, setting;
         result = [];
         items.do { |each|
             if (each.isKindOf(FoscScheme)) {
                 result = result.add(each.format('lilypond'));
             };
         };
-        prototype = [FoscLilyPondDimension, FoscScheme];
+        type = [FoscLilyPondDimension, FoscScheme];
         //!!!TODO
         // for key in self._public_attribute_names:
         //     assert not key.startswith('_'), repr(key)
@@ -199,7 +199,7 @@ FoscBlock : Fosc {
             { val.isKindOf(FoscMarkup) } {
                 prGetFormattedValue = val.prGetFormatPieces;
             }
-            { prototype.any { |type| val.isKindOf(type) } } {
+            { type.any { |type| val.isKindOf(type) } } {
                 prGetFormattedValue = [val.format('lilypond')];
             }
             {

@@ -12,8 +12,8 @@ FoscInspection : Fosc {
     def __init__(self, client=None):
             from abjad.tools import scoretools
             from abjad.tools import spannertools
-            prototype = (scoretools.Component, spannertools.Spanner, type(None))
-            if not isinstance(client, prototype):
+            type = (scoretools.Component, spannertools.Spanner, type(None))
+            if not isinstance(client, type):
                 message = 'must be component, spanner or none: {!r}.'
                 message = message.format(client)
                 raise TypeError(message)
@@ -26,10 +26,10 @@ FoscInspection : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     var <client;
     *new { |client|
-        var prototype;
-        //prototype = [FoscComponent, FoscSpanner, Nil];
-        prototype = [FoscComponent, Nil];
-        if (prototype.any { |type| client.isKindOf(type) }.not) {
+        var type;
+        //type = [FoscComponent, FoscSpanner, Nil];
+        type = [FoscComponent, Nil];
+        if (type.any { |type| client.isKindOf(type) }.not) {
             throw("%: client must be component, spanner, or nil: %.".format(this.species, client));
         };
         ^super.new.init(client);
@@ -135,22 +135,22 @@ FoscInspection : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • components
 
-    Gets all components of prototype in the descendants of client.
+    Gets all components of type in the descendants of client.
     
     Returns client selection.
 
     def get_components(
         self,
-        prototype=None,
+        type=None,
         include_self=True,
         ):
         return self._client._get_components(
-            prototype=prototype,
+            type=type,
             include_self=include_self,
             )
     -------------------------------------------------------------------------------------------------------- */
-    components { |prototype, includeSelf=true|
-        ^client.prComponents(prototype: prototype, includeSelf: includeSelf);
+    components { |type, includeSelf=true|
+        ^client.prComponents(type: type, includeSelf: includeSelf);
     }
     /* --------------------------------------------------------------------------------------------------------
     • contents
@@ -220,7 +220,7 @@ FoscInspection : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • effectiveIndicator
 
-    Gets effective indicator that matches prototype and governs client.
+    Gets effective indicator that matches type and governs client.
 
     Returns indicator or none.
     
@@ -261,31 +261,31 @@ FoscInspection : Fosc {
 
     def get_effective(
         self,
-        prototype=None,
+        type=None,
         unwrap=True,
         n=0,
         ):
         return self._client._get_effective(
-            prototype=prototype,
+            type=type,
             unwrap=unwrap,
             n=n,
             )
     -------------------------------------------------------------------------------------------------------- */
-    effectiveIndicator { |prototype, unwrap=true, n=0|
-        //^client.prGetEffectiveIndicatorOfType(prototype: prototype, unwrap: unwrap, n: n);
-        ^client.prGetEffective(prototype, unwrap, n);
+    effectiveIndicator { |type, unwrap=true, n=0|
+        //^client.prGetEffectiveIndicatorOfType(type: type, unwrap: unwrap, n: n);
+        ^client.prGetEffective(type, unwrap, n);
     }
     /* --------------------------------------------------------------------------------------------------------
     • effective
     -------------------------------------------------------------------------------------------------------- */
     // abjad 3.0
-    effective { |prototype, attributes, default, n=0, unwrap=true|
+    effective { |type, attributes, default, n=0, unwrap=true|
         // if not isinstance(self.client, Component):
         //     raise Exception('can only get effective on components.')
         // if attributes is not None:
         //     assert isinstance(attributes, dict), repr(attributes)
         // result = self.client._get_effective(
-        //     prototype,
+        //     type,
         //     attributes=attributes,
         //     n=n,
         //     unwrap=unwrap,
@@ -299,7 +299,7 @@ FoscInspection : Fosc {
                 .format(this.species, thisMethod.name, client));
         };
         if (attributes.notNil) { assert(attributes.isKindOf(Dictionary)) };
-        result = client.prGetEffective(prototype, attributes: attributes, n: n, unwrap: unwrap);
+        result = client.prGetEffective(type, attributes: attributes, n: n, unwrap: unwrap);
         if (result.isNil) { result = default };
         ^result;
     }
@@ -320,9 +320,9 @@ FoscInspection : Fosc {
     • effectiveWrapper
     -------------------------------------------------------------------------------------------------------- */
     // abjad 3.0
-    effectiveWrapper { |prototype, attributes, n=0|
+    effectiveWrapper { |type, attributes, n=0|
         if (attributes.notNil) { assert(attributes.isKindOf(Dictionary)) };
-        ^this.effective(prototype, attributes: attributes, n: n, unwrap: false);
+        ^this.effective(type, attributes: attributes, n: n, unwrap: false);
     }
     /* --------------------------------------------------------------------------------------------------------
     • graceContainer
@@ -345,34 +345,34 @@ FoscInspection : Fosc {
     Is true when client is grace note.
     -------------------------------------------------------------------------------------------------------- */
     graceNote {
-        var prototype;
+        var type;
         if (client.isKindOf(FoscLeaf).not) { ^false };
-        prototype = [FoscAfterGraceContainer, FoscGraceContainer];
+        type = [FoscAfterGraceContainer, FoscGraceContainer];
         client.prGetParentage.do { |component|
-            if (prototype.any { |type| component.isKindOf(type) }) { ^true };
+            if (type.any { |type| component.isKindOf(type) }) { ^true };
         };
         ^false;
     }
     /* --------------------------------------------------------------------------------------------------------
     • indicatorOfType (abjad: get_indicator)
 
-    Gets indicator of prototype attached to client.
+    Gets indicator of type attached to client.
     
-    Raises exception when more than one indicator of prototype attach to client.
+    Raises exception when more than one indicator of type attach to client.
 
-    Returns default when no indicator of prototype attaches to client.
+    Returns default when no indicator of type attaches to client.
 
     Returns indicator or default.
 
 
     def get_indicator(
         self,
-        prototype=None,
+        type=None,
         default=None,
         unwrap=True,
         ):
         indicators = self._client._get_indicators(
-                prototype=prototype,
+                type=type,
                 unwrap=unwrap,
                 )
         if not indicators:
@@ -383,9 +383,9 @@ FoscInspection : Fosc {
             message = 'multiple indicators attached to client.'
             raise Exception(message)
     -------------------------------------------------------------------------------------------------------- */
-    indicatorOfType { |prototype, default, unwrap=true|
+    indicatorOfType { |type, default, unwrap=true|
         var indicators;
-        indicators = client.prGetIndicators(prototype: prototype, unwrap: unwrap);
+        indicators = client.prGetIndicators(type: type, unwrap: unwrap);
         if (indicators.isEmpty) { ^default };
         if (indicators.size == 1) {
             ^indicators.as(Array)[0];
@@ -397,14 +397,14 @@ FoscInspection : Fosc {
     • indicators (abjad: get_indicators)
     -------------------------------------------------------------------------------------------------------- */
     // abjad 3.0
-    indicators { |prototype, unwrap=true|
+    indicators { |type, unwrap=true|
         if (client.isKindOf(FoscComponent).not) {
             throw(
                 "%:%: can only get indicators on a FoscComponent: %."
                     .format(this.species, thisMethod.name, client);
             );
         };
-        ^client.prGetIndicators(prototype: prototype, unwrap: unwrap);
+        ^client.prGetIndicators(type: type, unwrap: unwrap);
     }
     /* --------------------------------------------------------------------------------------------------------
     • leafAt
@@ -551,7 +551,7 @@ FoscInspection : Fosc {
         FoscVoice({ |i| FoscNote(10 + i, [1, 4]) } ! 10)
     ]);
     FoscInspection(a).leafAt(7).pitch.pitchNumber;
-    FoscInspection(a.select.byLeaf[5]).leafAt(2).pitch.pitchNumber;
+    FoscInspection(a.select.leaves[5]).leafAt(2).pitch.pitchNumber;
     FoscInspection(a.select.leaves[4]).leafAt(-3).pitch.pitchNumber;
     -------------------------------------------------------------------------------------------------------- */
     leafAt { |n=0|
@@ -713,8 +713,8 @@ FoscInspection : Fosc {
 
     Returns indicator or default.
 
-    def get_piecewise(self, prototype=None, default=None):
-        wrappers = self.get_indicators(prototype=prototype, unwrap=False)
+    def get_piecewise(self, type=None, default=None):
+        wrappers = self.get_indicators(type=type, unwrap=False)
         wrappers = wrappers or []
         wrappers = [_ for _ in wrappers if _.is_piecewise]
         if not wrappers:
@@ -725,9 +725,9 @@ FoscInspection : Fosc {
             message = 'multiple indicators attached to client.'
             raise Exception(message)
     -------------------------------------------------------------------------------------------------------- */
-    piecewise { |prototype, default|
+    piecewise { |type, default|
         var wrappers;
-        wrappers = this.indicators(prototype: prototype, unwrap: false);
+        wrappers = this.indicators(type: type, unwrap: false);
         wrappers = wrappers ? [];
         wrappers = wrappers.select { |each| each.isPiecewise };
         if (wrappers.isEmpty) { ^default };
@@ -810,22 +810,22 @@ FoscInspection : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • spannerOfType
 
-    Gets spanner of prototype attached to client.
+    Gets spanner of type attached to client.
     
-    Raises exception when more than one spanner of prototype attaches to client.
+    Raises exception when more than one spanner of type attaches to client.
 
-    Returns default when no spanner of prototype attaches to client.
+    Returns default when no spanner of type attaches to client.
 
     Returns spanner or default.
 
     def get_spanner(
         self,
-        prototype=None,
+        type=None,
         default=None,
         in_parentage=False,
         ):
         spanners = self._client._get_spanners(
-            prototype=prototype,
+            type=type,
             in_parentage=in_parentage,
             )
         if not spanners:
@@ -840,9 +840,9 @@ FoscInspection : Fosc {
     FoscAttach(FoscTie(), a);
     FoscInspection(a[0]).spannerOfType(FoscTie);
     -------------------------------------------------------------------------------------------------------- */
-    spannerOfType { |prototype, default, inParentage=false|
+    spannerOfType { |type, default, inParentage=false|
         var spanners;
-        spanners = client.prSpanners(prototype, inParentage);
+        spanners = client.prSpanners(type, inParentage);
         if (spanners.isEmpty) {
             ^default;
         } {
@@ -859,11 +859,11 @@ FoscInspection : Fosc {
 
     def get_spanners(
         self,
-        prototype=None,
+        type=None,
         in_parentage=False,
         ):
         return self._client._get_spanners(
-            prototype=prototype,
+            type=type,
             in_parentage=in_parentage,
             )
     
@@ -871,8 +871,8 @@ FoscInspection : Fosc {
     FoscAttach(FoscTie(), a);
     FoscInspection(a[0]).spanners;
     -------------------------------------------------------------------------------------------------------- */
-    spanners { |prototype, inParentage=false|
-        ^client.prSpanners(prototype, inParentage);
+    spanners { |type, inParentage=false|
+        ^client.prSpanners(type, inParentage);
     }
     /* --------------------------------------------------------------------------------------------------------
     • timespan
@@ -1031,48 +1031,48 @@ FoscInspection : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • hasEffectiveIndicator
 
-    Is true when indicator that matches prototype is in effect for client. Otherwise false.
+    Is true when indicator that matches type is in effect for client. Otherwise false.
 
     Returns true or false.
 
-    def has_effective_indicator(self, prototype=None):
-        return self._client._has_effective_indicator(prototype=prototype)
+    def has_effective_indicator(self, type=None):
+        return self._client._has_effective_indicator(type=type)
     -------------------------------------------------------------------------------------------------------- */
-    hasEffectiveIndicator { |prototype|
-        ^client.prHasEffectiveIndicator(prototype: prototype);
+    hasEffectiveIndicator { |type|
+        ^client.prHasEffectiveIndicator(type: type);
     }
     /* --------------------------------------------------------------------------------------------------------
     • hasIndicator
     
-    Is true when client has one or more indicators that match prototype. Otherwise false.
+    Is true when client has one or more indicators that match type. Otherwise false.
     
     Returns true or false.
 
-    def has_indicator(self, prototype=None):
-        return self._client._has_indicator(prototype=prototype)
+    def has_indicator(self, type=None):
+        return self._client._has_indicator(type=type)
     -------------------------------------------------------------------------------------------------------- */
-    hasIndicator { |prototype|
-        ^client.prHasIndicator(prototype: prototype);
+    hasIndicator { |type|
+        ^client.prHasIndicator(type: type);
     }
     /* --------------------------------------------------------------------------------------------------------
     • hasSpanner
 
-    Is true when client has one or more spanners that match prototype. Otherwise false.
+    Is true when client has one or more spanners that match type. Otherwise false.
     
     Returns true or false.
 
     def has_spanner(
         self,
-        prototype=None,
+        type=None,
         in_parentage=False,
         ):
         return self._client._has_spanner(
-            prototype=prototype,
+            type=type,
             in_parentage=in_parentage,
             )
     -------------------------------------------------------------------------------------------------------- */
-    hasSpanner { |prototype, inParentage=false|
-        ^client.prHasSpanner(prototype, inParentage);
+    hasSpanner { |type, inParentage=false|
+        ^client.prHasSpanner(type, inParentage);
     }
     /* --------------------------------------------------------------------------------------------------------
     • isBarLineCrossing
@@ -1284,8 +1284,8 @@ FoscInspection : Fosc {
     • wrappers
     -------------------------------------------------------------------------------------------------------- */
     // abjad 3.0
-    wrappers { |prototype|
-        ^this.indicators(prototype, false);
+    wrappers { |type|
+        ^this.indicators(type, false);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC PROPERTIES

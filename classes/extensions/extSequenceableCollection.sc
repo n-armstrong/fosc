@@ -224,16 +224,6 @@
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • incise
-
-    x = #[4,3,4,2];
-    x.incise(0)
-    -------------------------------------------------------------------------------------------------------- */
-    // incise { |index=0, n=1|
-    //     var result;
-    //     result = [];
-    // }
-    /* --------------------------------------------------------------------------------------------------------
     • intervals
     -------------------------------------------------------------------------------------------------------- */
     intervals {
@@ -248,41 +238,10 @@
     /* --------------------------------------------------------------------------------------------------------
     • iterate
     -------------------------------------------------------------------------------------------------------- */
-    //!!!TODO: deprecate ??
+    //!!!TODO: deprecate
     iterate {
         ^FoscIteration(this);
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • mask
-
-    a = (1..10);
-    a.mask(#[1,0,1,1,0,1], isCyclic: false);
-    a.mask(#[1,0,1,1,0,1], isCyclic: true);
-
-    a = (1..10);
-    a.mask([-1, 1], isCyclic: true);
-
-    a = (1..10);
-    a.mask([false, true], isCyclic: true);
-    -------------------------------------------------------------------------------------------------------- */
-    // mask { |pattern, isCyclic=false|
-    //     var result, val;
-    //     result = this.species.newClear(this.size);
-    //     pattern = pattern.collect { |each| each.binaryValue };
-    //     pattern = pattern.collect { |each| if (each == 0) { each = -1 } { each } };
-    //     this.do { |item, i|
-    //         if (isCyclic) {
-    //             result[i] = item * pattern.wrapAt(i);
-    //         } { 
-    //             if (pattern[i].notNil) {
-    //                 result[i] = item * pattern[i];
-    //             } {
-    //                 result[i] = item;
-    //             };
-    //         };
-    //     };
-    //     ^result;
-    // }
     /* --------------------------------------------------------------------------------------------------------
     • offsets
     -------------------------------------------------------------------------------------------------------- */
@@ -297,6 +256,7 @@
     /* --------------------------------------------------------------------------------------------------------
     • mutate
     -------------------------------------------------------------------------------------------------------- */
+    //!!!TODO: deprecate
     mutate {
         ^FoscMutation(this);
     }
@@ -392,29 +352,6 @@
         };
         ^result;
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • parts
-
-
-    • Example 1
-
-    m = [5,7,11,3];
-    m.parts(#[-1,2,3,-inf]);
-
-    
-    • Example 2 - incise last
-
-    m = [5,7,11,3];
-    m.parts(#[-1,-inf], reverse: true);
-    -------------------------------------------------------------------------------------------------------- */
-    // parts { |ratio, reverse=false, sustain=true|
-    //     var result;
-
-    //     result = [];
-    //     this.do { |each| result = result.addAll(each.parts(ratio, reverse, sustain)) };
-
-    //     ^result;
-    // }
     /* --------------------------------------------------------------------------------------------------------
     • partitionByRatio
 
@@ -726,27 +663,13 @@
 
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
-    doLeaves { |function, prototype, pitched, graceNotes=false|
-        var iterator;
-        
-        Fosc.prCheckIsIterable(this, thisMethod);
-        
-        iterator = FoscIteration(this).leaves(prototype: prototype, pitched: pitched, graceNotes: graceNotes);
-
-        iterator.do(function);
-    }
-    // doLeaves { |function, pitched, prototype, exclude, doNotIterateGraceContainers=false,
-    //     graceNotes=false, reverse=false|
+    // doLeaves { |function, type, pitched, graceNotes=false|
     //     var iterator;
+        
     //     Fosc.prCheckIsIterable(this, thisMethod);
-    //     iterator = FoscIteration(this).leaves(
-    //         prototype: prototype,
-    //         exclude: exclude,
-    //         doNotIterateGraceContainers: doNotIterateGraceContainers,
-    //         graceNotes: graceNotes,
-    //         pitched: pitched,
-    //         reverse: reverse
-    //     );
+        
+    //     iterator = FoscIteration(this).leaves(type: type, pitched: pitched, graceNotes: graceNotes);
+
     //     iterator.do(function);
     // }
     /* --------------------------------------------------------------------------------------------------------
@@ -755,58 +678,62 @@
      -- mirror selection and iteration methods in Fosc
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
-    selectComponents { |prototype, exclude, graceNotes=false, reverse=false|
-        Fosc.prCheckIsIterable(this, thisMethod);  
-        ^FoscSelection(this).components(
-            prototype: prototype,
-            exclude: exclude,
-            graceNotes: graceNotes,
-            reverse: reverse
-        );
-    }
+    //!!!TODO: deprecate
+    // selectComponents { |type, exclude, graceNotes=false, reverse=false|
+    //     Fosc.prCheckIsIterable(this, thisMethod);  
+    //     ^FoscSelection(this).components(
+    //         type: type,
+    //         exclude: exclude,
+    //         graceNotes: graceNotes,
+    //         reverse: reverse
+    //     );
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • selectLeaves
 
     -- mirror selection and iteration methods in Fosc
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
-    selectLeaves { |prototype, exclude, graceNotes=false, pitched, reverse=false|
-        Fosc.prCheckIsIterable(this, thisMethod);
-        ^FoscSelection(this).leaves(
-            prototype: prototype,
-            exclude: exclude,
-            graceNotes: graceNotes,
-            pitched: pitched,
-            reverse: reverse
-        );
+    //!!!TODO: deprecate
+    // selectLeaves { |type, exclude, graceNotes=false, pitched, reverse=false|
+    //     Fosc.prCheckIsIterable(this, thisMethod);
+    //     ^FoscSelection(this).leaves(
+    //         type: type,
+    //         exclude: exclude,
+    //         graceNotes: graceNotes,
+    //         pitched: pitched,
+    //         reverse: reverse
+    //     );
     
-    }
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • selectLogicalTies
 
      -- mirror selection and iteration methods in Fosc
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
-    selectLogicalTies { |exclude, graceNotes=false, nontrivial, pitched, reverse=false|
-        Fosc.prCheckIsIterable(this, thisMethod);   
-        ^FoscSelection(this).logicalTies(
-            exclude: exclude,
-            graceNotes: graceNotes,
-            nontrivial: nontrivial,
-            pitched: pitched,
-            reverse: reverse
-        );
-    }
+    //!!!TODO: deprecate
+    // selectLogicalTies { |exclude, graceNotes=false, nontrivial, pitched, reverse=false|
+    //     Fosc.prCheckIsIterable(this, thisMethod);   
+    //     ^FoscSelection(this).logicalTies(
+    //         exclude: exclude,
+    //         graceNotes: graceNotes,
+    //         nontrivial: nontrivial,
+    //         pitched: pitched,
+    //         reverse: reverse
+    //     );
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • selectRuns
 
     -- mirror selection and iteration methods in Fosc
     !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
     -------------------------------------------------------------------------------------------------------- */
-    selectRuns { |exclude|
-        Fosc.prCheckIsIterable(this, thisMethod);
-        ^FoscSelection(this).runs(exclude: exclude);
-    }
+    //!!!TODO: deprecate
+    // selectRuns { |exclude|
+    //     Fosc.prCheckIsIterable(this, thisMethod);
+    //     ^FoscSelection(this).runs(exclude: exclude);
+    // }
     /* --------------------------------------------------------------------------------------------------------
 	• truncateToAbsSum (abjad: truncate)
 
@@ -893,21 +820,6 @@
         if (indices.last < this.size) { ^this.atAll(indices) };
         if (indices.last > this.size && { indices.first < this.size }) { ^this[indices.first..] };
         if (indices.first >= this.size) { ^[] };
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • prIterateBottomUp
-
-    def _iterate_bottom_up(self):
-        def recurse(node):
-            if isinstance(node, Container):
-                for x in node:
-                    for y in recurse(x):
-                        yield y
-            yield node
-        return recurse(self)
-    -------------------------------------------------------------------------------------------------------- */
-    prIterateBottomUp {
-        ^this.notYetImplemented(thisMethod);
     }
     /* --------------------------------------------------------------------------------------------------------
     • prIterateTopDown

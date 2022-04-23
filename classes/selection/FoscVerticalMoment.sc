@@ -165,15 +165,15 @@ FoscVerticalMoment : FoscSelection {
     • *prFromOffset
     -------------------------------------------------------------------------------------------------------- */
     *prFromOffset { |expr, offset|
-        var governors, prototype, message, order, components;
+        var governors, type, message, order, components;
         governors = [];
-        prototype = [SequenceableCollection, FoscSelection];
+        type = [SequenceableCollection, FoscSelection];
         message = "must be component or of Fosc components: %.".format(expr);
         case
         { expr.isKindOf(FoscComponent) } {
             governors = governors.add(expr);
         }
-        { prototype.any { |type| expr.isKindOf(type) } } {
+        { type.any { |type| expr.isKindOf(type) } } {
             expr.do { |each|
                 if (each.isKindOf(FoscComponent)) {
                     governors = governors.add(each);
@@ -305,11 +305,11 @@ FoscVerticalMoment : FoscSelection {
     Tuple of zero or more notes and chords at vertical moment.
     -------------------------------------------------------------------------------------------------------- */
     notesAndChords {
-        var prototype, result;
-        prototype = [FoscNote, FoscChord];
+        var type, result;
+        type = [FoscNote, FoscChord];
         result = [];
         components.do { |each|
-            if (prototype.any { |type| each.isKindOf(type) }) { result = result.add(each) };
+            if (type.any { |type| each.isKindOf(type) }) { result = result.add(each) };
         };
         ^result;
     }
@@ -390,7 +390,7 @@ FoscVerticalMoment : FoscSelection {
                 #print 'found leaf starting on this moment ...'
                 try:
                     previous_leaf = leaf._get_in_my_logical_voice(
-                        -1, prototype=scoretools.Leaf)
+                        -1, type=scoretools.Leaf)
                     start = previous_leaf._get_timespan().start_offset
                     #print previous_leaf, start
                     if most_recent_start_offset <= start:

@@ -912,7 +912,7 @@ FoscMutation {
         var namedInterval, oldWrittenPitch, newWrittenPitch;
         //!!!TODO: namedInterval = FoscNamedInterval(interval);
         namedInterval = interval;
-        FoscIteration(client).components(prototype: [FoscNote, FoscChord]).do { |leaf|
+        FoscIteration(client).components(type: [FoscNote, FoscChord]).do { |leaf|
             if (leaf.isKindOf(FoscNote)) {
                 oldWrittenPitch = leaf.writtenPitch;
                 newWrittenPitch = oldWrittenPitch.transpose(namedInterval);

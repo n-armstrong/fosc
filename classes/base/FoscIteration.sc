@@ -1,10 +1,6 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscIteration
 
-!!!TODO: move FoscStream methods into FoscIteration, deprecate FoscStream
-
-
-
 Iteration.
 
 
@@ -21,12 +17,12 @@ FoscIteration {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     var <client, <routine, count=0;
     *new { |client|
-        var prototype, names;
+        var type, names;
 
-        prototype = [FoscComponent, FoscSelection, SequenceableCollection];
+        type = [FoscComponent, FoscSelection, SequenceableCollection];
         
-        if (prototype.any { |type| client.isKindOf(type) }.not) {
-            names = prototype.collect { |each| each.name }.join(", ");
+        if (type.any { |type| client.isKindOf(type) }.not) {
+            names = type.collect { |each| each.name }.join(", ");
             throw("FoscIteration:new: client must be one of: %.".format(names));
         };
 
@@ -188,17 +184,17 @@ FoscIteration {
     FoscIteration(a).components.do { |each| each.cs.postln };
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69], [1/8]));
-    FoscIteration(a).components(prototype: FoscNote).do { |each| each.cs.postln };
+    FoscIteration(a).components(type: FoscNote).do { |each| each.cs.postln };
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69], [1/8]));
     FoscIteration(a).components(FoscNote, reverse: true).do { |each| each.cs.postln };
     -------------------------------------------------------------------------------------------------------- */
-    components { |prototype, exclude, doNotIterateGraceContainers=false, graceNotes=false, reverse=false|
+    components { |type, exclude, doNotIterateGraceContainers=false, graceNotes=false, reverse=false|
         var localClient, iterablePrototype, graceContainer, afterGraceContainer, embeddedRoutine;
 
         localClient = client;
-        prototype = prototype ? FoscComponent;
-        if (prototype.isSequenceableCollection.not) { prototype = [prototype] };
+        type = type ? FoscComponent;
+        if (type.isSequenceableCollection.not) { type = [type] };
         exclude = FoscIteration.prCoerceExclude(exclude);
         assert(exclude.isSequenceableCollection);
         iterablePrototype = [FoscContainer, FoscSelection, SequenceableCollection];
@@ -212,7 +208,7 @@ FoscIteration {
             if (reverse.not) {
                 if (doNotIterateGraceContainers.not && graceNotes && graceContainer.notNil) {
                     embeddedRoutine = FoscIteration(graceContainer).components(
-                        prototype,
+                        type,
                         doNotIterateGraceContainers: doNotIterateGraceContainers,
                         graceNotes: graceNotes,
                         reverse: reverse
@@ -221,7 +217,7 @@ FoscIteration {
                     //if (next.notNil) { next.yield };
                 };
                 
-                if (prototype.any { |type| localClient.isKindOf(type) }) {
+                if (type.any { |type| localClient.isKindOf(type) }) {
                     if (
                         (graceNotes && FoscInspection(localClient).graceNote)
                         || { graceNotes.not && FoscInspection(localClient).graceNote.not }
@@ -235,7 +231,7 @@ FoscIteration {
                 
                 if (doNotIterateGraceContainers.not && graceNotes && afterGraceContainer.notNil) {
                     embeddedRoutine = FoscIteration(afterGraceContainer).components(
-                        prototype,
+                        type,
                         exclude: exclude,
                         doNotIterateGraceContainers: doNotIterateGraceContainers,
                         graceNotes: graceNotes,
@@ -248,7 +244,7 @@ FoscIteration {
                 if (iterablePrototype.any { |type| localClient.isKindOf(type) }) {
                     localClient.do { |each|
                         embeddedRoutine = FoscIteration(each).components(
-                            prototype: prototype,
+                            type: type,
                             exclude: exclude,
                             doNotIterateGraceContainers: doNotIterateGraceContainers,
                             graceNotes: graceNotes,
@@ -261,7 +257,7 @@ FoscIteration {
             } {
                 if (doNotIterateGraceContainers.not && graceNotes && afterGraceContainer.notNil) {
                     embeddedRoutine = FoscIteration(afterGraceContainer).components(
-                        prototype,
+                        type,
                         exclude: exclude,
                         doNotIterateGraceContainers: doNotIterateGraceContainers,
                         graceNotes: graceNotes,
@@ -271,7 +267,7 @@ FoscIteration {
                     //if (next.notNil) { next.yield };
                 };
                 
-                if (prototype.any { |type| localClient.isKindOf(type) }) {
+                if (type.any { |type| localClient.isKindOf(type) }) {
                     if (
                         (graceNotes && FoscInspection(localClient).graceNote)
                         || { graceNotes.not && FoscInspection(localClient).graceNote.not }
@@ -285,7 +281,7 @@ FoscIteration {
                 
                 if (doNotIterateGraceContainers.not && graceNotes && graceContainer.notNil) {
                     embeddedRoutine = FoscIteration(graceContainer).components(
-                        prototype,
+                        type,
                         doNotIterateGraceContainers: doNotIterateGraceContainers,
                         graceNotes: graceNotes,
                         reverse: reverse
@@ -297,7 +293,7 @@ FoscIteration {
                 if (iterablePrototype.any { |type| localClient.isKindOf(type) }) {
                     localClient.reverseDo { |each|
                         embeddedRoutine = FoscIteration(each).components(
-                            prototype: prototype,
+                            type: type,
                             exclude: exclude,
                             doNotIterateGraceContainers: doNotIterateGraceContainers,
                             graceNotes: graceNotes,
@@ -331,38 +327,35 @@ FoscIteration {
     a = FoscLeafMaker().(#[60,62,nil,65,67,nil], [1/8]);
     FoscIteration(a).leaves(pitched: false).do { |each| each.cs.postln };
     -------------------------------------------------------------------------------------------------------- */
-    leaves { |prototype, pitched, graceNotes=false|
-        prototype = prototype ? FoscLeaf;
-        
+    leaves { |type, pitched, graceNotes=false|
         case 
         { pitched == true } {
-            prototype = [FoscChord, FoscNote];
+            type = [FoscChord, FoscNote];
         }
         { pitched == false } {
-            prototype = [FoscMultimeasureRest, FoscRest, FoscSkip];
+            type = [FoscMultimeasureRest, FoscRest, FoscSkip];
+        }
+        {
+            type = FoscLeaf;
         };
         
-        ^this.components(prototype: prototype, graceNotes: graceNotes);
+        ^this.components(type: type, graceNotes: graceNotes);
     }
-    // leaves { |prototype, exclude, doNotIterateGraceContainers=false, graceNotes=false, pitched,
-    //     reverse=false|
-    //     prototype = prototype ? FoscLeaf;
-        
+    // leaves { |pitched, graceNotes=false|
+    //     var type;
+
     //     case 
     //     { pitched == true } {
-    //         prototype = [FoscChord, FoscNote];
+    //         type = [FoscChord, FoscNote];
     //     }
     //     { pitched == false } {
-    //         prototype = [FoscMultimeasureRest, FoscRest, FoscSkip];
+    //         type = [FoscMultimeasureRest, FoscRest, FoscSkip];
+    //     }
+    //     {
+    //         type = FoscLeaf;
     //     };
         
-    //     ^this.components(
-    //         prototype: prototype,
-    //         exclude: exclude,
-    //         doNotIterateGraceContainers: doNotIterateGraceContainers,
-    //         graceNotes: graceNotes,
-    //         reverse: reverse
-    //     );
+    //     ^this.components(type: type, graceNotes: graceNotes);
     // }
     /* --------------------------------------------------------------------------------------------------------
     • logicalTies
@@ -370,7 +363,8 @@ FoscIteration {
 
     • iterate all logicalTies
 
-    a = FoscStaff(FoscMusicMaker().(durations: #[[5,16]], mask: #[2,-1,1,1], pitches: (60..64)));
+    b = FoscMusicMaker().(durations: #[[5,16]], mask: #[2,-1,1,1], pitches: (60..64));
+    a = FoscStaff(b);
     b = FoscIteration(a).logicalTies;
     b.do { |each| each.cs.postln };
     
@@ -447,26 +441,27 @@ FoscIteration {
     a = FoscStaff(FoscLeafMaker().(#[60,61,nil,63,nil,nil,65,66], [1/8]));
     b = FoscStaff(FoscLeafMaker().((60..63), [5/16]));
     c = FoscScore([a, b]);
-    m = FoscIteration(c).timeline(prototype: FoscLogicalTie, pitched: true);
+    m = FoscIteration(c).timeline(type: FoscLogicalTie, pitched: true);
     m.do { |each, i| each.attach(FoscMarkup(i, 'above')) };
     c.show;
     -------------------------------------------------------------------------------------------------------- */
-    timeline { |prototype, pitched, graceNotes=false|
+    timeline { |type, pitched, graceNotes=false|
         var components, indices, scoreIndex;    
         
-        prototype = prototype ? FoscLeaf;
-        components = this.leaves(prototype, pitched, graceNotes).all;
+        type = type ? FoscLeaf;
+        components = this.leaves(type, pitched, graceNotes).all;
         
         components = components.reverse.sort { |a, b|
+            a.postln;
             a.prGetTimespan.startOffset < b.prGetTimespan.startOffset;
         };
 
         routine = components.iter;
     }
-    // timeline { |prototype, exclude, pitched, reverse=false|
+    // timeline { |type, exclude, pitched, reverse=false|
     //     var components, indices, scoreIndex;    
         
-    //     components = all(this.leaves(prototype: prototype, exclude: exclude, pitched: pitched));
+    //     components = all(this.leaves(type: type, exclude: exclude, pitched: pitched));
         
     //     indices = components.collect { |each|
     //         //!!!TODO: graceNotes ??

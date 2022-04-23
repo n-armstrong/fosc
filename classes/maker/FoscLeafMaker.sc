@@ -317,7 +317,7 @@ FoscLeafMaker {
         restPrototype = [Nil];
 
         case
-        { notePrototype.any { |prototype| pitch.isKindOf(prototype) } } {
+        { notePrototype.any { |type| pitch.isKindOf(type) } } {
             leaves = FoscLeafMaker.prMakeTiedLeaf(
                 class: FoscNote,
                 duration: duration,
@@ -327,7 +327,7 @@ FoscLeafMaker {
                 repeatTies: repeatTies
             );
         }
-        { chordPrototype.any { |prototype| pitch.isKindOf(prototype) } } {
+        { chordPrototype.any { |type| pitch.isKindOf(type) } } {
             leaves = FoscLeafMaker.prMakeTiedLeaf(
                 class: FoscChord,
                 duration: duration,
@@ -337,7 +337,7 @@ FoscLeafMaker {
                 repeatTies: repeatTies
             );
         }
-        { restPrototype.any { |prototype| pitch.isKindOf(prototype) } && skipsInsteadOfRests } {
+        { restPrototype.any { |type| pitch.isKindOf(type) } && skipsInsteadOfRests } {
             leaves = FoscLeafMaker.prMakeTiedLeaf(
                 class: FoscSkip,
                 duration: duration,
@@ -346,7 +346,7 @@ FoscLeafMaker {
                 repeatTies: repeatTies
             );
         }
-        { restPrototype.any { |prototype| pitch.isKindOf(prototype) } && useMultimeasureRests.not } {
+        { restPrototype.any { |type| pitch.isKindOf(type) } && useMultimeasureRests.not } {
             leaves = FoscLeafMaker.prMakeTiedLeaf(
                 class: FoscRest,
                 duration: duration,
@@ -355,7 +355,7 @@ FoscLeafMaker {
                 repeatTies: repeatTies
             );
         }
-        { restPrototype.any { |prototype| pitch.isKindOf(prototype) } && useMultimeasureRests } {
+        { restPrototype.any { |type| pitch.isKindOf(type) } && useMultimeasureRests } {
             multimeasureRest = FoscMultimeasureRest(1);
             multimeasureRest.multiplier_(duration);
             leaves = FoscSelection([multimeasureRest]);

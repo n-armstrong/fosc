@@ -29,9 +29,9 @@ FoscVoice : FoscContext {
     a.append('foo');      // raise exception
     -------------------------------------------------------------------------------------------------------- */
     prOnInsertionCheck { |index, node|
-        var prototype;
-        prototype = [FoscTuplet, FoscLeaf, FoscSelection];
-        if (prototype.any { |type| node.isKindOf(type) }.not) {
+        var type;
+        type = [FoscTuplet, FoscLeaf, FoscSelection];
+        if (type.any { |type| node.isKindOf(type) }.not) {
             throw("%: can't insert a % in this container.".format(this.species, node.species)); 
         };
         super.prOnInsertionCheck(index, node);

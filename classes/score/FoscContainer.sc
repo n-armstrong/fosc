@@ -1134,7 +1134,7 @@ FoscContainer : FoscComponent {
     a.show;
     -------------------------------------------------------------------------------------------------------- */
     prSetItem { |index, object|
-        var componentIndicators, wrappers, prototype, newObject, start, stop, oldComponents;
+        var componentIndicators, wrappers, type, newObject, start, stop, oldComponents;
 
         componentIndicators = []; 
         
@@ -1147,8 +1147,8 @@ FoscContainer : FoscComponent {
         if (object.isSequenceableCollection.not) { object = [object] };
         if (index.isInteger) { index = [index, index + 1] };
         
-        prototype = [FoscComponent, FoscSelection];
-        assert(object.every { |item| prototype.any { |type| item.isKindOf(type) } });
+        type = [FoscComponent, FoscSelection];
+        assert(object.every { |item| type.any { |type| item.isKindOf(type) } });
         newObject = [];   
         
         object.do { |each|

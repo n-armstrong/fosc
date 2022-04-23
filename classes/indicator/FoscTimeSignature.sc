@@ -143,7 +143,7 @@ FoscTimeSignature : Fosc {
     a.format;
 
     !!!TODO: bug: result shuold be [[4,4],[4,4],[2,4],[2,4]]
-    iterate(a).byLeaf.do { |leaf|
+    iterate(a).leaves.do { |leaf|
         FoscInspection(leaf).effectiveIndicator(FoscTimeSignature).pair.postln;
     };
     -------------------------------------------------------------------------------------------------------- */

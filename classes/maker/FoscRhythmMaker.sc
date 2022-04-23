@@ -296,7 +296,7 @@ FoscRhythmMaker : Fosc {
     • prValidateTuplets
     -------------------------------------------------------------------------------------------------------- */
     prValidateTuplets { |selections|
-        FoscIteration(selections).components(prototype: FoscTuplet).do { |tuplet|
+        FoscIteration(selections).components(type: FoscTuplet).do { |tuplet|
             if (tuplet.multiplier.isNormalized.not) {
                 throw("%::prValidateTuplets: tuplet multiplier is not normalized: %."
                     .format(this.species, tuplet.multiplier.str));
@@ -328,10 +328,10 @@ FoscRhythmMaker : Fosc {
     • *prIsSignTuple
     -------------------------------------------------------------------------------------------------------- */
     *prIsSignTuple { |expr|
-        var prototype;
+        var type;
         if (expr.isSequenceableCollection) {
-            prototype = #[-1, 0, 1];
-            ^expr.every { |each| prototype.includes(each) }
+            type = #[-1, 0, 1];
+            ^expr.every { |each| type.includes(each) }
         };
         ^false;
     }

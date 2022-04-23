@@ -317,17 +317,17 @@ FoscWrapper : Fosc {
     • prWarnDuplicateIndicator
     -------------------------------------------------------------------------------------------------------- */
     prWarnDuplicateIndicator { |component|
-        var prototype, command, wrapper, myLeak, parentage, wrapperContext, context, message;
+        var type, command, wrapper, myLeak, parentage, wrapperContext, context, message;
 
         if (deactivate == true) { ^this };
         
-        prototype = indicator.species;
+        type = indicator.species;
         
         if (indicator.respondsTo('command') && { indicator.command.notNil }) {
             command = indicator.command;
         };
 
-        wrapper = FoscInspection(component).effectiveWrapper(prototype, attributes: (command: command));
+        wrapper = FoscInspection(component).effectiveWrapper(type, attributes: (command: command));
 
         if (
             wrapper.isNil

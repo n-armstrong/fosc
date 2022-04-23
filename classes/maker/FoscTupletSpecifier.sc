@@ -55,7 +55,7 @@ FoscTupletSpecifier : Fosc {
         var tuplets, localDenominator, division, unitDuration, duration, denominator_, nonreducedFraction;
         
         if (denominator.isNil) { ^this };
-        tuplets = all(FoscIteration(selections).components(prototype: FoscTuplet));
+        tuplets = all(FoscIteration(selections).components(type: FoscTuplet));
         if (divisions.isNil) { divisions = Array.newClear(tuplets.size) };
         assert(selections.size == divisions.size);
         assert(tuplets.size == divisions.size);
@@ -126,7 +126,7 @@ FoscTupletSpecifier : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prForceFraction { |selections|
         if (forceFraction.not) { ^this };
-        FoscIteration(selections).components(prototype: FoscTuplet).do { |tuplet|
+        FoscIteration(selections).components(type: FoscTuplet).do { |tuplet|
             tuplet.forceFraction_(true);
         };
     }
@@ -139,7 +139,7 @@ FoscTupletSpecifier : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prRewriteDots { |selections|
         if (rewriteDots.not) { ^this };
-        FoscIteration(selections).components(prototype: FoscTuplet).do { |tuplet|
+        FoscIteration(selections).components(type: FoscTuplet).do { |tuplet|
             tuplet.rewriteDots;
         };
     }
@@ -246,7 +246,7 @@ FoscTupletSpecifier : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prToggleProlation { |selections|
         if (isDiminution.isNil) { ^this };
-        FoscIteration(selections).components(prototype: FoscTuplet).do { |tuplet|
+        FoscIteration(selections).components(type: FoscTuplet).do { |tuplet|
             if (
                 (isDiminution && tuplet.isDiminution.not)
                 || { isDiminution.not && tuplet.isAugmentation.not }
@@ -260,7 +260,7 @@ FoscTupletSpecifier : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prTrivialize { |selections|
         if (trivialize.not) { ^this };
-        FoscIteration(selections).components(prototype: FoscTuplet).do { |tuplet|
+        FoscIteration(selections).components(type: FoscTuplet).do { |tuplet|
             tuplet.trivialize;
         }; 
     }

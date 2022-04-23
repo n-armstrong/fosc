@@ -424,13 +424,13 @@ FoscLogicalTie : FoscSelection {
     c.tieSpanner;  // nil: a FoscTie has not been attached to the selection
     -------------------------------------------------------------------------------------------------------- */
     // tieSpanner {
-    //     var prototype, tieSpanner;
+    //     var type, tieSpanner;
     //     if (this.size > 1) {
-    //         prototype = [FoscTie];
+    //         type = [FoscTie];
     //         block { |break|
     //             this[0].prGetParentage.items.do { |component|
     //                 try {
-    //                     tieSpanner = component.prSpanner(prototype);
+    //                     tieSpanner = component.prSpanner(type);
     //                     break.value;
     //                 };
     //             };

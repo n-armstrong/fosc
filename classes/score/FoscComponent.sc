@@ -724,15 +724,15 @@ FoscComponent : Fosc {
     a.tweaks.prGetAttributePairs;
     -------------------------------------------------------------------------------------------------------- */
     tweak {
-        var constants, prototype, manager;
+        var constants, type, manager;
         
         if (this.respondsTo('tweaks').not) {
             throw("% does not respond to tweak.".format(this.species));
         };
         constants = #['above', 'below', 'down', 'left', 'right', 'up'];
-        prototype = [Boolean, SimpleNumber, String, SequenceableCollection, FoscScheme];
+        type = [Boolean, SimpleNumber, String, SequenceableCollection, FoscScheme];
         
-        if (constants.includes(this) || { prototype.any { |type| this.isKindOf(type) } }) {
+        if (constants.includes(this) || { type.any { |type| this.isKindOf(type) } }) {
             manager = FoscLilyPondTweakManager();
             manager.pendingValue_(this);
             ^manager;
@@ -1210,7 +1210,7 @@ FoscComponent : Fosc {
     b.leafAt(2).attach(FoscMetronomeMark(#[1,4], 90));
     a.doLeaves { |leaf| leaf.prGetEffective(FoscMetronomeMark).unitsPerMinute.postln };
     -------------------------------------------------------------------------------------------------------- */
-    prGetEffective { |prototype, attributes, command, n=0, unwrap=true|
+    prGetEffective { |type, attributes, command, n=0, unwrap=true|
         var candidateWrappers, parentage, enclosingVoiceName, localWrappers, appendWrapper=false, offset;
         var allOffsets, index, wrapper;
 
@@ -1232,7 +1232,7 @@ FoscComponent : Fosc {
                 case { wrapper.annotation.notNil } {
                     // continue
                 }
-                { wrapper.indicator.isKindOf(prototype) } {
+                { wrapper.indicator.isKindOf(type) } {
                     appendWrapper = true;
                     if (command.notNil && { wrapper.indicator.command != command }) {
                         // contimue
@@ -1271,7 +1271,7 @@ FoscComponent : Fosc {
                     { wrapper.annotation.notNil } {
                         // continue
                     } {
-                        if (wrapper.indicator.isKindOf(prototype)) {
+                        if (wrapper.indicator.isKindOf(type)) {
                             appendWrapper = true;
                             case { command.notNil && { wrapper.indicator.command != command } } {
                                 // continue
@@ -1373,20 +1373,20 @@ FoscComponent : Fosc {
 
     x.prGetIndicator(FoscMetronomeMark);
     -------------------------------------------------------------------------------------------------------- */
-    prGetIndicator { |prototype, attributes, unwrap=true|
+    prGetIndicator { |type, attributes, unwrap=true|
         var indicators;
         
-        indicators = this.prGetIndicators(prototype, attributes, unwrap);
+        indicators = this.prGetIndicators(type, attributes, unwrap);
         
         case 
         { indicators.isEmpty } {
             ^nil;
             // throw("%:% no attached indicators found matching %."
-            //     .format(this.species, thisMethod.name,prototype));
+            //     .format(this.species, thisMethod.name,type));
         }
         { indicators.size > 1 } {
             throw("%:% multiple attached indicators found matching %."
-                .format(this.species, thisMethod.name,prototype));
+                .format(this.species, thisMethod.name,type));
         }
         { ^indicators[0] };
     }
@@ -1398,17 +1398,17 @@ FoscComponent : Fosc {
     x.attach(FoscArticulation('>'));
     x.prGetIndicators;
     -------------------------------------------------------------------------------------------------------- */
-    prGetIndicators { |prototype, attributes, unwrap=true|
+    prGetIndicators { |type, attributes, unwrap=true|
         var result, prototypeObjects, prototypeClasses, indicator, newResult;
 
         result = [];
-        prototype = prototype ? [Object];
-        if (prototype.isSequenceableCollection.not) { prototype = [prototype] };
+        type = type ? [Object];
+        if (type.isSequenceableCollection.not) { type = [type] };
         prototypeObjects = [];
         prototypeClasses = [];
         
-        prototype.do { |indicatorPrototype|
-            if (prototype.any { |type| indicatorPrototype.isKindOf(Class) }) {
+        type.do { |indicatorPrototype|
+            if (type.any { |type| indicatorPrototype.isKindOf(Class) }) {
                 prototypeClasses = prototypeClasses.add(indicatorPrototype);
             } {
                 prototypeObjects = prototypeObjects.add(indicatorPrototype);
@@ -1526,9 +1526,9 @@ FoscComponent : Fosc {
     x.attach(FoscDynamic('p'));
     x.prHasEffectiveIndicator(FoscDynamic);
     -------------------------------------------------------------------------------------------------------- */
-    prHasEffectiveIndicator { |prototype, attributes, command|
+    prHasEffectiveIndicator { |type, attributes, command|
         var indicator;
-        indicator = this.prGetEffective(prototype, attributes, command);
+        indicator = this.prGetEffective(type, attributes, command);
         ^indicator.notNil;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1540,9 +1540,9 @@ FoscComponent : Fosc {
     a.prHasIndicator(FoscDynamic);
     a.prHasIndicator(FoscMetronomeMark);
     -------------------------------------------------------------------------------------------------------- */
-    prHasIndicator { |prototype, attributes|
+    prHasIndicator { |type, attributes|
         var indicators;
-        indicators = this.prGetIndicators(prototype, attributes);
+        indicators = this.prGetIndicators(type, attributes);
         ^indicators.notEmpty;
     }
     /* --------------------------------------------------------------------------------------------------------

@@ -1,5 +1,7 @@
 /* ------------------------------------------------------------------------------------------------------------
 • Fosc
+
+Fosc.dumpClassSubtree
 ------------------------------------------------------------------------------------------------------------ */
 Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,9 +72,6 @@ Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • ==
 	-------------------------------------------------------------------------------------------------------- */
-	// == { |object|
-	// 	^(this != object).not;
-	// }
 	/* --------------------------------------------------------------------------------------------------------
     • !-
 	-------------------------------------------------------------------------------------------------------- */
@@ -82,15 +81,9 @@ Fosc {
    	/* --------------------------------------------------------------------------------------------------------
     • >
 	-------------------------------------------------------------------------------------------------------- */
-	// > { |object|
-	// 	^(this <= object).not;
-	// }
 	/* --------------------------------------------------------------------------------------------------------
     • >=
 	-------------------------------------------------------------------------------------------------------- */
-	// >= { |object|
-	// 	^(this < object).not;
-	// }
 	/* --------------------------------------------------------------------------------------------------------
     • >
 	-------------------------------------------------------------------------------------------------------- */
@@ -104,37 +97,37 @@ Fosc {
 		^(this > object).not;
 	}
 	/* --------------------------------------------------------------------------------------------------------
-    • add (python: __add__)
+    • add
 	-------------------------------------------------------------------------------------------------------- */
 	+ { |object|
 		^this.add(object);
 	}
 	/* --------------------------------------------------------------------------------------------------------
-    • concat (python: __add__)
+    • concat
 	-------------------------------------------------------------------------------------------------------- */
 	++ { |object|
 		^this.concat(object);
 	}
 	/* --------------------------------------------------------------------------------------------------------
-    • div (python: __div_)
+    • div
 	-------------------------------------------------------------------------------------------------------- */
 	/ { |object|
 		^this.div(object);
 	}
 	/* --------------------------------------------------------------------------------------------------------
-    • dup (python: __mult__)
+    • dup
 	-------------------------------------------------------------------------------------------------------- */
 	! { |object|
 		^this.dup(object);
 	}
 	/* --------------------------------------------------------------------------------------------------------
-    • mul (python: __mul__)
+    • mul
 	-------------------------------------------------------------------------------------------------------- */
 	* { |object|
 		^this.mul(object);
 	}
 	/* --------------------------------------------------------------------------------------------------------
-    • sub (python: __sub__)
+    • sub
 	-------------------------------------------------------------------------------------------------------- */
 	- { |object|
 		^this.sub(object);
@@ -142,7 +135,7 @@ Fosc {
 	// SET OPERATIONS
 	/* --------------------------------------------------------------------------------------------------------
     • difference
-    //!!! - must be an override at a lower point in the hierarchy
+    !!!TODO: override lower in the class hierarchy
 	-------------------------------------------------------------------------------------------------------- */
 	// - { |object|
  	//        ^this.difference(object)
@@ -151,7 +144,7 @@ Fosc {
     • difference
 	-------------------------------------------------------------------------------------------------------- */
     & { |object|
-        ^this.intersection(object);
+        ^this.sect(object);
     }
      /* --------------------------------------------------------------------------------------------------------
     • symmetricDifference
@@ -355,13 +348,13 @@ Fosc {
     a = FoscNote(60, 1/4);
     a.doComponents({ |each, i| each.cs.postln }, FoscNote);
     -------------------------------------------------------------------------------------------------------- */
-    doComponents { |function, prototype, exclude, doNotIterateGraceContainers=false, graceNotes=false,
+    doComponents { |function, type, exclude, doNotIterateGraceContainers=false, graceNotes=false,
         reverse=false|
         
         Fosc.prCheckIsIterable(this, thisMethod);        
         
         FoscIteration(this).components(
-            prototype, exclude, doNotIterateGraceContainers, graceNotes, reverse
+            type, exclude, doNotIterateGraceContainers, graceNotes, reverse
         ).do(function);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -391,9 +384,9 @@ Fosc {
     a = FoscLeafMaker().(#[60,62,nil,65,67,nil], [1/8]);
     a.doLeaves({ |each| each.cs.postln }, pitched: false);
     -------------------------------------------------------------------------------------------------------- */
-    doLeaves { |function, prototype, pitched, graceNotes=false|
+    doLeaves { |function, type, pitched, graceNotes=false|
         Fosc.prCheckIsIterable(this, thisMethod);
-        FoscIteration(this).leaves(prototype, pitched, graceNotes).do(function);
+        FoscIteration(this).leaves(type, pitched, graceNotes).do(function);
     }
     /* --------------------------------------------------------------------------------------------------------
     • doLogicalTies
@@ -484,9 +477,9 @@ Fosc {
     c.doTimeline({ |each, i| each.attach(FoscMarkup(i, 'above')) }, pitched: false);
     c.show;
     -------------------------------------------------------------------------------------------------------- */
-    doTimeline { |function, prototype, pitched|
+    doTimeline { |function, type, pitched|
         Fosc.prCheckIsIterable(this, thisMethod);
-        FoscIteration(this).timeline(prototype, pitched).do(function);
+        FoscIteration(this).timeline(type, pitched).do(function);
     }
     /* --------------------------------------------------------------------------------------------------------
     • doTimelineByLogicalTies
@@ -556,7 +549,7 @@ Fosc {
     Select notes
 
     a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
-    b = a.selectComponents(prototype: FoscNote);
+    b = a.selectComponents(type: FoscNote);
     b.do { |each| each.str.postln };
 
     
@@ -565,7 +558,7 @@ Fosc {
     Select notes and rests
 
     a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
-    b = a.selectComponents(prototype: [FoscNote, FoscRest]);
+    b = a.selectComponents(type: [FoscNote, FoscRest]);
     b.do { |each| each.str.postln };
 
     
@@ -574,14 +567,14 @@ Fosc {
     Select notes and rests in reverse order
 
     a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
-    b = a.selectComponents(prototype: [FoscNote, FoscRest], reverse: true);
+    b = a.selectComponents(type: [FoscNote, FoscRest], reverse: true);
     b.do { |each| each.str.postln };
     -------------------------------------------------------------------------------------------------------- */
-    selectComponents { |prototype, exclude, graceNotes=false, reverse=false|
+    selectComponents { |type, exclude, graceNotes=false, reverse=false|
         Fosc.prCheckIsIterable(this, thisMethod);
 
         ^FoscSelection(this).components(
-            prototype: prototype,
+            type: type,
             exclude: exclude,
             graceNotes: graceNotes,
             reverse: reverse
@@ -589,7 +582,6 @@ Fosc {
     }
     /* --------------------------------------------------------------------------------------------------------
     • selectLeaves
-
 
     • Example 1
 
@@ -617,9 +609,9 @@ Fosc {
     b = a.selectLeaves(pitched: false);
     b.do { |each| each.str.postln };
     -------------------------------------------------------------------------------------------------------- */
-    selectLeaves { |prototype, pitched, graceNotes=false|
+    selectLeaves { |type, pitched, graceNotes=false|
         Fosc.prCheckIsIterable(this, thisMethod);
-        ^FoscSelection(this).leaves(prototype, pitched, graceNotes);
+        ^FoscSelection(this).leaves(type, pitched, graceNotes);
     }
     /* --------------------------------------------------------------------------------------------------------
     • selectLogicalTies
@@ -674,7 +666,7 @@ Fosc {
     b.selectRuns.do { |each| if (each.size > 1) { each.slur } };
     b.show;
     -------------------------------------------------------------------------------------------------------- */
-    selectRuns { |exclude|
+    selectRuns {
         Fosc.prCheckIsIterable(this, thisMethod);
         ^FoscSelection(this).runs;
     }
@@ -749,10 +741,10 @@ Fosc {
     • *prCheckIsIterable
     -------------------------------------------------------------------------------------------------------- */
     *prCheckIsIterable { |object, method|
-        var prototype, isIterable;
+        var type, isIterable;
         
-        prototype = [FoscComponent, FoscSelection, SequenceableCollection];
-        isIterable = prototype.any { |type| object.isKindOf(type) };
+        type = [FoscComponent, FoscSelection, SequenceableCollection];
+        isIterable = type.any { |type| object.isKindOf(type) };
         
         if (isIterable.not) {
             throw("%: receiver is not iterable: %.".format(method.name, object));

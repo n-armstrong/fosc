@@ -158,12 +158,12 @@ FoscStartBeam : Fosc {
     • *prIsBeamable
     -------------------------------------------------------------------------------------------------------- */
     *prIsBeamable { |leaf, beamRests=false|
-        var prototype;
+        var type;
         if ([FoscChord, FoscNote].any { |type| leaf.isKindOf(type) }) {
             if (0 < leaf.writtenDuration.flagCount) { ^true };
         };
-        prototype = [FoscMultimeasureRest, FoscRest, FoscSkip];
-        if (beamRests && { prototype.any { |type| leaf.isKindOf(type) } }) {
+        type = [FoscMultimeasureRest, FoscRest, FoscSkip];
+        if (beamRests && { type.any { |type| leaf.isKindOf(type) } }) {
             ^true;
         };
         ^false;

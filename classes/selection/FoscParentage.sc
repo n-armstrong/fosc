@@ -20,15 +20,15 @@ FoscParentage : FoscSequence {
         ^super.new.init(component, graceNotes);
 	}
 	init { |argComponent, graceNotes|
-		var parent, prototype;
+		var parent, type;
         component = argComponent;
         items = [];
         if (component.notNil) {
             parent = component;
-            prototype = [FoscAfterGraceContainer, FoscGraceContainer];
+            type = [FoscAfterGraceContainer, FoscGraceContainer];
             while { parent.notNil } {
                 items = items.add(parent);
-                if (graceNotes && { prototype.any { |type| parent.isKindOf(type) } }) {
+                if (graceNotes && { type.any { |type| parent.isKindOf(type) } }) {
                     parent = parent.mainLeaf;
                 } {
                     parent = parent.parent;
@@ -177,30 +177,13 @@ FoscParentage : FoscSequence {
         };
         ^result;
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • tupletDepth
-    
-    a = FoscNote(60, 1);
-    b = FoscRhythm([3, 4], [1, FoscRhythm(3, [1, 2, a])]);
-    p = FoscParentage(a);
-    p.tupletDepth;
-    -------------------------------------------------------------------------------------------------------- */
-    // DEPRECATED
-    // tupletDepth {
-    //     var result;
-    //     result = 0;
-    //     items[1..].do { |parent|
-    //         if (parent.isKindOf(FoscRhythm) && { parent.isTuplet }) { result = result + 1 };
-    //     };
-    //     ^result;
-    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • firstInstanceOf (abjad: get_first)
 
-    Gets first instance of prototype in parentage.
+    Gets first instance of type in parentage.
 
     Returns component or none.
     
@@ -213,11 +196,11 @@ FoscParentage : FoscSequence {
     p.firstInstanceOf(FoscContainer) === b;     // true
     p.firstInstanceOf(FoscRest);                // nil
     -------------------------------------------------------------------------------------------------------- */
-    firstInstanceOf { |prototype|
-        if (prototype.isNil) { prototype = FoscComponent };
-        if (prototype.isSequenceableCollection.not) { prototype = [prototype] };
+    firstInstanceOf { |type|
+        if (type.isNil) { type = FoscComponent };
+        if (type.isSequenceableCollection.not) { type = [type] };
         items.do { |component|
-            if (prototype.any { |type| component.isKindOf(type) }) { ^component };
+            if (type.any { |type| component.isKindOf(type) }) { ^component };
         };
         ^nil;
     }

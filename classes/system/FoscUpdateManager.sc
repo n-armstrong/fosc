@@ -59,7 +59,7 @@ FoscUpdateManager : Fosc {
     *prIterateEntireScore { |scoreRoot|
         var components, graces;
         components = all(FoscIteration(scoreRoot).components(graceNotes: false));
-        graces = all(FoscIteration(scoreRoot).components(prototype: FoscGraceContainer));
+        graces = all(FoscIteration(scoreRoot).components(type: FoscGraceContainer));
         components = components.addAll(graces);
         ^components;
     }
@@ -94,16 +94,16 @@ FoscUpdateManager : Fosc {
     • prGetMeasureStartOffsets
     -------------------------------------------------------------------------------------------------------- */
     prGetMeasureStartOffsets { |component|
-        var wrappers, prototype, scoreRoot, localWrappers, pairs, inspector, startOffset, timeSignature;
+        var wrappers, type, scoreRoot, localWrappers, pairs, inspector, startOffset, timeSignature;
         var pair, offsetZero, defaultTimeSignature, defaultPair, parentage, scoreStopOffset, dummyLastPair;
         var currenStartOffset, currentTimeSignature, nextStartOffset, nextTimeSignature;
         var measureStartOffsets, measureStartOffset;
 
         wrappers = [];
-        prototype = FoscTimeSignature;
+        type = FoscTimeSignature;
         scoreRoot = component.prGetParentage.root;
         FoscUpdateManager.prIterateEntireScore(scoreRoot).do { |component|
-            localWrappers = FoscInspection(component).wrappers(prototype);
+            localWrappers = FoscInspection(component).wrappers(type);
             wrappers = wrappers.addAll(localWrappers);
         };
 

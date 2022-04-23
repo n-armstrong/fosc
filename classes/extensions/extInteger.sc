@@ -188,38 +188,4 @@
         
         ^result;
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • parts
-
-    m = FoscMask([-1,2,3,-inf], reverse: false, sustain: true);
-
-    (1..11).do { |n| m = n.parts([-1,2,3,-inf]); "% \t%".format(n, m).postln };
-    (1..11).do { |n| m = n.parts([-1,2,3,-inf], sustain: false); "% \t%".format(n, m).postln };
-    (1..11).do { |n| m = n.parts([-1,2,3,-inf], reverse: true); "% \t%".format(n, m).postln };
-
-
-    5.parts(-1);
-    5.parts(-3);
-    5.parts(-1, reverse: true);
-    5.parts(-3, reverse: true);
-    5.parts(-6);
-    -------------------------------------------------------------------------------------------------------- */
-    // parts { |ratio, reverse=false, sustain=true|
-    //     var result, signs;
-
-    //     if (ratio.isSequenceableCollection.not) { ratio = [ratio] };
-    //     signs = ratio.collect { |each| each.sign };
-    //     ratio = ratio.abs.extendToAbsSum(this);
-    //     signs = signs.extend(ratio.size, 1);
-    //     result = (ratio * signs).asInteger;
-        
-    //     if (sustain.not) {
-    //         result = result.collect { |each| if (each > 0) { 1 ! each } { each } };
-    //         result = result.flat;
-    //     };
-        
-    //     if (reverse) { result = result.reverse };
-        
-    //     ^result;
-    // }
 }

@@ -106,12 +106,12 @@ FoscMeterManager : Fosc {
         FoscNote("C5", [1, 4])
     ]);
     x = FoscStaff([a, b, c, d]);
-    x.select.byLeaf[1..2].attach(FoscTie());
-    x.select.byLeaf[5..7].attach(FoscTie());
-    x.select.byLeaf[8..10].attach(FoscTie());
-    x.select.byLeaf[11..12].attach(FoscTie());
-    x.select.byLeaf[13..14].attach(FoscTie());
-    x.select.byLeaf[15..16].attach(FoscTie());
+    x.select.leaves[1..2].attach(FoscTie());
+    x.select.leaves[5..7].attach(FoscTie());
+    x.select.leaves[8..10].attach(FoscTie());
+    x.select.leaves[11..12].attach(FoscTie());
+    x.select.leaves[13..14].attach(FoscTie());
+    x.select.leaves[15..16].attach(FoscTie());
     x.format;
     
     FoscMeterManager.iterateRewriteInputs(x[0]).do { |each| each.music.postln }; 
@@ -144,9 +144,9 @@ FoscMeterManager : Fosc {
     b = FoscMeasure([4, 4], [FoscNote(60, [1, 32]), FoscNote(62, [7, 8]), FoscNote(62, [1, 16]), FoscNote(64, [1, 32])]);
     c = FoscMeasure([2, 4], [FoscNote(64, [2, 4])]);
     x = FoscStaff([a, b, c]);
-    x.select.byLeaf[0..1].attach(FoscTie());
-    x.select.byLeaf[2..3].attach(FoscTie());
-    x.select.byLeaf[4..5].attach(FoscTie());
+    x.select.leaves[0..1].attach(FoscTie());
+    x.select.leaves[2..3].attach(FoscTie());
+    x.select.leaves[4..5].attach(FoscTie());
     s = x[1][0..];
 
     m = FoscMeterManager.iterateRewriteInputs(s).all;

@@ -72,15 +72,15 @@ FoscStartTextSpan : Fosc {
         //     assert isinstance(left_broken_text, (bool, markups.Markup))
         // self._left_broken_text = left_broken_text
         // if left_text is not None:
-        //     prototype = (LilyPondLiteral, markups.Markup)
-        //     assert isinstance(left_text, prototype), repr(left_text)
+        //     type = (LilyPondLiteral, markups.Markup)
+        //     assert isinstance(left_text, type), repr(left_text)
         // self._left_text = left_text
         // if right_padding is not None:
         //     assert isinstance(right_padding, (int, float)), repr(right_padding)
         // self._right_padding = right_padding
         // if right_text is not None:
-        //     prototype = (LilyPondLiteral, markups.Markup)
-        //     assert isinstance(right_text, prototype), repr(right_text)
+        //     type = (LilyPondLiteral, markups.Markup)
+        //     assert isinstance(right_text, type), repr(right_text)
         // self._right_text = right_text
         // if style is not None:
         //     assert style in self._styles, repr(style)

@@ -238,7 +238,7 @@ FoscNote("d'", 1/4)
 <br>Select notes and rests.
 ```supercollider
 a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
-b = a.selectComponents(prototype: [FoscNote, FoscRest]);
+b = a.selectComponents(type: [FoscNote, FoscRest]);
 b.do { |each| each.cs.postln };
 ```
 ```
@@ -297,7 +297,7 @@ FoscNote("g'", 1/8)
 a = FoscMusicMaker();
 b = a.(durations: 1/8 ! 4, mask: #[-1,1,1,1], pitches: #[60,61,62]);
 c = FoscStaff(b);
-c.doComponents({ |note| note.attach(FoscArticulation('>')) }, prototype: FoscNote);
+c.doComponents({ |note| note.attach(FoscArticulation('>')) }, type: FoscNote);
 c.show;
 ```
 ![](./docs/img/iteration-1.png)
