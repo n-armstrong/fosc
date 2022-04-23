@@ -208,7 +208,7 @@ FoscComponent : Fosc {
     f = a.illustrate(includes: [p]);
     f.show;
     -------------------------------------------------------------------------------------------------------- */
-    illustrate { |defaultPaperSize, globalStaffSize, includes|
+    illustrate { |paperSize, staffSize, includes|
         var lilypondFile;
         
         if (includes.isNil) {
@@ -223,9 +223,9 @@ FoscComponent : Fosc {
         
         lilypondFile = FoscLilypondFile(
             this,
-            defaultPaperSize: defaultPaperSize,
+            paperSize: paperSize,
             includes: includes,
-            globalStaffSize: globalStaffSize
+            staffSize: staffSize
         );
         
 

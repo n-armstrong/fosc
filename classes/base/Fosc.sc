@@ -1,7 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
 • Fosc
-
-MethodOverride.printAll
 ------------------------------------------------------------------------------------------------------------ */
 Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,19 +219,38 @@ Fosc {
     a = FoscNote(60, 1/4);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-	show { |path|
-		var result, pdfPath, success;
+	// show { |path|
+	// 	var result, pdfPath, success;
+        
+    //     if (this.respondsTo('illustrate').not) {
+    //         throw("% does not respond to 'illustrate' and can't be shown.".format(this));
+    //     };
+        
+    //     //if (args.notEmpty) { path = args[0] };
+    //     result = FoscPersistenceManager(this).asPDF(path);
+    //     # pdfPath, success = result;
+        
+    //     if (success) { FoscIOManager.openFile(pdfPath) };
+	// }
+    show { |paperSize, staffSize, includes|
+        var illustrateFunction, result, pdfPath, success;
         
         if (this.respondsTo('illustrate').not) {
             throw("% does not respond to 'illustrate' and can't be shown.".format(this));
         };
         
         //if (args.notEmpty) { path = args[0] };
-        result = FoscPersistenceManager(this).asPDF(path);
+        illustrateFunction = (
+            paperSize: paperSize,
+            staffSize: staffSize,
+            includes: includes
+        );
+        
+        result = FoscPersistenceManager(this).asPDF(illustrateFunction: illustrateFunction);
         # pdfPath, success = result;
         
         if (success) { FoscIOManager.openFile(pdfPath) };
-	}
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // !!! TODO: move write methods out of Fosc and into FoscComponent
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -634,9 +634,9 @@ FoscSelection : FoscSequence {
 
     a = FoscMusicMaker();
     b = a.(durations: [1/4], divisions: #[[1,1],[3,-2],[-4,3]]);
-    b.show(globalStaffSize: 15);
+    b.show(staffSize: 15);
     -------------------------------------------------------------------------------------------------------- */
-    illustrate { |defaultPaperSize, globalStaffSize, includes|
+    illustrate { |paperSize, staffSize, includes|
         var isRhythmicTemplate=true, template, score, lilypondFile;
 
         this.doLeaves({ |leaf|
@@ -651,11 +651,10 @@ FoscSelection : FoscSequence {
             template = FoscStavesScoreTemplate(staffCount: 1); 
         };
         
-
         score = template.();
         score['v1'].add(this.deepCopy);
         //if (includes.isNil) { includes = [this.defaultStylesheetPath] };
-        lilypondFile = score.illustrate(defaultPaperSize, globalStaffSize, includes);
+        lilypondFile = score.illustrate(paperSize, staffSize, includes);
         
         ^lilypondFile;
     }
@@ -664,10 +663,10 @@ FoscSelection : FoscSequence {
 
     a = FoscMusicMaker();
     b = a.(durations: [1/4], divisions: #[[1,1],[3,-2],[-4,3]]);
-    b.show(globalStaffSize: 15);
+    b.show(staffSize: 15);
     -------------------------------------------------------------------------------------------------------- */
-    show { |defaultPaperSize, globalStaffSize=16, includes|
-        ^this.illustrate(defaultPaperSize, globalStaffSize, includes).show;
+    show { |paperSize, staffSize=16, includes|
+        ^this.illustrate(paperSize, staffSize, includes).show;
     }
     /* --------------------------------------------------------------------------------------------------------
     • includes (abjad: __contains__)

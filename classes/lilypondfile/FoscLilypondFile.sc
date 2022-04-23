@@ -28,16 +28,16 @@ FoscLilypondFile : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    var <comments, <dateTimeToken, <defaultPaperSize, <globalStaffSize, <includes, <items, <tag;
+    var <comments, <dateTimeToken, <paperSize, <staffSize, <includes, <items;
     var <lilypondLanguageToken, <lilypondVersionToken, <useRelativeIncludes, <isStylesheet;
     var <headerBlock, <layoutBlock, <paperBlock, <scoreBlock; //!!!TODO: REMOVE ?
-    *new { |items, dateTimeToken, defaultPaperSize, comments, includes, globalStaffSize,
+    *new { |items, dateTimeToken, paperSize, comments, includes, staffSize,
         lilypondLanguageToken, lilypondVersionToken, useRelativeIncludes=false, isStylesheet=false|     
         
-        ^super.new.init(items, dateTimeToken, defaultPaperSize, comments, includes, globalStaffSize,
+        ^super.new.init(items, dateTimeToken, paperSize, comments, includes, staffSize,
             lilypondLanguageToken, lilypondVersionToken, useRelativeIncludes, isStylesheet);
     }
-    init { |argItems, argDateTimeToken, argDefaultPaperSize, argComments, argIncludes, argGlobalStaffSize,
+    init { |argItems, argDateTimeToken, argPaperSize, argComments, argIncludes, argStaffSize,
         argLilypondLanguageToken, argLilypondVersionToken, argUseRelativeIncludes, argIsStylesheet|
         var tuning;
 
@@ -55,11 +55,11 @@ FoscLilypondFile : Fosc {
         if (dateTimeToken.isNil) { dateTimeToken = FoscDateTimeToken() };
         comments = argComments ? [];
         if (comments.notEmpty) { comments = comments.collect { |each| each.asString } };
-        defaultPaperSize = argDefaultPaperSize;
+        paperSize = argPaperSize;
         includes = argIncludes ? [];
         
         if (includes.notEmpty) { includes = includes.collect { |each| each.asString } };
-        globalStaffSize = argGlobalStaffSize;
+        staffSize = argStaffSize;
         lilypondLanguageToken = argLilypondLanguageToken;
         lilypondLanguageToken = lilypondLanguageToken ?? { FoscLilypondLanguageToken() };
         lilypondLanguageToken = FoscLilypondLanguageToken(lilypondLanguageToken);
@@ -95,20 +95,20 @@ FoscLilypondFile : Fosc {
     a.dateTimeToken;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
-    • defaultPaperSize
+    • paperSize
 
     Gets default paper size of Lilypond file. Set to pair or nil. Defaults to nil.
     
     a = FoscLilypondFile();
-    a.defaultPaperSize;
+    a.paperSize;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
-    • globalStaffSize
+    • staffSize
 
     Gets global staff size of Lilypond file. Set to number or nil. Defaults to nil.
     
     a = FoscLilypondFile();
-    a.globalStaffSize;
+    a.staffSize;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • headerBlock
@@ -270,7 +270,7 @@ FoscLilypondFile : Fosc {
     
     c = ["File construct as an example.", "Second comment."];
     i = ["external-settings-file-1.ly", "external-settings-file-2.ly"];
-    a = FoscLilypondFile(comments: c, includes: i, globalStaffSize: 16);
+    a = FoscLilypondFile(comments: c, includes: i, staffSize: 16);
     a.format;
     -------------------------------------------------------------------------------------------------------- */
     prGetFormatPieces { |tag|
@@ -399,22 +399,22 @@ FoscLilypondFile : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • prGetFormattedSchemeSettings
 
-    a = FoscLilypondFile(defaultPaperSize: #['a5', 'portrait'], globalStaffSize: 16);
-    a.defaultPaperSize;
+    a = FoscLilypondFile(paperSize: #['a5', 'portrait'], staffSize: 16);
+    a.paperSize;
     a.prGetFormattedSchemeSettings;
     -------------------------------------------------------------------------------------------------------- */
     prGetFormattedSchemeSettings {
         var result, dimension, orientation, string;
         result = [];
-        if (defaultPaperSize.notNil) {
-            # dimension, orientation = defaultPaperSize;
+        if (paperSize.notNil) {
+            # dimension, orientation = paperSize;
             string = "#(set-default-paper-size \"%\" '%)";
             string = string.format(dimension, orientation);
             result = result.add(string);
         };
-        if (globalStaffSize.notNil) {
+        if (staffSize.notNil) {
             string = "#(set-global-staff-size %)";
-            string = string.format(globalStaffSize);
+            string = string.format(staffSize);
             result = result.add(string);
         };
         if (result.notEmpty) { result = [result.join("\n")] };

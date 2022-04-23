@@ -8,6 +8,7 @@
 \layout {
     \context {
         \Score
+        \accidentalStyle modern
         \remove Bar_number_engraver
         \override Beam.beam-thickness = 0.5
         \override Beam.breakable = ##t

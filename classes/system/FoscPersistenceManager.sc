@@ -24,15 +24,23 @@ FoscPersistenceManager : Fosc {
     Autogenerates file path when 'path' is nil.
 
     Returns output path and elapsed formatting time when LilyPond output is written.
+
+
+    a = FoscNote(60, 1/4);
+    a.show(staffSize: 12);
+
+    a = FoscNote(60, 1/8);
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
     asLY { |path, illustrateFunction ... args|
         var illustration, lyFileName, lyFile;
-        
+
         if (illustrateFunction.isNil) {
-            illustrateFunction = client.illustrate;
+            illustration = client.illustrate.format;
+        } {
+            illustration = client.performWithEnvir('illustrate', illustrateFunction);
+            illustration = illustration.format;
         };
-        
-        illustration = illustrateFunction.format; //!!!TODO: temporary
         
         if (path.isNil) {
             lyFileName = FoscIOManager.nextOutputFileName;
@@ -45,6 +53,26 @@ FoscPersistenceManager : Fosc {
         
         ^path;
     }
+    // asLY { |path, illustrateFunction ... args|
+    //     var illustration, lyFileName, lyFile;
+        
+    //     if (illustrateFunction.isNil) {
+    //         illustrateFunction = client.illustrate;
+    //     };
+        
+    //     illustration = illustrateFunction.format; //!!!TODO: temporary
+        
+    //     if (path.isNil) {
+    //         lyFileName = FoscIOManager.nextOutputFileName;
+    //         path = Fosc.outputDirectory ++ "/" ++ lyFileName;
+    //     };
+        
+    //     lyFile = File(path, "w");
+    //     lyFile.write(illustration);
+    //     lyFile.close;
+        
+    //     ^path;
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • asMIDI
     -------------------------------------------------------------------------------------------------------- */

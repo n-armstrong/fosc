@@ -136,14 +136,14 @@ FoscPitchSegment : FoscTypedList {
 	m = FoscPitchSegment(#[48,55,58,63,69].mirror);
 	m.show;
 	-------------------------------------------------------------------------------------------------------- */
-	illustrate { |defaultPaperSize, globalStaffSize, includes|
+	illustrate { |paperSize, staffSize, includes|
 		var staff, selections, tweaks, score, includesPath, lilypondFile;
 
         staff = FoscStaff(FoscLeafMaker().(this.pitches, [1/8]));
         score = FoscScore.makePianoScore(staff);
         includesPath = Fosc.stylesheetDirectory;
         includes = includes ?? { ["%/noteheads.ily".format(includesPath)] };
-        lilypondFile = score.illustrate(defaultPaperSize, globalStaffSize, includes);
+        lilypondFile = score.illustrate(paperSize, staffSize, includes);
         
         ^lilypondFile;
 	}

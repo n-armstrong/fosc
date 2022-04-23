@@ -124,7 +124,7 @@ FoscRhythmMaker : Fosc {
     a.(divisions: [1/4], ratios: #[[1,1],[3,2],[4,3]]);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-    illustrate { |defaultPaperSize, globalStaffSize, includes|
+    illustrate { |paperSize, staffSize, includes|
         var template, score, includesPath, lilypondFile;
 
         template = FoscGroupedRhythmicStavesScoreTemplate(staffCount: 1);
@@ -138,15 +138,15 @@ FoscRhythmMaker : Fosc {
             includes = [this.defaultStylesheetPath];
         };
 
-        lilypondFile = score.illustrate(defaultPaperSize, globalStaffSize, includes);
+        lilypondFile = score.illustrate(paperSize, staffSize, includes);
         
         ^lilypondFile;
     }
     /* --------------------------------------------------------------------------------------------------------
     • show
     -------------------------------------------------------------------------------------------------------- */
-    show { |defaultPaperSize, globalStaffSize=16, includes|
-        ^this.illustrate(defaultPaperSize, globalStaffSize, includes).show;
+    show { |paperSize, staffSize=16, includes|
+        ^this.illustrate(paperSize, staffSize, includes).show;
     }
     /* --------------------------------------------------------------------------------------------------------
     • value

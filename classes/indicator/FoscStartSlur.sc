@@ -100,9 +100,9 @@ FoscStartSlur : Fosc {
     def __eq__(self, argument) -> bool:
         return StorageFormatManager.compare_objects(self, argument)
     -------------------------------------------------------------------------------------------------------- */
-    == {
-        ^this.notYetImplemented(thisMethod);
-    }
+    // == {
+    //     ^this.notYetImplemented(thisMethod);
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • asCompileString
 
@@ -113,27 +113,15 @@ FoscStartSlur : Fosc {
     def __repr__(self) -> str:
         return StorageFormatManager(self).get_repr_format()
     -------------------------------------------------------------------------------------------------------- */
-    asCompileString {
-        ^this.notYetImplemented(thisMethod);
-    }
+    // asCompileString {
+    //     ^this.notYetImplemented(thisMethod);
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • hash
-
-    !!!TODO
-
-    Hashes Abjad value object.
-
-    def __hash__(self) -> int:
-        hash_values = StorageFormatManager(self).get_hash_values()
-        try:
-            result = hash(hash_values)
-        except TypeError:
-            raise TypeError(f'unhashable type: {self}')
-        return result
     -------------------------------------------------------------------------------------------------------- */
-    hash {
-        ^this.notYetImplemented(thisMethod);
-    }
+    // hash {
+    //     ^this.notYetImplemented(thisMethod);
+    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,9 +129,7 @@ FoscStartSlur : Fosc {
     • prAddDirection
     -------------------------------------------------------------------------------------------------------- */
     prAddDirection { |string|
-        if (direction.notNil) {
-            string = "% %".format(direction, string);
-        };
+        if (direction.notNil) { string = "% %".format(direction, string) };
         ^string;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -151,13 +137,17 @@ FoscStartSlur : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle { |component|
         var bundle, localTweaks, string;
+       
         bundle = FoscLilypondFormatBundle();
+        
         if (tweaks.notNil) {
             localTweaks = tweaks.prListFormatContributions;
             bundle.after.spannerStarts.addAll(localTweaks);
         };
+
         string = this.prAddDirection("(");
         bundle.after.spannerStarts.add(string);
+        
         ^bundle;
     }
 }
