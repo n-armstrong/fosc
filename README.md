@@ -46,7 +46,7 @@ Download the __fosc__ master branch and unzip. Rename the 'fosc-master' folder t
 
 ### <br>Configure Fosc
 
-In your sclang startup file, add code to allow __Fosc__ to communicate with LilyPond. __Note__: it's possible that your LilyPond binary may be installed somewhere different to the standard locations below.
+In your sclang startup file, add code to allow __Fosc__ to communicate with LilyPond. __Note__: it's possible that your LilyPond executable is installed somewhere different to the standard locations below.
 
 __Mac OS X__
 ```supercollider
