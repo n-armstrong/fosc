@@ -24,7 +24,7 @@ Fosc {
     -------------------------------------------------------------------------------------------------------- */ 
     *lilypondPath {
         if (lilypondPath.isNil || { File.exists(lilypondPath).not }) {
-            error("Lilypond executable not found at: %.".format(lilypondPath));
+            error("LilyPond executable not found at: %.".format(lilypondPath));
             ^nil;
         } {
             ^lilypondPath;  
@@ -209,7 +209,7 @@ Fosc {
 
 	Makes LilyPond input files and output PDF.
 
-    Writes LilyPond input file and output PDF to Abjad output directory.
+    Writes LilyPond input file and output PDF to output directory.
 
     Opens output PDF.
 
@@ -218,6 +218,12 @@ Fosc {
 
     a = FoscNote(60, 1/4);
     a.show;
+
+
+    • Example 2
+
+    a = FoscNote(60, 1/4);
+    a.show(staffSize: 10);
     -------------------------------------------------------------------------------------------------------- */
 	// show { |path|
 	// 	var result, pdfPath, success;
@@ -238,14 +244,9 @@ Fosc {
         if (this.respondsTo('illustrate').not) {
             throw("% does not respond to 'illustrate' and can't be shown.".format(this));
         };
-        
-        //if (args.notEmpty) { path = args[0] };
-        illustrateFunction = (
-            paperSize: paperSize,
-            staffSize: staffSize,
-            includes: includes
-        );
-        
+
+        if (includes.notNil && { includes.isSequenceableCollection.not }) { includes = [includes] };
+        illustrateFunction = (paperSize: paperSize, staffSize: staffSize, includes: includes);
         result = FoscPersistenceManager(this).asPDF(illustrateFunction: illustrateFunction);
         # pdfPath, success = result;
         
