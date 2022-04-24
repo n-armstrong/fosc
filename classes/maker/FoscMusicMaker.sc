@@ -233,6 +233,10 @@ FoscMusicMaker : Fosc {
     a = FoscMusicMaker();
     b = a.(durations: [1/4], divisions: #[-2,3,2], pitches: (60..66));
     b.show;
+
+    a = FoscMusicMaker();
+    b = a.(durations: [[5,16]], mask: #[-1,1,1,1,1], pitches: (60..64));
+    b.show;
     -------------------------------------------------------------------------------------------------------- */
     prMakeSelections { |durations, divisions, pitches|
         var size, selections, selection;
@@ -240,9 +244,7 @@ FoscMusicMaker : Fosc {
         if (durations.isNil) { durations = #[0.25] };
         if (divisions.isNil) { divisions = #[[1]] };
         if (divisions.rank == 1) { divisions = [divisions] };
-        size = [durations.size, divisions.size].maxItem;
-        //if (pitches.notNil && { durations.size == divisions.size }) { size = pitches.size };
-        if (pitches.notNil && { pitches.size < size }) { pitches = pitches.wrapExtend(size) };
+        size = [durations.size, divisions.size, pitches.size].maxItem;
         durations = durations.wrapExtend(size);
         divisions = divisions.wrapExtend(size);
         durations = durations.collect { |each| FoscNonreducedFraction(each) };

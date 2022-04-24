@@ -4,11 +4,11 @@
 
 • Example 1
 
-a = FoscRhythm(1/4, #[-2, 2]);
+a = FoscRhythm(1/4, #[-2,2]);
 a.selection.do { |each| each.str.postln };
 a.show;
 
-a = FoscRhythm(1/4, #[-2, 3]);
+a = FoscRhythm(1/4, #[-2,3]);
 a.selection.do { |each| each.str.postln };
 a.show;
 
@@ -25,7 +25,7 @@ a.show;
 
 Ircam-style rhythm-tree syntax.
 
-a = FoscRhythm(1/4, #[1, -2, [2, [1, 2, 4]]]);
+a = FoscRhythm(1/4, #[1,-2,[2,[1,2,4]]]);
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
 FoscRhythm : FoscTreeContainer {
@@ -74,7 +74,7 @@ FoscRhythm : FoscTreeContainer {
 
     !!!TODO: DEPRECATE IN FAVOUR OF SELECTION
 
-    a = FoscRhythm(1/4, #[1, -2, [2, [1, 2, 4]]]);
+    a = FoscRhythm(1/4, #[1,-2,[2,[1,2,4]]]);
     b = a.value;
     b.show;
     -------------------------------------------------------------------------------------------------------- */
@@ -127,22 +127,6 @@ FoscRhythm : FoscTreeContainer {
     illustrate { |paperSize, staffSize, includes|
         ^this.selection.illustrate(paperSize, staffSize, includes);
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • inspect
-
-    a = FoscRhythm(2/4, #[-2, [2, [-2, 3]], 3]);
-    a.inspect;
-    -------------------------------------------------------------------------------------------------------- */
-    // inspect {
-    //     this.do { |each|
-    //         each.depth.do { Post.tab };
-    //         if (each.parent.isNil) {
-    //             Post << each.prGetPreprolatedDuration.str << nl;
-    //         } {
-    //             Post << each.prGetPreprolatedDuration.numerator << nl;
-    //         };
-    //     };
-    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -342,6 +326,11 @@ FoscRhythm : FoscTreeContainer {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • prRecurse
+
+    a = FoscRhythm(3/16, [4,5]).selection;
+    a.show;
+
+    Fosc
     -------------------------------------------------------------------------------------------------------- */
     prRecurse { |node, tupletDuration|
         var basicProlatedDuration, basicWrittenDuration, tuplet, contentsDuration, multiplier, selection;
@@ -451,13 +440,17 @@ FoscRhythmMixin {
     -------------------------------------------------------------------------------------------------------- */
     parentageRatios { |node|
         var result;
+        
         result = [];
+        
         while { node.parent.notNil } {
             result = result.add([node.prGetPreprolatedDuration, node.parent.prGetContentsDuration]);
             node = node.parent;
         };
+        
         result = result.add(node.prGetPreprolatedDuration);
         result = result.reverse;
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -471,13 +464,16 @@ FoscRhythmMixin {
     -------------------------------------------------------------------------------------------------------- */
     prolations { |node|
         var prolations, improperParentage;
+        
         prolations = [FoscMultiplier(1)];
         improperParentage = node.improperParentage;
+        
         improperParentage.doAdjacentPairs { |child, parent|
             prolations = prolations.add(
                 FoscMultiplier(parent.prGetPreprolatedDuration, parent.prGetContentsDuration);
             );
         };
+        
         ^prolations;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -501,7 +497,9 @@ FoscRhythmMixin {
     -------------------------------------------------------------------------------------------------------- */
     prUpdateOffsetsOfEntireTree { |node|
         var recurse, offset, root, children, hasChildren;
+        
         if (node.offsetsAreCurrent) { ^nil };
+        
         recurse = { |container, currentOffset|
             container.instVarPut('offset', currentOffset);
             container.instVarPut('offsetsAreCurrent', true);
@@ -516,14 +514,17 @@ FoscRhythmMixin {
             };
             currentOffset;
         };
+
         root = node.root;
         offset = FoscOffset(0);
+        
         try {
             children = node.items;
             hasChildren = children.notEmpty;
         } {
             hasChildren = false;
         };
+
         if (node === root && { hasChildren.not }) {
             node.instVarPut('offset', offset);
             node.instVarPut('offsetsAreCurrent', true);
