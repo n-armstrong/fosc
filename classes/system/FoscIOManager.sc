@@ -12,11 +12,14 @@ FoscIOManager : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     *deleteFile { |path|
         var returnCode;
+        
         if (File.exists(path).not) {
             throw("%:%: path does not exist: %.".format(this.name, thisMethod.name, path));
         };
+        
         path = shellQuote(path);
         returnCode = systemCmd("rm %".format(path));
+        
         ^returnCode;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -38,10 +41,12 @@ FoscIOManager : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     *lastOutputFileName { |extension, outputDirectory|
         var pattern, allFileNames, allOutput, result;
+        
         pattern = "\\d{4,4}.[a-z]{2,3}";
         outputDirectory = outputDirectory ?? { Fosc.outputDirectory };
         if (File.exists(outputDirectory).not) { ^nil };
         allFileNames = "%/*".format(outputDirectory).pathMatch.collect { |each| each.basename };
+        
         if (extension.notNil) {
             allOutput = allFileNames.select { |each|
                 pattern.matchRegexp(each) && { each.splitext[1] == extension };
@@ -49,7 +54,9 @@ FoscIOManager : Fosc {
         } {
             allOutput = allFileNames.select { |each| pattern.matchRegexp(each) };
         };
+        
         result = if (allOutput.isEmpty) { nil } { allOutput.sort.last };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -57,12 +64,15 @@ FoscIOManager : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     *moveFile { |sourcePath, destinationPath|
         var returnCode;
+        
         if (File.exists(sourcePath).not) {
             throw("%:%: sourcePath does not exist: %.".format(this.name, thisMethod.name, sourcePath));
         };
+        
         sourcePath = shellQuote(sourcePath);
         destinationPath = shellQuote(destinationPath);
         returnCode = systemCmd("mv % %".format(sourcePath, destinationPath));
+        
         ^returnCode;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -74,9 +84,9 @@ FoscIOManager : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     *nextOutputFileName { |extension='ly', outputDirectory|
         var lastOutput, nextNumber, lastNumber, result;
-        // assert file_extension.isalpha() and \
-        //     0 < len(file_extension) < 4, repr(file_extension)
+
         lastOutput = FoscIOManager.lastOutputFileName(outputDirectory: outputDirectory);
+        
         if (lastOutput.isNil) {
             nextNumber = 1;
             result = "0001.%".format(extension);
@@ -85,33 +95,48 @@ FoscIOManager : Fosc {
             nextNumber = lastNumber + 1;
             result = "%.%".format(nextNumber.asDigits(10, 4).join, extension);
         };
+        
         if (nextNumber > 9000) {
             warn("%: output Directory is almost full: %.".format(this.species, outputDirectory));
         };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • *openFile
     -------------------------------------------------------------------------------------------------------- */
-    *openFile { |path, application|
-        var returnCode;
+    *openFile { |path|
         if (File.exists(path).not) {
             throw("%:%: path does not exist: %.".format(this.name, thisMethod.name, path));
         };
-        path = shellQuote(path);
-        returnCode = systemCmd("open %".format(path));
-        returnCode = Platform.case(
-            \osx,       { systemCmd("open %".format(path)) },
-            \linux,     { systemCmd("xdg-open %".format(path)) },
-            \windows,   { systemCmd("START \"\" %".format(path)) }
-        );
-        ^returnCode;
+        
+        path.openOS;
     }
+    // *openFile { |path|
+    //     var returnCode;
+        
+    //     if (File.exists(path).not) {
+    //         throw("%:%: path does not exist: %.".format(this.name, thisMethod.name, path));
+    //     };
+        
+    //     path = shellQuote(path);
+        
+    //     returnCode = systemCmd("open %".format(path));
+        
+    //     returnCode = Platform.case(
+    //         \osx, { systemCmd("open %".format(path)) },
+    //         \linux, { systemCmd("xdg-open %".format(path)) },
+    //         \windows, { systemCmd("START \"\" %".format(path)) }
+    //     );
+        
+    //     ^returnCode;
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • *runLilypond
     -------------------------------------------------------------------------------------------------------- */
     *runLilypond { |lyPath, flags, outputPath, executablePath|
         var lilypondBase, command, exitCode, success;
+        
         executablePath = executablePath ?? { Fosc.lilypondPath };
         lilypondBase = lyPath.splitext[0].shellQuote;
         lyPath = lyPath.shellQuote;
@@ -120,6 +145,7 @@ FoscIOManager : Fosc {
         command = "% % -dno-point-and-click -o % %".format(executablePath, flags, outputPath, lyPath);
         exitCode = systemCmd(command);
         success = (exitCode == 0);
+        
         ^success;
     }
 }

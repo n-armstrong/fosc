@@ -230,7 +230,7 @@ Fosc {
     a.show(staffSize: 10);
     -------------------------------------------------------------------------------------------------------- */
     show { |paperSize, staffSize, includes|
-        var illustrateEnvir, result, pdfPath, success;
+        var illustrateEnvir, pdfPath;
         
         if (this.respondsTo('illustrate').not) {
             throw("% does not respond to 'illustrate' and can't be shown.".format(this));
@@ -238,10 +238,8 @@ Fosc {
 
         if (includes.notNil && { includes.isSequenceableCollection.not }) { includes = [includes] };
         illustrateEnvir = (paperSize: paperSize, staffSize: staffSize, includes: includes);
-        result = FoscPersistenceManager(this).asPDF(illustrateEnvir: illustrateEnvir);
-        # pdfPath, success = result;
-        
-        if (success) { FoscIOManager.openFile(pdfPath) };
+        pdfPath = this.write.asPDF(illustrateEnvir: illustrateEnvir);
+        FoscIOManager.openFile(pdfPath);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // !!! TODO: move write methods into FoscComponent
@@ -259,7 +257,7 @@ Fosc {
 
     a = FoscNote(60, 1/4);
     b = a.writeLY(staffSize: 10);
-    unixCmd("open " ++ b.shellQuote);
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
     writeLY { |path, paperSize, staffSize, includes|
         var illustrateEnvir;
@@ -279,7 +277,7 @@ Fosc {
 
     a = FoscNote(60, 1/4);
     b = a.writePDF(staffSize: 10);
-    unixCmd("open " ++ b[0].shellQuote);
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
     writePDF { |path, paperSize, staffSize, includes|
         var illustrateEnvir;
@@ -293,7 +291,7 @@ Fosc {
 
     a = FoscNote(60, 1/4);
     b = a.writePNG(resolution: 300);
-    unixCmd("open " ++ b[0]);
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
     writePNG { |path, staffSize, includes, resolution=300|
         var illustrateEnvir;

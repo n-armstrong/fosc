@@ -80,9 +80,8 @@ FoscPersistenceManager : Fosc {
         outputPath = outputPath ?? { lyPath.splitext[0] };
         success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
         if (success && clean) { File.delete(lyPath) };
-        outputPath = outputPath ++ ".pdf";
         
-        ^[outputPath, success];
+        ^(outputPath ++ ".pdf");
     }
     /* --------------------------------------------------------------------------------------------------------
     • asPNG
@@ -113,9 +112,7 @@ FoscPersistenceManager : Fosc {
             ].do { |each| File.delete(each.format(outputPath)) };
         };
         
-        outputPath = (outputPath ++ ".png").shellQuote;
-        
-        ^[outputPath, success];
+        ^(outputPath ++ ".png");
     }
     /* --------------------------------------------------------------------------------------------------------
     • asSVG
