@@ -1459,7 +1459,7 @@ FoscSelection : FoscSequence {
 
     • Example 2
 
-    a = FoscStaff(FoscRhythmMaker().([1/4], #[[1,[4,[1,1,1,1,1]]],[1,1,1]]));
+    a = FoscStaff(FoscMusicMaker().([1/4], #[[1,[4,[1,1,1,1,1]]],[1,1,1]]));
     mutate(a).rewritePitches((60..72));
     a.show;
 
@@ -1510,7 +1510,7 @@ FoscSelection : FoscSequence {
 
     • Example 1
 
-    a = FoscStaff(FoscRhythmMaker().([1/4], #[[1,[4,[1,1,1,1,1]]],[1,1,1]]));
+    a = FoscStaff(FoscMusicMaker().([1/4], #[[1,[4,[1,1,1,1,1]]],[1,1,1]]));
     m = a.selectLeaves[1..6].prFuseLeavesAndReplaceWithRests;
     a.show;
 

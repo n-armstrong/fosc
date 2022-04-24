@@ -5,12 +5,12 @@
 • Example 1
 
 a = FoscRhythm(1/4, #[-2, 2]);
-a.value.do { |each| each.str.postln };
-
-a = FoscRhythm(1/4, #[-2, 3]);
-a.value.do { |each| each.str.postln };
+a.selection.do { |each| each.str.postln };
 a.show;
 
+a = FoscRhythm(1/4, #[-2, 3]);
+a.selection.do { |each| each.str.postln };
+a.show;
 
 
 • Example 2
@@ -43,6 +43,7 @@ FoscRhythm : FoscTreeContainer {
     initFoscRhythm { |duration, items|
         preProlatedDuration = FoscDuration(duration ? 1);
         mixin = FoscRhythmMixin();
+        
         items = items.collect { |each, i|
             case 
             { each.isInteger } { FoscRhythmLeaf(each) }
@@ -50,6 +51,7 @@ FoscRhythm : FoscTreeContainer {
             { each.isSequenceableCollection } { FoscRhythm(*each) }
             { throw("%::new: bad value: %.".format(this.species, each.asCompileString)) };
         };
+        
         this.addAll(items);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,12 +71,15 @@ FoscRhythm : FoscTreeContainer {
     }
     /* --------------------------------------------------------------------------------------------------------
     • value
+
+    !!!TODO: DEPRECATE IN FAVOUR OF SELECTION
+
+    a = FoscRhythm(1/4, #[1, -2, [2, [1, 2, 4]]]);
+    b = a.value;
+    b.show;
     -------------------------------------------------------------------------------------------------------- */
-    value { |pulseDuration=1|
-        var result;
-        pulseDuration = FoscDuration(pulseDuration);
-        result = this.prRecurse(this, pulseDuration * this.prGetPreprolatedDuration);
-        ^result;
+    value {
+        ^this.selection;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
@@ -92,10 +97,12 @@ FoscRhythm : FoscTreeContainer {
         if (expr.isKindOf(this.species).not) { ^false };
         if (this.duration != expr.duration) { ^false };
         if (this.items.size != expr.items.size) { ^false };
+        
         expr.items.do { |each, i|
             if (items[i].prGetPreprolatedDuration != each.prGetPreprolatedDuration) { ^false };
             if (items[i].isPitched != each.isPitched) { ^false };
         };
+        
         ^true;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -113,13 +120,12 @@ FoscRhythm : FoscTreeContainer {
     Illustrates FoscRhythm.
     
     Returns LilyPond file.
+
+    a = FoscRhythm(2/4, #[-2, [2, [-2, 3]], 3]);
+    a.show(staffSize: 12);
     -------------------------------------------------------------------------------------------------------- */
-    illustrate {
-        var selection, selections;
-        selection = this.value.copy;
-        selections = selection.leaves.groupBy { |a, b| a.parent != b.parent };
-        selections.do { |each| each.beam(beamRests: false) };
-        ^FoscLilyPondFile.rhythm([selection]);
+    illustrate { |paperSize, staffSize, includes|
+        ^this.selection.illustrate(paperSize, staffSize, includes);
     }
     /* --------------------------------------------------------------------------------------------------------
     • inspect
@@ -127,30 +133,16 @@ FoscRhythm : FoscTreeContainer {
     a = FoscRhythm(2/4, #[-2, [2, [-2, 3]], 3]);
     a.inspect;
     -------------------------------------------------------------------------------------------------------- */
-    inspect {
-        this.do { |each|
-            each.depth.do { Post.tab };
-            if (each.parent.isNil) {
-                Post << each.prGetPreprolatedDuration.str << nl;
-            } {
-                Post << each.prGetPreprolatedDuration.numerator << nl;
-            };
-        };
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • show
-
-    a = FoscRhythm(3/8, #[-2, 2, 3]);
-    a.show;
-
-    a = FoscRhythm(3/16, [1, -2, FoscRhythm(2, #[1, 2, 4])]);
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    show {
-        var lilypondFile;
-        lilypondFile = this.illustrate;
-        lilypondFile.show;
-    }
+    // inspect {
+    //     this.do { |each|
+    //         each.depth.do { Post.tab };
+    //         if (each.parent.isNil) {
+    //             Post << each.prGetPreprolatedDuration.str << nl;
+    //         } {
+    //             Post << each.prGetPreprolatedDuration.numerator << nl;
+    //         };
+    //     };
+    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,8 +178,10 @@ FoscRhythm : FoscTreeContainer {
     -------------------------------------------------------------------------------------------------------- */
     durations {
         var result;
+        
         result = [];
         this.offsets.doAdjacentPairs { |a, b| result = result.add(b - a) };
+        
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -218,13 +212,12 @@ FoscRhythm : FoscTreeContainer {
     -------------------------------------------------------------------------------------------------------- */
     offsets {
         var result;
+        
         result = Set[];
-        this.leaves.do { |leaf|
-            // DEPRECATED if (leaf.isTiedToPrevLeaf.not) { result.add(leaf.startOffset) };
-            result.add(leaf.startOffset);
-        };
+        this.leaves.do { |leaf| result.add(leaf.startOffset) };
         result.add(this.stopOffset);
         result = result.as(Array).sort;
+
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -281,6 +274,28 @@ FoscRhythm : FoscTreeContainer {
     b.properParentage;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
+    • selection
+
+    The starting offset of a node in a rhythm-tree relative to the root.
+
+    Returns a FoscOffset.
+
+
+    • Example 1
+
+    a = FoscRhythm(1, #[1, [1, [1, 1]], [1, [1, 1]]]);
+    a.do { |node| node.depth.do { Post.tab }; node.startOffset.cs.postln };
+    -------------------------------------------------------------------------------------------------------- */
+    selection {
+        var selection, selections;
+        
+        selection = this.prRecurse(this, this.prGetPreprolatedDuration);
+        selections = selection.leaves.groupBy { |a, b| a.parent != b.parent };
+        selections.do { |each| each.beam(beamRests: false) };
+
+        ^selection;
+    }
+    /* --------------------------------------------------------------------------------------------------------
     • startOffset
 
     The starting offset of a node in a rhythm-tree relative to the root.
@@ -331,9 +346,11 @@ FoscRhythm : FoscTreeContainer {
     prRecurse { |node, tupletDuration|
         var basicProlatedDuration, basicWrittenDuration, tuplet, contentsDuration, multiplier, selection;
         var tieIndices, leaf, prevLeaf;
+        
         basicProlatedDuration = tupletDuration / node.prGetContentsDuration;
         basicWrittenDuration = basicProlatedDuration.equalOrGreaterPowerOfTwo;
         tuplet = FoscTuplet(1, []);
+        
         node.items.do { |child|
             if (child.isKindOf(this.species)) {
                 tuplet.addAll(this.prRecurse(child, child.prGetPreprolatedDuration * basicWrittenDuration));
@@ -341,13 +358,178 @@ FoscRhythm : FoscTreeContainer {
                 tuplet.addAll(child.(basicWrittenDuration));
             };
         };
+        
         contentsDuration = FoscInspection(tuplet).duration;
         multiplier = tupletDuration / contentsDuration;
         tuplet.multiplier_(multiplier);
-
         if (tuplet.multiplier == 1) { tuplet.isHidden_(true) };
         selection = FoscSelection([tuplet]);
 
         ^selection;
     }
 }
+/* ------------------------------------------------------------------------------------------------------------
+• RhythmLeaf
+------------------------------------------------------------------------------------------------------------ */
+FoscRhythmLeaf : FoscTreeNode {
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // INIT
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    var <preProlatedDuration, <isPitched, <offset, <offsetsAreCurrent=false;
+    var mixin;
+    *new { |preProlatedDuration|
+        if (preProlatedDuration.isKindOf(FoscRhythmLeaf)) { ^preProlatedDuration };
+        ^super.new.initFoscRhythmLeaf(preProlatedDuration);
+    }
+    initFoscRhythmLeaf { |argPreProlatedDuration|
+        preProlatedDuration = FoscDuration(argPreProlatedDuration.abs);
+        isPitched = (argPreProlatedDuration > 0);
+        mixin = FoscRhythmMixin();
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC INSTANCE METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • doesNotUnderstand
+
+    Delegate unkown methods to FoscRhythmMixin.
+    -------------------------------------------------------------------------------------------------------- */
+    doesNotUnderstand { |selector ... args|
+        if (mixin.respondsTo(selector)) {
+            ^mixin.performList(selector, [this].addAll(args));
+        } {
+            throw(DoesNotUnderstandError(this, selector, args));
+        };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • value
+
+    Generate Abjad score components.
+
+    ## Returns sequence of components.
+
+    Returns selection.
+    
+    a = FoscRhythmLeaf(5);
+    a.prGetPreprolatedDuration.str;
+    b = a.([1, 16]);
+    FoscVoice(b).show;
+    -------------------------------------------------------------------------------------------------------- */
+    value { |pulseDuration|
+       var totalDuration, maker;
+        
+        pulseDuration = FoscDuration(pulseDuration);
+        totalDuration = pulseDuration * this.prGetPreprolatedDuration;
+        if (this.isPitched) { ^FoscLeafMaker().([60], [totalDuration]) };
+        
+        ^FoscLeafMaker().([nil], [totalDuration]);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE INSTANCE PROPERTIES
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    prGetPreprolatedDuration {
+        ^preProlatedDuration;
+    }
+}
+/* ------------------------------------------------------------------------------------------------------------
+• FoscRhythmMixin
+
+Shared interface for FoscRhythm and FoscRhythmLeaf.
+------------------------------------------------------------------------------------------------------------ */
+FoscRhythmMixin {
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC INSTANCE PROPERTIES
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • duration
+    -------------------------------------------------------------------------------------------------------- */
+    duration { |node|
+        ^(node.prolation * node.prGetPreprolatedDuration);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • parentageRatios
+    -------------------------------------------------------------------------------------------------------- */
+    parentageRatios { |node|
+        var result;
+        result = [];
+        while { node.parent.notNil } {
+            result = result.add([node.prGetPreprolatedDuration, node.parent.prGetContentsDuration]);
+            node = node.parent;
+        };
+        result = result.add(node.prGetPreprolatedDuration);
+        result = result.reverse;
+        ^result;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prolation
+    -------------------------------------------------------------------------------------------------------- */
+    prolation { |node|
+        ^node.prolations.reduce('*');
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prolations
+    -------------------------------------------------------------------------------------------------------- */
+    prolations { |node|
+        var prolations, improperParentage;
+        prolations = [FoscMultiplier(1)];
+        improperParentage = node.improperParentage;
+        improperParentage.doAdjacentPairs { |child, parent|
+            prolations = prolations.add(
+                FoscMultiplier(parent.prGetPreprolatedDuration, parent.prGetContentsDuration);
+            );
+        };
+        ^prolations;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • startOffset
+    -------------------------------------------------------------------------------------------------------- */
+    startOffset { |node|
+        node.prUpdateOffsetsOfEntireTree;
+        ^node.offset;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • stopOffset
+    -------------------------------------------------------------------------------------------------------- */
+    stopOffset { |node|
+        ^(node.startOffset + node.duration);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE INSTANCE METHODS
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • prUpdateOffsetsOfEntireTree
+    -------------------------------------------------------------------------------------------------------- */
+    prUpdateOffsetsOfEntireTree { |node|
+        var recurse, offset, root, children, hasChildren;
+        if (node.offsetsAreCurrent) { ^nil };
+        recurse = { |container, currentOffset|
+            container.instVarPut('offset', currentOffset);
+            container.instVarPut('offsetsAreCurrent', true);
+            container.items.do { |child|
+                if (child.respondsTo('items') && { child.items.notEmpty }) {
+                    currentOffset = recurse.(child, currentOffset);
+                } {
+                    child.instVarPut('offset', currentOffset);
+                    child.instVarPut('offsetsAreCurrent', true);
+                    currentOffset = currentOffset + child.duration;
+                };
+            };
+            currentOffset;
+        };
+        root = node.root;
+        offset = FoscOffset(0);
+        try {
+            children = node.items;
+            hasChildren = children.notEmpty;
+        } {
+            hasChildren = false;
+        };
+        if (node === root && { hasChildren.not }) {
+            node.instVarPut('offset', offset);
+            node.instVarPut('offsetsAreCurrent', true);
+        } {
+            recurse.(root, offset);
+        };
+    }
+}
+

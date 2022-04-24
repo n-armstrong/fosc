@@ -657,84 +657,6 @@
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • doLeaves
-
-    -- mirror selection and iteration methods in Fosc
-
-    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
-    -------------------------------------------------------------------------------------------------------- */
-    // doLeaves { |function, type, pitched, graceNotes=false|
-    //     var iterator;
-        
-    //     Fosc.prCheckIsIterable(this, thisMethod);
-        
-    //     iterator = FoscIteration(this).leaves(type: type, pitched: pitched, graceNotes: graceNotes);
-
-    //     iterator.do(function);
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • selectComponents
-   
-     -- mirror selection and iteration methods in Fosc
-    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
-    -------------------------------------------------------------------------------------------------------- */
-    //!!!TODO: deprecate
-    // selectComponents { |type, exclude, graceNotes=false, reverse=false|
-    //     Fosc.prCheckIsIterable(this, thisMethod);  
-    //     ^FoscSelection(this).components(
-    //         type: type,
-    //         exclude: exclude,
-    //         graceNotes: graceNotes,
-    //         reverse: reverse
-    //     );
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • selectLeaves
-
-    -- mirror selection and iteration methods in Fosc
-    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
-    -------------------------------------------------------------------------------------------------------- */
-    //!!!TODO: deprecate
-    // selectLeaves { |type, exclude, graceNotes=false, pitched, reverse=false|
-    //     Fosc.prCheckIsIterable(this, thisMethod);
-    //     ^FoscSelection(this).leaves(
-    //         type: type,
-    //         exclude: exclude,
-    //         graceNotes: graceNotes,
-    //         pitched: pitched,
-    //         reverse: reverse
-    //     );
-    
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • selectLogicalTies
-
-     -- mirror selection and iteration methods in Fosc
-    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
-    -------------------------------------------------------------------------------------------------------- */
-    //!!!TODO: deprecate
-    // selectLogicalTies { |exclude, graceNotes=false, nontrivial, pitched, reverse=false|
-    //     Fosc.prCheckIsIterable(this, thisMethod);   
-    //     ^FoscSelection(this).logicalTies(
-    //         exclude: exclude,
-    //         graceNotes: graceNotes,
-    //         nontrivial: nontrivial,
-    //         pitched: pitched,
-    //         reverse: reverse
-    //     );
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • selectRuns
-
-    -- mirror selection and iteration methods in Fosc
-    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
-    -------------------------------------------------------------------------------------------------------- */
-    //!!!TODO: deprecate
-    // selectRuns { |exclude|
-    //     Fosc.prCheckIsIterable(this, thisMethod);
-    //     ^FoscSelection(this).runs(exclude: exclude);
-    // }
-    /* --------------------------------------------------------------------------------------------------------
 	• truncateToAbsSum (abjad: truncate)
 
 	Truncates collection to absolute sum of values.
@@ -799,6 +721,87 @@
 		};
 		^this.species.newFrom(items);
 	}
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC INSTANCE METHODS: FOR DEPRECATION
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • doLeaves
+
+    -- mirror selection and iteration methods in Fosc
+
+    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
+    -------------------------------------------------------------------------------------------------------- */
+    doLeaves { |function, type, pitched, graceNotes=false|
+        var iterator;
+        
+        Fosc.prCheckIsIterable(this, thisMethod);
+        
+        iterator = FoscIteration(this).leaves(type: type, pitched: pitched, graceNotes: graceNotes);
+
+        iterator.do(function);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • selectComponents
+   
+     -- mirror selection and iteration methods in Fosc
+    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
+    -------------------------------------------------------------------------------------------------------- */
+    //!!!TODO: deprecate
+    selectComponents { |type, exclude, graceNotes=false, reverse=false|
+        Fosc.prCheckIsIterable(this, thisMethod);  
+        ^FoscSelection(this).components(
+            type: type,
+            exclude: exclude,
+            graceNotes: graceNotes,
+            reverse: reverse
+        );
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • selectLeaves
+
+    -- mirror selection and iteration methods in Fosc
+    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
+    -------------------------------------------------------------------------------------------------------- */
+    //!!!TODO: deprecate
+    selectLeaves { |type, exclude, graceNotes=false, pitched, reverse=false|
+        Fosc.prCheckIsIterable(this, thisMethod);
+        ^FoscSelection(this).leaves(
+            type: type,
+            exclude: exclude,
+            graceNotes: graceNotes,
+            pitched: pitched,
+            reverse: reverse
+        );
+    
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • selectLogicalTies
+
+     -- mirror selection and iteration methods in Fosc
+    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
+    -------------------------------------------------------------------------------------------------------- */
+    //!!!TODO: deprecate
+    selectLogicalTies { |exclude, graceNotes=false, nontrivial, pitched, reverse=false|
+        Fosc.prCheckIsIterable(this, thisMethod);   
+        ^FoscSelection(this).logicalTies(
+            exclude: exclude,
+            graceNotes: graceNotes,
+            nontrivial: nontrivial,
+            pitched: pitched,
+            reverse: reverse
+        );
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • selectRuns
+
+    -- mirror selection and iteration methods in Fosc
+    !!!TODO: make a mixin interface for use by FoscComponent, FoscSelection and SequenceableCollection
+    -------------------------------------------------------------------------------------------------------- */
+    //!!!TODO: deprecate
+    selectRuns { |exclude|
+        Fosc.prCheckIsIterable(this, thisMethod);
+        ^FoscSelection(this).runs(exclude: exclude);
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

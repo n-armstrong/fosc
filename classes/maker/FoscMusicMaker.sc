@@ -234,41 +234,6 @@ FoscMusicMaker : Fosc {
     b = a.(durations: [1/4], divisions: #[-2,3,2], pitches: (60..66));
     b.show;
     -------------------------------------------------------------------------------------------------------- */
-    // prMakeSelections { |durations, divisions, pitches|
-    //     var numLogicalTies, n, size, selections, division, selection;
-
-    //     if (durations.isNil) { durations = #[0.25] };
-    //     if (divisions.isNil) { divisions = #[[1]] };
-    //     if (divisions.rank == 1) { divisions = [divisions] };
-        
-    //     numLogicalTies = divisions.flat.collect { |each| each > 0 }.size;
-    //     'numLogicalTies: '.post; numLogicalTies.postln;
-
-    //     case
-    //     { pitches.size > numLogicalTies } {
-    //         n = (pitches.size / numLogicalTies).ceil.asInteger;
-    //         divisions = divisions.wrapExtend(n);
-    //         if (durations.size < divisions.size) { durations = durations.wrapExtend(divisions.size) };
-    //     };
-
-
-    //     //size = [durations.size, divisions.size, pitches.size].maxItem;
-    //     //durations = durations.wrapExtend(size);
-    //     //divisions = divisions.wrapExtend(size);
-    //     // 'size: '.post; size.postln;
-    //     // 'durations: '.post; durations.postln;
-    //     // 'divisions: '.post; divisions.postln;
-    //     durations = durations.collect { |each| FoscNonreducedFraction(each) };
-    //     selections = [];
-        
-    //     durations.do { |duration, i|
-    //         division = divisions[i];
-    //         selection = FoscRhythm(duration, division).value;
-    //         selections = selections.add(selection);
-    //     };
-        
-    //     ^selections;
-    // }
     prMakeSelections { |durations, divisions, pitches|
         var size, selections, division, selection;
 
@@ -276,7 +241,8 @@ FoscMusicMaker : Fosc {
         if (divisions.isNil) { divisions = #[[1]] };
         if (divisions.rank == 1) { divisions = [divisions] };
         size = [durations.size, divisions.size].maxItem;
-        if (pitches.notNil && { durations.size == divisions.size }) { size = pitches.size };
+        //if (pitches.notNil && { durations.size == divisions.size }) { size = pitches.size };
+        if (pitches.size < size) { pitches = pitches.wrapExtend(size) };
         durations = durations.wrapExtend(size);
         divisions = divisions.wrapExtend(size);
         durations = durations.collect { |each| FoscNonreducedFraction(each) };
@@ -284,7 +250,8 @@ FoscMusicMaker : Fosc {
         
         durations.do { |duration, i|
             division = divisions[i];
-            selection = FoscRhythm(duration, division).value;
+            //selection = FoscRhythm(duration, division).value;
+            selection = FoscRhythm(duration, division).selection;
             selections = selections.add(selection);
         };
         

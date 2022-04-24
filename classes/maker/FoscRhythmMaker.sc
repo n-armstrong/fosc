@@ -9,7 +9,7 @@
 
 
 
-Object model of a partially evaluated function that accepts a (possibly empty) list of divisions as input and returns a list of selections as output. Output structured one selection per division with each selection wrapping a single fixed-duration tuplet.
+Object model of a partially evaluated function that accepts a (possibly empty) list of durations as input and returns a list of selections as output. Output structured one selection per division with each selection wrapping a single fixed-duration tuplet.
 
 Usage follows the two-step configure-once / call-repeatedly pattern shown here.
 
@@ -17,23 +17,23 @@ Usage follows the two-step configure-once / call-repeatedly pattern shown here.
 • Example 1
 
 a = FoscRhythmMaker();
-a.(divisions: [1/4], ratios: #[[1,1],[3,2],[4,3]]);
+a.(durations: [1/4], divisions: #[[1,1],[3,2],[4,3]]);
 a.show;
 
 
 • Example 2
 
 a = FoscRhythmMaker();
-a.(divisions: [2/16, 3/16, 5/32], ratios: #[[1,1,1,1]]);
+a.(durations: [2/16, 3/16, 5/32], divisions: #[[1,1,1,1]]);
 a.show;
 
 
 • Example 3
 
-Negative values in 'ratios' specify rests.
+Negative values in 'divisions' specify rests.
 
 a = FoscRhythmMaker();
-a.(divisions: [1/4], ratios: #[[-2,1],[3,2],[4,-3]]);
+a.(durations: [1/4], divisions: #[[-2,1],[3,2],[4,-3]]);
 a.show;
 
 
@@ -42,7 +42,7 @@ a.show;
 Apply a mask to rhythms.
 
 a = FoscRhythmMaker();
-a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[6,4,3,7]);
+a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[6,4,3,7]);
 a.show;
 
 
@@ -51,7 +51,7 @@ a.show;
 Mask patterns repeat cyclically.
 
 a = FoscRhythmMaker();
-a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[1,3]);
+a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[1,3]);
 a.show;
 
 
@@ -60,7 +60,7 @@ a.show;
 Negative values in a mask specify rests.
 
 a = FoscRhythmMaker();
-a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[-6,4,3,-7]);
+a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[-6,4,3,-7]);
 a.show;
 
 
@@ -71,22 +71,22 @@ a.show;
 Override the defaults.
 
 a = FoscRhythmMaker(beamRests: true);
-b = a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[2,-1,4,2,3,-7]);
+b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,-1,4,2,3,-7]);
 b.show;
 ------------------------------------------------------------------------------------------------------------ */
 FoscRhythmMaker : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    var <beamEachDivision, <beamRests, <extractTrivialTuplets, <rewriteRestFilledTuplets, <rewriteSustainedTuplets;
+    var <beamEachDuration, <beamRests, <extractTrivialTuplets, <rewriteRestFilledTuplets, <rewriteSustainedTuplets;
     var beamSpecifier, durationSpecifier, meterSpecifier, tupletSpecifier, selections;
-    *new { |beamEachDivision=true, beamRests=false, extractTrivialTuplets=true, rewriteRestFilledTuplets=true, rewriteSustainedTuplets=true|
+    *new { |beamEachDuration=true, beamRests=false, extractTrivialTuplets=true, rewriteRestFilledTuplets=true, rewriteSustainedTuplets=true|
 
-        ^super.new.init(beamEachDivision, beamRests, extractTrivialTuplets, rewriteRestFilledTuplets, rewriteSustainedTuplets);
+        ^super.new.init(beamEachDuration, beamRests, extractTrivialTuplets, rewriteRestFilledTuplets, rewriteSustainedTuplets);
     }
-    init { |argBeamEachDivision, argBeamRests, argExtractTrivialTuplets, argRewriteRestFilledTuplets, argRewriteSustainedTuplets|
+    init { |argBeamEachDuration, argBeamRests, argExtractTrivialTuplets, argRewriteRestFilledTuplets, argRewriteSustainedTuplets|
         
-        beamEachDivision = argBeamEachDivision;
+        beamEachDuration = argBeamEachDuration;
         beamRests = argBeamRests;
         extractTrivialTuplets = argExtractTrivialTuplets;
         rewriteRestFilledTuplets = argRewriteRestFilledTuplets;
@@ -95,7 +95,7 @@ FoscRhythmMaker : Fosc {
 
         beamSpecifier = FoscBeamSpecifier(
             beamRests: beamRests,
-            beamEachDivision: beamEachDivision
+            beamEachDivision: beamEachDuration
         );
         
         //durationSpecifier = argDurationSpecifier;
@@ -121,7 +121,7 @@ FoscRhythmMaker : Fosc {
     • illustrate
 
     a = FoscRhythmMaker();
-    a.(divisions: [1/4], ratios: #[[1,1],[3,2],[4,3]]);
+    a.(durations: [1/4], divisions: #[[1,1],[3,2],[4,3]]);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
     illustrate { |paperSize, staffSize, includes|
@@ -153,16 +153,16 @@ FoscRhythmMaker : Fosc {
 
 
     a = FoscRhythmMaker();
-    b = a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[-6,4,3,-7]);
+    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[-6,4,3,-7]);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-    value { |divisions, ratios, mask|
-        selections = this.prMakeMusic(divisions, ratios);
+    value { |durations, divisions, mask|
+        selections = this.prMakeMusic(durations, divisions);
         selections = this.prApplyMask(selections, mask);
 
-        if (tupletSpecifier.notNil) { selections = tupletSpecifier.(selections, divisions) };
-        if (meterSpecifier.notNil) { selections = meterSpecifier.(selections, divisions) };
-        //!!!TODO: if (durationSpecifier.notNil) { selections = durationSpecifier.(selections, divisions) };
+        if (tupletSpecifier.notNil) { selections = tupletSpecifier.(selections, durations) };
+        if (meterSpecifier.notNil) { selections = meterSpecifier.(selections, durations) };
+        //!!!TODO: if (durationSpecifier.notNil) { selections = durationSpecifier.(selections, durations) };
         
         this.prValidateSelections(selections);
         this.prValidateTuplets(selections);
@@ -175,7 +175,7 @@ FoscRhythmMaker : Fosc {
     // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
-    • beamEachDivision
+    • beamEachDuration
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • beamRests
@@ -250,29 +250,29 @@ FoscRhythmMaker : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • prCoerceDivisions
     -------------------------------------------------------------------------------------------------------- */
-    prCoerceDivisions { |divisions|
-        if (divisions.isSequenceableCollection.not) { divisions = [divisions] };
-        divisions = divisions.collect { |each| FoscNonreducedFraction(each) };
-        ^divisions;
+    prCoerceDivisions { |durations|
+        if (durations.isSequenceableCollection.not) { durations = [durations] };
+        durations = durations.collect { |each| FoscNonreducedFraction(each) };
+        ^durations;
     }
     /* --------------------------------------------------------------------------------------------------------
     • prMakeMusic
 
     a = FoscRhythmMaker();
-    a.(divisions: 1/4 ! 4, ratios: #[[1,1,1,1,1]], mask: #[-6,4,3,-7]);
+    a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[-6,4,3,-7]);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-    prMakeMusic { |divisions, ratios|
+    prMakeMusic { |durations, divisions|
         var n, ratio, duration, selection;
         
-        n = [divisions.size, ratios.size].maxItem;
+        n = [durations.size, divisions.size].maxItem;
+        durations = durations.wrapExtend(n);
         divisions = divisions.wrapExtend(n);
-        ratios = ratios.wrapExtend(n);
         selections = [];
-        divisions = this.prCoerceDivisions(divisions);
+        durations = this.prCoerceDivisions(durations);
         
-        divisions.do { |division, i|
-            ratio = ratios[i];
+        durations.do { |division, i|
+            ratio = divisions[i];
             duration = FoscDuration(division);
             selection = FoscRhythm(duration, ratio).value;
             selections = selections.add(selection);

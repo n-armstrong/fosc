@@ -6,25 +6,15 @@
 
 A tuplet.
 
-a = FoscTuplet(2/3, FoscLeafMaker().(#[60,62,64], [1/8]));
+a = FoscTuplet(2/3, #[60,62,64].collect { |pitch| FoscNote(pitch, 1/8) });
 a.show;
 
 
 • Example 2
 
-A nested tuplet.
-
-a = FoscTuplet(2/3, FoscLeafMaker().(#[60,62,64], [1/8]));
-b = FoscTuplet(4/7, FoscLeafMaker().(#[67,69], [3/8, 1/16]));
-a.insert(1, b);
-a.show;
-
-
-• Example 3
-
 Tuplets can be tweaked.
 
-a = FoscTuplet(2/3, FoscLeafMaker().(#[60,62,64], [1/8]));
+a = FoscTuplet(2/3, #[60,62,64].collect { |pitch| FoscNote(pitch, 1/8) });
 tweak(a).color = 'blue';
 a.show;
 ------------------------------------------------------------------------------------------------------------ */
@@ -56,7 +46,7 @@ FoscTuplet : FoscContainer {
 
     • Example 1
 
-    m = FoscLeafMaker().(#[60,61,62], [1/8]);
+    m = #[60,62,64].collect { |pitch| FoscNote(pitch, 1/8) };
     a = FoscTuplet.newFromDuration(2/8, m);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
