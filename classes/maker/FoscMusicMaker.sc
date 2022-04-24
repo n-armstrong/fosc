@@ -235,23 +235,22 @@ FoscMusicMaker : Fosc {
     b.show;
     -------------------------------------------------------------------------------------------------------- */
     prMakeSelections { |durations, divisions, pitches|
-        var size, selections, division, selection;
+        var size, selections, selection;
 
         if (durations.isNil) { durations = #[0.25] };
         if (divisions.isNil) { divisions = #[[1]] };
         if (divisions.rank == 1) { divisions = [divisions] };
         size = [durations.size, divisions.size].maxItem;
         //if (pitches.notNil && { durations.size == divisions.size }) { size = pitches.size };
-        if (pitches.size < size) { pitches = pitches.wrapExtend(size) };
+        if (pitches.notNil && { pitches.size < size }) { pitches = pitches.wrapExtend(size) };
         durations = durations.wrapExtend(size);
         divisions = divisions.wrapExtend(size);
         durations = durations.collect { |each| FoscNonreducedFraction(each) };
         selections = [];
         
         durations.do { |duration, i|
-            division = divisions[i];
             //selection = FoscRhythm(duration, division).value;
-            selection = FoscRhythm(duration, division).selection;
+            selection = FoscRhythm(duration, divisions[i]).selection;
             selections = selections.add(selection);
         };
         
