@@ -1514,7 +1514,8 @@ FoscSelection : FoscSequence {
     m = a.selectLeaves[1..6].prFuseLeavesAndReplaceWithRests;
     a.show;
 
-    prDetachIndicators
+    m = FoscLeafMaker().([nil], [1/4]);
+    m.show;
     -------------------------------------------------------------------------------------------------------- */
     prFuseLeavesAndReplaceWithRests {
         var leaves, groups, totalPreprolated, parent, index, rest;
@@ -1531,7 +1532,8 @@ FoscSelection : FoscSequence {
         
         groups.do { |leaves, i|
             totalPreprolated = leaves.prGetPreprolatedDuration;
-            rest = FoscMusicMaker().(durations: [totalPreprolated], divisions: [-1]);
+            //rest = FoscMusicMaker().(durations: [totalPreprolated], divisions: [-1]);
+            rest = FoscLeafMaker().([nil], [totalPreprolated]);
             mutate(leaves).replace(rest);
         };
     }

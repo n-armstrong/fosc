@@ -145,13 +145,30 @@ FoscMusicMaker : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • value
+
+    a = FoscMusicMaker();
+    b = a.(durations: [1/8], divisions: #[2,3]);
+    b = a.(durations: [1/8], mask: #[-1,1,1,1,-1,1,1,1], pitches: (60..65));
+    b.show;
+
+    a = FoscMusicMaker();
+    b = a.(durations: [1/8], divisions: #[2,3], mask: #[-1,1,1,1], pitches: (60..67));
+    b.show;
+
+    a = FoscMusicMaker();
+    b = a.(durations: [1/4], divisions: #[-2,3,2], pitches: (60..66));
+    b.show;
+
+    a = FoscMusicMaker();
+    b = a.(durations: [[5,16]], mask: #[-1,1,1,1,1], pitches: (60..64));
+    b.show;
     -------------------------------------------------------------------------------------------------------- */
     value { |durations, divisions, mask, pitches|
-        var selections, selection;
+        var size, selections, selection;
 
         if (pitches.isString) { pitches = FoscPitchManager.pitchStringToPitches(pitches) };
-        // selections = this.prMakeSelections(durations, divisions, pitches);
-        selections = this.prMakeSelections(durations, divisions, pitches);
+        size = [durations.size, divisions.size, mask.size, pitches.size].maxItem;
+        selections = this.prMakeSelections(durations, divisions, size);
         selections = this.prApplyMask(selections, mask);
         if (tupletSpecifier.notNil) { selections = tupletSpecifier.(selections, durations) };
         if (meterSpecifier.notNil) { selections = meterSpecifier.(selections, durations) };
@@ -223,7 +240,7 @@ FoscMusicMaker : Fosc {
     • prMakeSelections
 
     a = FoscMusicMaker();
-    b = a.(durations: 1/8, mask: #[-1,1,1,1,-1,1,1,1], pitches: (60..65));
+    b = a.(durations: [1/8], mask: #[-1,1,1,1,-1,1,1,1], pitches: (60..65));
     b.show;
 
     a = FoscMusicMaker();
@@ -238,13 +255,14 @@ FoscMusicMaker : Fosc {
     b = a.(durations: [[5,16]], mask: #[-1,1,1,1,1], pitches: (60..64));
     b.show;
     -------------------------------------------------------------------------------------------------------- */
-    prMakeSelections { |durations, divisions, pitches|
-        var size, selections, selection;
+    prMakeSelections { |durations, divisions, size|
+        var selections, selection;
 
         if (durations.isNil) { durations = #[0.25] };
         if (divisions.isNil) { divisions = #[[1]] };
+        //if (pitches.isNil) { pitches = #[60] };
         if (divisions.rank == 1) { divisions = [divisions] };
-        size = [durations.size, divisions.size, pitches.size].maxItem;
+        //size = [durations.size, divisions.size].maxItem;
         durations = durations.wrapExtend(size);
         divisions = divisions.wrapExtend(size);
         durations = durations.collect { |each| FoscNonreducedFraction(each) };
