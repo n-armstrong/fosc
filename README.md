@@ -206,7 +206,7 @@ b.show;
 <br>Apply a *mask* to fuse contiguous musical events. Mask patterns repeat cyclically. *pitches* are added after a *mask* is applied.
 ```supercollider
 a = FoscMusicMaker();
-b = a.(durations: 1/4 ! 4, divisions: #[1,1,1,1,1], mask: #[2,1], pitches: #[60,62]);
+b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,1], pitches: #[60,62]);
 b.show;
 ```
 ![](./docs/img/music-maker-8.png)
@@ -214,7 +214,7 @@ b.show;
 <br>Negative *mask* values are rests.
 ```supercollider
 a = FoscMusicMaker();
-b = a.(durations: 1/4 ! 4, divisions: #[1,1,1,1,1], mask: #[2,-1], pitches: #[60,62]);
+b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,-1], pitches: #[60,62]);
 b.show;
 ```
 ![](./docs/img/music-maker-9.png)
