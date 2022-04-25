@@ -1,8 +1,12 @@
 # Fosc
 
-__Fosc__ is a [SuperCollider][https://supercollider.github.io/] API for generating musical notation in [LilyPond][http://lilypond.org/].
+[supercollider]: https://supercollider.github.io/
+[lilypond]: http://lilypond.org/
+[abjad]: https://abjad.github.io
 
-__Fosc__ stands for FO-rmalised S-core C-ontrol (FO-r S-uperC-ollider). It's a close relative of [Abjad][https://abjad.github.io], and ports much of Abjad's Python code base to SuperCollider.
+__Fosc__ is a [SuperCollider][supercollider] API for generating musical notation in [LilyPond][lilypond].
+
+__Fosc__ stands for FO-rmalised S-core C-ontrol (FO-r S-uperC-ollider). It's a close relative of [Abjad][abjad], and ports much of Abjad's Python code base to SuperCollider.
 
 __Fosc__ lets you:
 
@@ -18,7 +22,7 @@ __Fosc__ lets you:
 
 ### Install LilyPond
 
-[LilyPond][http://lilypond.org/] is an open-source program that engraves music notation in an automated way. __Fosc__ uses LilyPond to produce notational output. It's recommended that you install the most recent version of LilyPond directly from the LilyPond website.
+[LilyPond][lilypond] is an open-source program that engraves music notation in an automated way. __Fosc__ uses LilyPond to produce notational output. It's recommended that you install the most recent version of LilyPond directly from the LilyPond website.
 
 ### <br>Install Fosc
 
