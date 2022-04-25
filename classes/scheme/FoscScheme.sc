@@ -1,50 +1,62 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscScheme
 
-!!!NB:
-abjad: Scheme(1, 2, 3, force_quotes=True, verbatim=False)
-fosc:  FoscScheme(1, 2, 3).forceQuotes_(true).isVerbatim_(false);
 
-- Examples from: http://abjad.mbrsi.org/api/tools/schemetools/Scheme.html#abjad.tools.schemetools.Scheme
+• Example 1. A Scheme boolean value
 
-// Example 1. A Scheme boolean value:
 a = FoscScheme(true);
 a.format;
 
-// Example 2. A nested Scheme expession:
+
+• Example 2. A nested Scheme expession
 a = FoscScheme(['left', [1, 2, false]], ['right', [1, 2, 3.3]]);
 a.format;
 
-// Example 3. A variable-length argument:
-// Scheme wraps nested variable-length arguments in a tuple.
+
+• Example 3. A variable-length argument
+
+Scheme wraps nested variable-length arguments in a tuple.
+
 a = FoscScheme(1, 2, 3);
 b = FoscScheme([1, 2, 3]);
 format(a) == format(b);
 
-// Example 4. A quoted Scheme expression:
+
+• Example 4. A quoted Scheme expression
+
 a = FoscScheme([1, 2, 3]).quoting_("'#");
 a.format;
 
-// Example 5. A Scheme expression with forced quotes:
+
+• Example 5. A Scheme expression with forced quotes
+
 a = FoscScheme('nospaces').forceQuotes_(true);
 a.format;
 
-// Example 6. A Scheme expression of LilyPond functions:
-// Use this in certain override situations when LilyPond’s Scheme interpreter treats unquoted strings as symbols
-// instead of strings. The string must contain no whitespace for this to work.
+
+• Example 6. A Scheme expression of LilyPond functions
+
+Use this in certain override situations when LilyPond’s Scheme interpreter treats unquoted strings as symbols instead of strings. The string must contain no whitespace for this to work.
+
 x = "tuplet-number::append-note-wrapper";
 y = "tuplet-number::calc-denominator-text";
 a = FoscScheme("4").forceQuotes_(true);
 b = FoscScheme(x, y, a);
 b.format;
 
-// Example 7. A Scheme lambda expression of LilyPond function that takes a markup with a quoted string argument.
-// Setting verbatim to true causes the expression to format exactly as-is without modifying quotes or whitespace:
+
+• Example 7. A Scheme lambda expression of LilyPond function that takes a markup with a quoted string argument.
+
+Setting verbatim to true causes the expression to format exactly as-is without modifying quotes or whitespace.
+
 x = "(lambda (grob) (grob-interpret-markup grob' #{ \\markup \\musicglyph #\"noteheads.s0harmonic\" #}))";
 a = FoscScheme(x).isVerbatim_(true)
 a.format;
 ------------------------------------------------------------------------------------------------------------ */
 FoscScheme : Fosc {
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// INIT
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	var <value, <quoting, <forceQuotes=false, <isVerbatim=false;
 	*new { |... args|
 		^super.new.init(args);
@@ -56,27 +68,33 @@ FoscScheme : Fosc {
 			value = args;
 		};
 	}
-
-	// PUBLIC /////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PUBLIC CLASS METHODS
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
-	• formatEmbeddedSchemeValue
-	- Formats `value` as an embedded Scheme value.
+	• *formatEmbeddedSchemeValue
+
+	Formats `value` as an embedded Scheme value.
+	
 	FoscScheme.formatEmbeddedSchemeValue(FoscOrdinalConstant('x', -1, \left));
 	-------------------------------------------------------------------------------------------------------- */
 	*formatEmbeddedSchemeValue { |value, forceQuotes=false|
 		var result;
-		if (value.isKindOf(FoscOrdinalConstant)) {
-			result = "#" ++ value.representation.asString.toLower;
-		} {
-			result = FoscScheme.formatSchemeValue(value, forceQuotes: true);
-			if (value.isKindOf(Boolean) || { value.isString && forceQuotes.not } || value.isKindOf(FoscScheme)) {
-				result = "#" ++ result;
-			};
+
+		result = FoscScheme.formatSchemeValue(value, forceQuotes: true);
+		
+		if (
+			value.isKindOf(Boolean)
+			|| { value.isString && forceQuotes.not } 
+			|| { value.isKindOf(FoscScheme) }
+		) {
+			result = "#" ++ result;
 		};
+		
 		^result;
 	}
 	/* --------------------------------------------------------------------------------------------------------
-	• formatSchemeValue
+	• *formatSchemeValue
 	
 	Formats value as Scheme would.
 
@@ -103,11 +121,14 @@ FoscScheme : Fosc {
 		^case
 		{ [String, Symbol].includes(value.class) } {
 			value = value.asString;
+			
 			if (isVerbatim.not) {
 				value = value.replace("\"", "\\\"");
 				if (forceQuotes || { value.includesAny([Char.space, $#]) }) { value = "\"%\"".format(value) };
 				value;
-			} { value };
+			} {
+				value;
+			};
 		}
 		{ value.isNumber } {
 			value.asString;
@@ -148,20 +169,15 @@ FoscScheme : Fosc {
 			FoscSchemePair('stretchability', stretchability),
 		);
 	}
-
-	// PUBLIC /////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PUBLIC INSTANCE PROPERTIES
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
 	• forceQuotes_
 	- Is true when quotes should be forced in output.
 	-------------------------------------------------------------------------------------------------------- */
 	forceQuotes_ { |bool|
 		forceQuotes = bool;
-	}
-	/* --------------------------------------------------------------------------------------------------------
-	• format
-	-------------------------------------------------------------------------------------------------------- */
-	format {
-		^this.prGetLilypondFormat;
 	}
 	/* --------------------------------------------------------------------------------------------------------
 	• isVerbatim_
@@ -178,8 +194,18 @@ FoscScheme : Fosc {
 	quoting_ { |str|
 		quoting = str.asString;
 	}
-
-	// PRIVATE ////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PUBLIC INSTANCE METHODS
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/* --------------------------------------------------------------------------------------------------------
+	• format
+	-------------------------------------------------------------------------------------------------------- */
+	format {
+		^this.prGetLilypondFormat;
+	}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PRIVATE INSTANCE METHODS
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/* --------------------------------------------------------------------------------------------------------
 	• prGetFormattedValue
 	-------------------------------------------------------------------------------------------------------- */

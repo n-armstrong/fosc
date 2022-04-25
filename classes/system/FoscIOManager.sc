@@ -110,27 +110,8 @@ FoscIOManager : Fosc {
             throw("%:%: path does not exist: %.".format(this.name, thisMethod.name, path));
         };
         
-        path.openOS;
+        openOS(path);
     }
-    // *openFile { |path|
-    //     var returnCode;
-        
-    //     if (File.exists(path).not) {
-    //         throw("%:%: path does not exist: %.".format(this.name, thisMethod.name, path));
-    //     };
-        
-    //     path = shellQuote(path);
-        
-    //     returnCode = systemCmd("open %".format(path));
-        
-    //     returnCode = Platform.case(
-    //         \osx, { systemCmd("open %".format(path)) },
-    //         \linux, { systemCmd("xdg-open %".format(path)) },
-    //         \windows, { systemCmd("START \"\" %".format(path)) }
-    //     );
-        
-    //     ^returnCode;
-    // }
     /* --------------------------------------------------------------------------------------------------------
     • *runLilypond
     -------------------------------------------------------------------------------------------------------- */

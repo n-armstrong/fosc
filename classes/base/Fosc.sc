@@ -1,7 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
 • Fosc
-
-Fosc.dumpClassSubtree
 ------------------------------------------------------------------------------------------------------------ */
 Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -227,10 +225,10 @@ Fosc {
     • Example 2
 
     a = FoscNote(60, 1/4);
-    a.show(staffSize: 10);
+    a.show(staffSize: 12);
     -------------------------------------------------------------------------------------------------------- */
     show { |paperSize, staffSize, includes|
-        var illustrateEnvir, pdfPath;
+        var illustrateEnvir, path;
         
         if (this.respondsTo('illustrate').not) {
             throw("% does not respond to 'illustrate' and can't be shown.".format(this));
@@ -238,8 +236,8 @@ Fosc {
 
         if (includes.notNil && { includes.isSequenceableCollection.not }) { includes = [includes] };
         illustrateEnvir = (paperSize: paperSize, staffSize: staffSize, includes: includes);
-        pdfPath = this.write.asPDF(illustrateEnvir: illustrateEnvir);
-        FoscIOManager.openFile(pdfPath);
+        path = this.write.asPDF(illustrateEnvir: illustrateEnvir);
+        FoscIOManager.openFile(path);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // !!! TODO: move write methods into FoscComponent

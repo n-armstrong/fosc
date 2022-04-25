@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscWrapper (abjad 3.0)
+• FoscWrapper
 
 Indicator wrapper.
 ------------------------------------------------------------------------------------------------------------ */
@@ -8,26 +8,29 @@ FoscWrapper : Fosc {
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     var <component, <context, deactivate, <effectiveContext, <indicator, <annotation, <syntheticOffset;
-    *new { |component, context, deactivate=false, effectiveContext, indicator, annotation,
-        syntheticOffset|
+    *new { |component, context, deactivate=false, effectiveContext, indicator, annotation, syntheticOffset|
         ^super.new.init(component, context, deactivate, effectiveContext, indicator, annotation,
             syntheticOffset);
     }
-    init { |argComponent, argContext, argDeactivate, argEffectiveContext, argIndicator,
-        argAnnotation, argSyntheticOffset, argTag|
+    init { |argComponent, argContext, argDeactivate, argEffectiveContext, argIndicator, argAnnotation,
+        argSyntheticOffset|
         var message;
-        //!!!TODO: assert not isinstance(indicator, type(self)), repr(indicator)
+        
         if (argAnnotation.notNil) {
             assert([Symbol, String].any { |type| argAnnotation.isKindOf(type) });
         };
+        
         annotation = argAnnotation;
+        
         if (argComponent.notNil) {
             assert([FoscComponent].any { |type| argComponent.isKindOf(type) });
         };
+        
         component = argComponent;
         context = argContext;
         deactivate = argDeactivate;
         indicator = argIndicator;
+        
         if (argSyntheticOffset.notNil) { syntheticOffset = FoscOffset(argSyntheticOffset) };
         if (component.notNil) { this.prBindComponent(component) };
     }
@@ -129,15 +132,15 @@ FoscWrapper : Fosc {
     c = FoscScore([FoscStaff([b])]);
     a.attach(FoscTimeSignature([4,4]), context: "Score");
     a.wrappers.do { |each| [each.indicator, each.context].postln };
-    c.format;
+    c.lilypond;
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prBindComponent { |argComponent|
         if (indicator.respondsTo('context') && { indicator.context.notNil }) {
             this.prWarnDuplicateIndicator(component);
             this.prUnbindComponent;
             component = argComponent;
             this.prUpdateEffectiveContext;
+            
             if (
                 indicator.respondsTo('mutatesOffsetsInSeconds')
                 && { indicator.mutatesOffsetsInSeconds.not }
@@ -145,6 +148,7 @@ FoscWrapper : Fosc {
                 component.prUpdateLater(offsetsInSeconds: true);
             };
         };
+
         component.wrappers.add(this);
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -152,11 +156,14 @@ FoscWrapper : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prBindEffectiveContext { |correctEffectiveContext|
         this.prUnbindEffectiveContext;
+        
         if (correctEffectiveContext.notNil) {
             correctEffectiveContext.dependentWrappers.add(this);
         };
+        
         effectiveContext = correctEffectiveContext;
         this.prUpdateEffectiveContext;
+        
         if (
             indicator.respondsTo('mutatesOffsetsInSeconds')
             && { indicator.mutatesOffsetsInSeconds.not }
@@ -175,7 +182,6 @@ FoscWrapper : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • prFindCorrectEffectiveContext
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prFindCorrectEffectiveContext {
         var localContext, candidate, parentage;
 
@@ -236,79 +242,68 @@ FoscWrapper : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • prGetEffectiveContext
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prGetEffectiveContext {
         if (component.notNil) { component.prUpdateNow(indicators: true) };
         ^effectiveContext;
     }
     /* --------------------------------------------------------------------------------------------------------
     • prGetFormatPieces
-
-    FoscComponent
-    FoscLeaf
-    FoscLilyPondFormatBundle
-
-    "context: ".post; [indicator, correctEffectiveContext].postln;
-
-    a = FoscScoreSegment.read(Threads, 'A1');
-    a.show;
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prGetFormatPieces {
         var result, bundle, localContext, lilypondFormat;
+        
         result = [];
         if (annotation.notNil) { ^result };
+        
         if (indicator.respondsTo('prGetLilypondFormatBundle')) {
             bundle = indicator.prGetLilypondFormatBundle(component);
-            //!!!TODO: bundle.tagFormatContributions(tag, deactivate: deactivate);
             ^bundle;
         };
+        
         try {
             localContext = this.prGetEffectiveContext;
             lilypondFormat = indicator.prGetLilypondFormat(context: localContext);
         } {
             lilypondFormat = indicator.prGetLilypondFormat;
         };
+        
         if (lilypondFormat.isString) { lilypondFormat = [lilypondFormat] };
-        //!!!TODO: assert(lilypondFormat.isSequenceableCollection);
-        //lilypondFormat = FoscLilyPondFormatManager.tag(lilypondFormat, tag, deactivate: deactivate);
         result = result.addAll(lilypondFormat);
         
         if (this.prGetEffectiveContext.notNil) { ^result };
         //!!!TODO: result = result.collect { |each| "\\%\\%\\% % \\%\\%\\%".format(each) };
         
         result = result.collect { |each| "%".format(each) };
+
         ^result;
     }
     /* --------------------------------------------------------------------------------------------------------
     • prUnbindComponent
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prUnbindComponent {
-        if (component.notNil && { component.wrappers.includes(this) }) {
-            component.wrappers.remove(this);
-        };
+        if (component.notNil && { component.wrappers.includes(this) }) { component.wrappers.remove(this) };
         component = nil;
     }
     /* --------------------------------------------------------------------------------------------------------
     • prUnbindEffectiveContext
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prUnbindEffectiveContext {
         if (effectiveContext.notNil && { effectiveContext.dependentWrappers.includes(this) }) {
             effectiveContext.dependentWrappers.remove(this);
         };
+
         effectiveContext = nil;
     }
     /* --------------------------------------------------------------------------------------------------------
     • prUpdateEffectiveContext
 
     a = FoscScoreSegment.read(Threads, 'A1');
-    -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
+    -------------------------------------------------------------------------------------------------------- */ 
     prUpdateEffectiveContext {
         var correctEffectiveContext;
+        
         correctEffectiveContext = this.prFindCorrectEffectiveContext;
+        
         if (effectiveContext != correctEffectiveContext) {
             this.prBindEffectiveContext(correctEffectiveContext);
         };
@@ -353,19 +348,16 @@ FoscWrapper : Fosc {
         if (wrapper.indicator == this.indicator && { context != wrapperContext }) {
             ^nil;
         };
-       
-        /*
-        a = FoscVoice(FoscLeafMaker().(#[60,62,64,65,67], 1/4), name: 'foo');
-        a[0..2].hairpin('p < mf');
-        a[2..4].hairpin('f > p');
-        */
+
         message = "Can't attach % to % in % because % is already attached to "
             .format(indicator.cs, component.cs, context.name ? context, wrapper.indicator.cs);
+        
         if (component == wrapper.component) {
             message = message ++ "the same leaf.";
         } {
             message = message ++ "% in %.".format(wrapper.component, wrapperContext.name);
         };
+        
         throw(message);
     }
 }

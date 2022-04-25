@@ -977,7 +977,7 @@ FoscSelection : FoscSequence {
         var candidateDuration, component, componentDuration;
 
         durations = durations.collect { |each| FoscDuration(each) };
-        if (isCyclic) { durations = FoscCyclicArray(durations) };
+        //if (isCyclic) { durations = FoscCyclicArray(durations) };
         result = [];
         part = [];
         currentDurationIndex = 0; 
@@ -990,11 +990,7 @@ FoscSelection : FoscSequence {
                 if (componentsCopy.isEmpty) { break.value };
                 component = componentsCopy.removeAt(0);
                 componentDuration = component.prGetDuration;
-                
-                if (inSeconds) {
-                    componentDuration = component.prGetDuration(inSeconds: true);
-                };
-                
+                if (inSeconds) { componentDuration = component.prGetDuration(inSeconds: true) };
                 candidateDuration = cumulativeDuration + componentDuration;
 
                 case
@@ -1008,7 +1004,14 @@ FoscSelection : FoscSequence {
                     part = [];
                     cumulativeDuration = FoscDuration(0);
                     currentDurationIndex = currentDurationIndex + 1;
-                    targetDuration = durations[currentDurationIndex];
+                    
+                    // targetDuration = durations[currentDurationIndex];
+                    if (isCyclic) {
+                        targetDuration = durations.wrapAt(currentDurationIndex);
+                    } {
+                        targetDuration = durations[currentDurationIndex];
+                    };
+
                     if (targetDuration.isNil) { break.value };
                 }
                 { targetDuration < candidateDuration } {
@@ -1020,7 +1023,14 @@ FoscSelection : FoscSequence {
                         part = [component];
                         cumulativeDuration = part.collect { |each| each.prGetDuration(inSeconds) }.sum; 
                         currentDurationIndex = currentDurationIndex + 1;
-                        targetDuration = durations[currentDurationIndex];
+                        
+                        // targetDuration = durations[currentDurationIndex];
+                        if (isCyclic) {
+                            targetDuration = durations.wrapAt(currentDurationIndex);
+                        } {
+                            targetDuration = durations[currentDurationIndex];
+                        };
+
                         if (targetDuration.isNil) { break.value };
                         
                         if (targetDuration < cumulativeDuration) {
@@ -1036,7 +1046,14 @@ FoscSelection : FoscSequence {
                         part = [];
                         cumulativeDuration = FoscDuration(0);
                         currentDurationIndex = currentDurationIndex + 1;
-                        targetDuration = durations[currentDurationIndex];
+                        
+                        //targetDuration = durations[currentDurationIndex];
+                        if (isCyclic) {
+                            targetDuration = durations.wrapAt(currentDurationIndex);
+                        } {
+                            targetDuration = durations[currentDurationIndex];
+                        };
+                    
                         if (targetDuration.isNil) { break.value };
                     };
                 }

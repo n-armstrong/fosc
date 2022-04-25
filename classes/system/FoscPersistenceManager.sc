@@ -26,10 +26,7 @@ FoscPersistenceManager : Fosc {
 
 
     a = FoscNote(60, 1/4);
-    a.show(staffSize: 12);
-
-    a = FoscNote(60, 1/8);
-    a.show;
+    a.show(staffSize: 14);
     -------------------------------------------------------------------------------------------------------- */
     asLY { |path, illustrateEnvir|
         var illustration, lyFileName, lyFile;
@@ -114,15 +111,6 @@ FoscPersistenceManager : Fosc {
         
         ^(outputPath ++ ".png");
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • asSVG
-
-    lilypond -dbackend=svg -dcrop file.ly
-    -------------------------------------------------------------------------------------------------------- */
-    // asSVG { |lyPath, outputPath, illustrateEnvir, crop=true, clean=true|
-    //     // if (crop) { add "-dcrop" to flags string };
-    //     ^this.notYetImplemented(thisMethod);
-    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -198,7 +198,7 @@ b.show;
 <br>Rhythm cells are repeated cyclically when the length of *divisions* is less than the length of *durations*.
 ```supercollider
 a = FoscMusicMaker();
-b = a.(durations: 1/4 ! 4, divisions: #[1,1,1,1,1]);
+b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]]);
 b.show;
 ```
 ![](./docs/img/music-maker-7.png)
