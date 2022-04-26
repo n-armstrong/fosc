@@ -56,7 +56,7 @@ Fosc.lilypondVersion;
 ## <br>Creating score objects
 
 <br>Display a note.
-```
+```supercollider
 a = FoscNote(60, 1/4);
 a.show;
 ```
