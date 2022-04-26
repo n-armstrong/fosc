@@ -120,7 +120,6 @@ FoscIOManager : Fosc {
         
         executablePath = executablePath ?? { Fosc.lilypondPath };
         lilypondBase = path.splitext[0];
-        'lilypondBase: '.post; lilypondBase.postln;
         path = path.shellQuote;
         flags = flags ? "";
         outputPath = (outputPath ? lilypondBase).shellQuote;

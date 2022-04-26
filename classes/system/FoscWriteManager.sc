@@ -37,6 +37,8 @@ FoscWriteManager : Fosc {
 
     • Example 1
 
+    Automatically generate a file path and write to fosc-output directory.
+
     a = FoscNote(60, 1/4);
     b = a.write.asLY;
     openOS(b);
@@ -44,8 +46,19 @@ FoscWriteManager : Fosc {
 
     • Example 2
 
+    Specify the file path.
+
     a = FoscNote(60, 1/4);
     b = a.write.asLY(Platform.userHomeDir ++ "/test.ly");
+    openOS(b);
+
+
+    • Example 3
+
+    Add file extension automatically.
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asLY(Platform.userHomeDir ++ "/test");
     openOS(b);
     -------------------------------------------------------------------------------------------------------- */
     asLY { |path, illustrateEnvir|
@@ -61,7 +74,8 @@ FoscWriteManager : Fosc {
             lyFileName = FoscIOManager.nextOutputFileName;
             path = "%/%".format(Fosc.outputDirectory, lyFileName);
         };
-        
+
+        if (path.splitext[1].isNil) { path = path ++ ".ly" };
         lyFile = File(path, "w");
         lyFile.write(illustration);
         lyFile.close;
@@ -87,7 +101,7 @@ FoscWriteManager : Fosc {
 
     • Example 1
 
-    Automatically generate a file name and write to fosc-output directory.
+    Automatically generate a file path and write to fosc-output directory.
 
     a = FoscNote(60, 1/4);
     b = a.write.asPDF;
@@ -96,7 +110,7 @@ FoscWriteManager : Fosc {
 
     • Example 2
 
-    Specify the output path.
+    Specify the file path.
 
     a = FoscNote(60, 1/4);
     b = a.write.asPDF(Platform.userHomeDir ++ "/foo.pdf");
@@ -105,7 +119,7 @@ FoscWriteManager : Fosc {
 
     • Example 3
 
-    Add file extensions automatically.
+    Add file extension automatically.
 
     a = FoscNote(60, 1/4);
     b = a.write.asPDF(Platform.userHomeDir ++ "/foo");
@@ -134,7 +148,7 @@ FoscWriteManager : Fosc {
 
     • Example 1
 
-    Automatically generate a file name and write to fosc-output directory.
+    Automatically generate a file path and write to fosc-output directory.
 
     a = FoscNote(60, 1/4);
     b = a.write.asPNG(resolution: 300);
@@ -143,7 +157,7 @@ FoscWriteManager : Fosc {
 
     • Example 2
 
-    Specify the output path.
+    Specify the file path.
 
     a = FoscNote(60, 1/4);
     b = a.write.asPNG(Platform.userHomeDir ++ "/foo.png");
@@ -152,7 +166,7 @@ FoscWriteManager : Fosc {
 
     • Example 3
 
-    Add file extensions automatically.
+    Add file extension automatically.
 
     a = FoscNote(60, 1/4);
     b = a.write.asPNG(Platform.userHomeDir ++ "/foo");
@@ -160,16 +174,14 @@ FoscWriteManager : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     asPNG { |path, illustrateEnvir, resolution=300|
         var lyPath, flags, files;
-    
-        flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png";
-        flags = flags.format(resolution);
         
         if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
         if (path.notNil) { path = path.splitext[0] ++ ".ly" };
         lyPath = this.asLY(path, illustrateEnvir);
         path = lyPath.splitext[0];
-        FoscIOManager.runLilypond(lyPath, flags, path);
-        
+        flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png";
+        flags = flags.format(resolution);
+        FoscIOManager.runLilypond(lyPath, flags, path);  
         files = #["%-1.eps", "%-systems.count", "%-systems.tex", "%-systems.texi"];
         files.do { |each| File.delete(each.format(path)) };
         
@@ -187,7 +199,7 @@ FoscWriteManager : Fosc {
 
     • Example 1
 
-    Automatically generate a file name and write to fosc-output directory.
+    Automatically generate a file path and write to fosc-output directory.
 
     a = FoscNote(60, 1/4);
     b = a.write.asSVG;
@@ -196,7 +208,7 @@ FoscWriteManager : Fosc {
 
     • Example 2
 
-    Specify the output path.
+    Specify the file path.
 
     a = FoscNote(60, 1/4);
     b = a.write.asSVG(Platform.userHomeDir ++ "/foo.svg");
@@ -205,7 +217,7 @@ FoscWriteManager : Fosc {
 
     • Example 3
 
-    Add file extensions automatically.
+    Add file extension automatically.
 
     a = FoscNote(60, 1/4);
     b = a.write.asSVG(Platform.userHomeDir ++ "/foo");
