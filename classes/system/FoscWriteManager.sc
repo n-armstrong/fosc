@@ -13,6 +13,16 @@ FoscWriteManager : Fosc {
         client = argClient;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC INSTANCE PROPERTIES
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • client
+
+    Gets client of persistence manager.
+
+    Returns component or selection.
+    -------------------------------------------------------------------------------------------------------- */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
@@ -28,7 +38,14 @@ FoscWriteManager : Fosc {
     • Example 1
 
     a = FoscNote(60, 1/4);
-    a.show(staffSize: 14);
+    b = a.write.asLY;
+    openOS(b);
+
+
+    • Example 2
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asLY(Platform.userHomeDir ++ "/test.ly");
     openOS(b);
     -------------------------------------------------------------------------------------------------------- */
     asLY { |path, illustrateEnvir|
@@ -67,20 +84,43 @@ FoscWriteManager : Fosc {
     Returns output path.
     
 
+
     • Example 1
+
+    Automatically generate a file name and write to fosc-output directory.
 
     a = FoscNote(60, 1/4);
     b = a.write.asPDF;
     openOS(b);
+
+
+    • Example 2
+
+    Specify the output path.
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asPDF(Platform.userHomeDir ++ "/foo.pdf");
+    openOS(b);
+
+
+    • Example 3
+
+    Add file extensions automatically.
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asPDF(Platform.userHomeDir ++ "/foo");
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    asPDF { |lyPath, outputPath, illustrateEnvir, flags|     
+    asPDF { |path, illustrateEnvir, flags|  
+        var lyPath;
+
         if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
-        lyPath = this.asLY(lyPath, illustrateEnvir);
-        outputPath = outputPath ?? { lyPath.splitext[0] };
-        FoscIOManager.runLilypond(lyPath, flags, outputPath);
-        //if (clean) { File.delete(lyPath) };
+        if (path.notNil) { path = path.splitext[0] ++ ".ly" };
+        lyPath = this.asLY(path, illustrateEnvir);
+        path = lyPath.splitext[0];
+        FoscIOManager.runLilypond(lyPath, flags, path);
         
-        ^(outputPath ++ ".pdf");
+        ^(path ++ ".pdf");
     }
     /* --------------------------------------------------------------------------------------------------------
     • asPNG
@@ -94,23 +134,46 @@ FoscWriteManager : Fosc {
 
     • Example 1
 
+    Automatically generate a file name and write to fosc-output directory.
+
     a = FoscNote(60, 1/4);
     b = a.write.asPNG(resolution: 300);
     openOS(b);
+
+
+    • Example 2
+
+    Specify the output path.
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asPNG(Platform.userHomeDir ++ "/foo.png");
+    openOS(b);
+
+
+    • Example 3
+
+    Add file extensions automatically.
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asPNG(Platform.userHomeDir ++ "/foo");
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    asPNG { |lyPath, outputPath, illustrateEnvir, resolution=300|
-        var flags, files;
-        
-        if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
-        lyPath = this.asLY(lyPath, illustrateEnvir);
-        outputPath = outputPath ?? { lyPath.splitext[0] };
+    asPNG { |path, illustrateEnvir, resolution=300|
+        var lyPath, flags, files;
+    
         flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png";
         flags = flags.format(resolution);
-        FoscIOManager.runLilypond(lyPath, flags, outputPath);
-        files = #["%-1.eps", "%-systems.count", "%-systems.tex", "%-systems.texi"];
-        files.do { |each| File.delete(each.format(outputPath)) };
         
-        ^(outputPath ++ ".png");
+        if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
+        if (path.notNil) { path = path.splitext[0] ++ ".ly" };
+        lyPath = this.asLY(path, illustrateEnvir);
+        path = lyPath.splitext[0];
+        FoscIOManager.runLilypond(lyPath, flags, path);
+        
+        files = #["%-1.eps", "%-systems.count", "%-systems.tex", "%-systems.texi"];
+        files.do { |each| File.delete(each.format(path)) };
+        
+        ^(path ++ ".png");
     }
     /* --------------------------------------------------------------------------------------------------------
     • asSVG
@@ -124,26 +187,39 @@ FoscWriteManager : Fosc {
 
     • Example 1
 
+    Automatically generate a file name and write to fosc-output directory.
+
     a = FoscNote(60, 1/4);
     b = a.write.asSVG;
     openOS(b);
+
+
+    • Example 2
+
+    Specify the output path.
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asSVG(Platform.userHomeDir ++ "/foo.svg");
+    openOS(b);
+
+
+    • Example 3
+
+    Add file extensions automatically.
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asSVG(Platform.userHomeDir ++ "/foo");
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    asSVG { |lyPath, outputPath, illustrateEnvir|        
+    asSVG { |path, illustrateEnvir|        
+        var lyPath;
+
         if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
-        lyPath = this.asLY(lyPath, illustrateEnvir);
-        outputPath = outputPath ?? { lyPath.splitext[0] };
-        FoscIOManager.runLilypond(lyPath, "-dbackend=svg", outputPath);
+        if (path.notNil) { path = path.splitext[0] ++ ".ly" };
+        lyPath = this.asLY(path, illustrateEnvir);
+        path = lyPath.splitext[0];
+        FoscIOManager.runLilypond(lyPath, "-dbackend=svg", path);
 
-        ^(outputPath ++ ".svg");
+        ^(path ++ ".svg");
     }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PRIVATE INSTANCE PROPERTIES
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* --------------------------------------------------------------------------------------------------------
-    • client
-
-    Gets client of persistence manager.
-
-    Returns component or selection.
-    -------------------------------------------------------------------------------------------------------- */
 }

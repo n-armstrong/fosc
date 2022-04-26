@@ -115,15 +115,16 @@ FoscIOManager : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • *runLilypond
     -------------------------------------------------------------------------------------------------------- */
-    *runLilypond { |lyPath, flags, outputPath, executablePath|
+    *runLilypond { |path, flags, outputPath, executablePath|
         var lilypondBase, command, exitCode, success;
         
         executablePath = executablePath ?? { Fosc.lilypondPath };
-        lilypondBase = lyPath.splitext[0].shellQuote;
-        lyPath = lyPath.shellQuote;
+        lilypondBase = path.splitext[0];
+        'lilypondBase: '.post; lilypondBase.postln;
+        path = path.shellQuote;
         flags = flags ? "";
         outputPath = (outputPath ? lilypondBase).shellQuote;
-        command = "% % -dno-point-and-click -o % %".format(executablePath, flags, outputPath, lyPath);
+        command = "% % -dno-point-and-click -o % %".format(executablePath, flags, outputPath, path);
         exitCode = systemCmd(command);
         success = (exitCode == 0);
         
