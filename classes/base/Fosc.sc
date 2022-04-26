@@ -277,10 +277,10 @@ Fosc {
     b = a.writePDF(staffSize: 10);
     openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    writePDF { |path, paperSize, staffSize, includes|
+    writePDF { |path, paperSize, staffSize, includes, clean=false|
         var illustrateEnvir;
         illustrateEnvir = (paperSize: paperSize, staffSize: staffSize, includes: includes);
-        ^this.write.asPDF(path, illustrateEnvir: illustrateEnvir);
+        ^this.write.asPDF(path, illustrateEnvir: illustrateEnvir, clean: clean);
     }
     /* --------------------------------------------------------------------------------------------------------
     • writePNG
@@ -291,10 +291,24 @@ Fosc {
     b = a.writePNG(resolution: 300);
     openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    writePNG { |path, staffSize, includes, resolution=300|
+    writePNG { |path, staffSize, includes, resolution=300, clean=false|
         var illustrateEnvir;
         illustrateEnvir = (staffSize: staffSize, includes: includes);
-        ^this.write.asPNG(path, illustrateEnvir: illustrateEnvir, resolution: resolution);
+        ^this.write.asPNG(path, illustrateEnvir: illustrateEnvir, resolution: resolution, clean: clean);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • writeSVG
+
+    • Example 1
+
+    a = FoscNote(60, 1/4);
+    b = a.writeSVG;
+    openOS(b);
+    -------------------------------------------------------------------------------------------------------- */
+    writeSVG { |path, staffSize, includes, clean=false|
+        var illustrateEnvir;
+        illustrateEnvir = (staffSize: staffSize, includes: includes);
+        ^this.write.asSVG(path, illustrateEnvir: illustrateEnvir, clean: clean);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: FoscSelection / FoscComponent shared interface

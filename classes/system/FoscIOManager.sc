@@ -114,18 +114,22 @@ FoscIOManager : Fosc {
     }
     /* --------------------------------------------------------------------------------------------------------
     • *runLilypond
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asPDF(clean: true);
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    *runLilypond { |path, flags, outputPath, executablePath|
+    *runLilypond { |path, flags, outputPath, executablePath, clean=false|
         var lilypondBase, command, exitCode, success;
         
         executablePath = executablePath ?? { Fosc.lilypondPath };
         lilypondBase = path.splitext[0];
-        path = path.shellQuote;
-        flags = flags ? "";
-        outputPath = (outputPath ? lilypondBase).shellQuote;
-        command = "% % -dno-point-and-click -o % %".format(executablePath, flags, outputPath, path);
+        outputPath = outputPath ? lilypondBase;
+        flags = ((flags ? "") ++ " %").format("-dno-point-and-click -o");
+        command = "% % % %".format(executablePath, flags, outputPath.shellQuote, path.shellQuote);
         exitCode = systemCmd(command);
         success = (exitCode == 0);
+        if (success && clean) { File.delete(path) };
         
         ^success;
     }

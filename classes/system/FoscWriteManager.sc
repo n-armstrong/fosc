@@ -125,14 +125,13 @@ FoscWriteManager : Fosc {
     b = a.write.asPDF(Platform.userHomeDir ++ "/foo");
     openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    asPDF { |path, illustrateEnvir, flags|  
+    asPDF { |path, flags, illustrateEnvir, clean=false|  
         var lyPath;
 
-        if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
         if (path.notNil) { path = path.splitext[0] ++ ".ly" };
         lyPath = this.asLY(path, illustrateEnvir);
         path = lyPath.splitext[0];
-        FoscIOManager.runLilypond(lyPath, flags, path);
+        FoscIOManager.runLilypond(lyPath, flags, path, clean: clean);
         
         ^(path ++ ".pdf");
     }
@@ -172,7 +171,7 @@ FoscWriteManager : Fosc {
     b = a.write.asPNG(Platform.userHomeDir ++ "/foo");
     openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    asPNG { |path, illustrateEnvir, resolution=300|
+    asPNG { |path, resolution=300, illustrateEnvir, clean=false|
         var lyPath, flags, files;
         
         if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
@@ -181,7 +180,7 @@ FoscWriteManager : Fosc {
         path = lyPath.splitext[0];
         flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png";
         flags = flags.format(resolution);
-        FoscIOManager.runLilypond(lyPath, flags, path);  
+        FoscIOManager.runLilypond(lyPath, flags, path, clean: clean);  
         files = #["%-1.eps", "%-systems.count", "%-systems.tex", "%-systems.texi"];
         files.do { |each| File.delete(each.format(path)) };
         
@@ -223,14 +222,14 @@ FoscWriteManager : Fosc {
     b = a.write.asSVG(Platform.userHomeDir ++ "/foo");
     openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    asSVG { |path, illustrateEnvir|        
+    asSVG { |path, illustrateEnvir, clean=false|        
         var lyPath;
 
         if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
         if (path.notNil) { path = path.splitext[0] ++ ".ly" };
         lyPath = this.asLY(path, illustrateEnvir);
         path = lyPath.splitext[0];
-        FoscIOManager.runLilypond(lyPath, "-dbackend=svg", path);
+        FoscIOManager.runLilypond(lyPath, "-dbackend=svg", path, clean: clean);
 
         ^(path ++ ".svg");
     }
