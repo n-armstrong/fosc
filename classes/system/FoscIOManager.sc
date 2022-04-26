@@ -122,7 +122,7 @@ FoscIOManager : Fosc {
         lilypondBase = lyPath.splitext[0].shellQuote;
         lyPath = lyPath.shellQuote;
         flags = flags ? "";
-        outputPath = outputPath ? lilypondBase;
+        outputPath = (outputPath ? lilypondBase).shellQuote;
         command = "% % -dno-point-and-click -o % %".format(executablePath, flags, outputPath, lyPath);
         exitCode = systemCmd(command);
         success = (exitCode == 0);

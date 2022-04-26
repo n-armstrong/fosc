@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------------------------------------------
-• FoscPersistenceManager
+• FoscWriteManager
 ------------------------------------------------------------------------------------------------------------ */
-FoscPersistenceManager : Fosc {
+FoscWriteManager : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,15 +18,18 @@ FoscPersistenceManager : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • asLY
 
-    Persists client as LilyPond file.
+    Writes client as LilyPond file.
 
     Autogenerates file path when 'path' is nil.
 
-    Returns output path and elapsed formatting time when LilyPond output is written.
+    Returns output path.
 
+
+    • Example 1
 
     a = FoscNote(60, 1/4);
     a.show(staffSize: 14);
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
     asLY { |path, illustrateEnvir|
         var illustration, lyFileName, lyFile;
@@ -57,59 +60,81 @@ FoscPersistenceManager : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • asPDF
 
-    Persists client as PDF.
-    
-    Autogenerates file path when 'lyPath' is nil.
+    Writes client as PDF file.
+
+    Autogenerates file path when 'path' is nil.
 
     Returns output path.
-
-    If 'clean' is true, ly file is deleted.
     
+
+    • Example 1
 
     a = FoscNote(60, 1/4);
     b = a.write.asPDF;
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    asPDF { |lyPath, outputPath, illustrateEnvir, flags, clean=false|
-        var success;
-        
+    asPDF { |lyPath, outputPath, illustrateEnvir, flags|     
         if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
         lyPath = this.asLY(lyPath, illustrateEnvir);
         outputPath = outputPath ?? { lyPath.splitext[0] };
-        success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
-        if (success && clean) { File.delete(lyPath) };
+        FoscIOManager.runLilypond(lyPath, flags, outputPath);
+        //if (clean) { File.delete(lyPath) };
         
         ^(outputPath ++ ".pdf");
     }
     /* --------------------------------------------------------------------------------------------------------
     • asPNG
     
+    Writes client as cropped PNG file.
+
+    Autogenerates file path when 'path' is nil.
+
+    Returns output path.
+
 
     • Example 1
 
     a = FoscNote(60, 1/4);
     b = a.write.asPNG(resolution: 300);
-    unixCmd("open " ++ b[0]);
+    openOS(b);
     -------------------------------------------------------------------------------------------------------- */
-    asPNG { |lyPath, outputPath, illustrateEnvir, resolution=300, clean=true|
-        var flags, success;
+    asPNG { |lyPath, outputPath, illustrateEnvir, resolution=300|
+        var flags, files;
         
         if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
         lyPath = this.asLY(lyPath, illustrateEnvir);
         outputPath = outputPath ?? { lyPath.splitext[0] };
-        flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png".format(resolution);
-        success = FoscIOManager.runLilypond(lyPath, flags, outputPath.shellQuote);
-        
-        if (success && clean) {
-            #[
-                "%-1.eps",
-                "%-systems.count",
-                "%-systems.tex",
-                "%-systems.texi",
-                "%.ly"
-            ].do { |each| File.delete(each.format(outputPath)) };
-        };
+        flags = "-dbackend=eps -dresolution=% -dno-gs-load-fonts -dinclude-eps-fonts --png";
+        flags = flags.format(resolution);
+        FoscIOManager.runLilypond(lyPath, flags, outputPath);
+        files = #["%-1.eps", "%-systems.count", "%-systems.tex", "%-systems.texi"];
+        files.do { |each| File.delete(each.format(outputPath)) };
         
         ^(outputPath ++ ".png");
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • asSVG
+    
+    Writes client as SVG file.
+
+    Autogenerates file path when 'path' is nil.
+
+    Returns output path.
+
+
+    • Example 1
+
+    a = FoscNote(60, 1/4);
+    b = a.write.asSVG;
+    openOS(b);
+    -------------------------------------------------------------------------------------------------------- */
+    asSVG { |lyPath, outputPath, illustrateEnvir|        
+        if (illustrateEnvir.isNil) { assert(client.respondsTo('illustrate')) };
+        lyPath = this.asLY(lyPath, illustrateEnvir);
+        outputPath = outputPath ?? { lyPath.splitext[0] };
+        FoscIOManager.runLilypond(lyPath, "-dbackend=svg", outputPath);
+
+        ^(outputPath ++ ".svg");
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE INSTANCE PROPERTIES
