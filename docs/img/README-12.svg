@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="54.272762mm"
+   height="14.028883mm"
+   viewBox="0 0 30.8842 7.9832091"
+   id="svg68"
+   sodipodi:docname="README-12.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs72" />
+  <sodipodi:namedview
+     id="namedview70"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm" />
+  <style
+     text="style/css"
+     id="style2"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <!-- Page: 1/1 -->
+  <text
+     font-family="serif"
+     font-size="2.2001px"
+     text-anchor="start"
+     fill="currentColor"
+     id="text6"
+     y="-1.0046909"><tspan
+       id="tspan4" /></text>
+  <line
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.1"
+     stroke="currentColor"
+     x1="0.050000001"
+     y1="5.9432092"
+     x2="30.554199"
+     y2="5.9432092"
+     id="line8" />
+  <polygon
+     transform="translate(7.7784,2.9432091)"
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.08"
+     fill="currentColor"
+     stroke="currentColor"
+     points="0.04,0.2 0.04,-0.2 5.49,-0.2 5.49,0.2 "
+     id="polygon10" />
+  <path
+     d="m 5.872,5.3992091 c 0.22,0 0.432,0.112 0.432,0.356 0,0.284 -0.22,0.484 -0.408,0.596 -0.14,0.084 -0.3,0.136 -0.464,0.136 -0.22,0 -0.432,-0.112 -0.432,-0.356 0,-0.284 0.22,-0.484 0.408,-0.596 0.14,-0.084 0.3,-0.136 0.464,-0.136 z"
+     fill="currentColor"
+     id="path12"
+     style="stroke-width:0.004" />
+  <rect
+     x="6.1742001"
+     y="1.8182092"
+     width="0.13"
+     height="3.9389"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect14" />
+  <polygon
+     transform="translate(6.3042,1.8582091)"
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.065"
+     fill="currentColor"
+     stroke="currentColor"
+     points="1.0105,0.3186 -0.0325,-0.0203 -0.0325,0.4614 1.0105,0.8003 "
+     id="polygon16" />
+  <polygon
+     transform="translate(6.3042,2.8582091)"
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.065"
+     fill="currentColor"
+     stroke="currentColor"
+     points="1.0105,0.3186 -0.0325,-0.0203 -0.0325,0.4614 1.0105,0.8003 "
+     id="polygon18" />
+  <polygon
+     transform="translate(6.3042,3.8582091)"
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.065"
+     fill="currentColor"
+     stroke="currentColor"
+     points="1.0105,0.3186 -0.0325,-0.0203 -0.0325,0.4614 1.0105,0.8003 "
+     id="polygon20" />
+  <path
+     d="m 7.4762,5.3992091 c 0.22,0 0.432,0.112 0.432,0.356 0,0.284 -0.22,0.484 -0.408,0.596 -0.14,0.084 -0.3,0.136 -0.464,0.136 -0.22,0 -0.432,-0.112 -0.432,-0.356 0,-0.284 0.22,-0.484 0.408,-0.596 0.14,-0.084 0.3,-0.136 0.464,-0.136 z"
+     fill="currentColor"
+     id="path22"
+     style="stroke-width:0.004" />
+  <path
+     d="m 8.3584,5.4432091 c 0,-0.124 0.1,-0.224 0.224,-0.224 0.124,0 0.224,0.1 0.224,0.224 0,0.124 -0.1,0.224 -0.224,0.224 -0.124,0 -0.224,-0.1 -0.224,-0.224 z"
+     fill="currentColor"
+     id="path24"
+     style="stroke-width:0.004" />
+  <rect
+     x="7.7783999"
+     y="2.9432092"
+     width="0.13"
+     height="2.8139"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect26" />
+  <path
+     d="m 12.8762,5.3992091 c 0.22,0 0.432,0.112 0.432,0.356 0,0.284 -0.22,0.484 -0.408,0.596 -0.14,0.084 -0.3,0.136 -0.464,0.136 -0.22,0 -0.432,-0.112 -0.432,-0.356 0,-0.284 0.22,-0.484 0.408,-0.596 0.14,-0.084 0.3,-0.136 0.464,-0.136 z"
+     fill="currentColor"
+     id="path28"
+     style="stroke-width:0.004" />
+  <rect
+     x="13.1784"
+     y="2.9432092"
+     width="0.13"
+     height="2.8139"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect30" />
+  <text
+     font-family="serif"
+     font-style="italic"
+     font-size="1.7461px"
+     text-anchor="start"
+     fill="currentColor"
+     id="text34"
+     x="9.7634001"
+     y="1.2836092"><tspan
+       id="tspan32">5:3</tspan></text>
+  <line
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.16"
+     stroke="currentColor"
+     x1="14.3042"
+     y1="0.70320916"
+     x2="14.3042"
+     y2="1.4032091"
+     id="line36" />
+  <line
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.16"
+     stroke="currentColor"
+     x1="7.5784001"
+     y1="0.70320916"
+     x2="7.5784001"
+     y2="1.4032091"
+     id="line38" />
+  <line
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.16"
+     stroke="currentColor"
+     x1="14.3042"
+     y1="0.70320916"
+     x2="12.7192"
+     y2="0.70320916"
+     id="line40" />
+  <line
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.16"
+     stroke="currentColor"
+     x1="7.5784001"
+     y1="0.70320916"
+     x2="9.3633003"
+     y2="0.70320916"
+     id="line42" />
+  <line
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.16"
+     stroke="currentColor"
+     x1="30.804199"
+     y1="0.60990912"
+     x2="30.804199"
+     y2="1.3099091"
+     id="line44" />
+  <line
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.16"
+     stroke="currentColor"
+     x1="16.5784"
+     y1="0.60990912"
+     x2="16.5784"
+     y2="1.3099091"
+     id="line46" />
+  <line
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.16"
+     stroke="currentColor"
+     x1="30.804199"
+     y1="0.60990912"
+     x2="25.4692"
+     y2="0.60990912"
+     id="line48" />
+  <line
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.16"
+     stroke="currentColor"
+     x1="16.5784"
+     y1="0.60990912"
+     x2="22.1133"
+     y2="0.60990912"
+     id="line50" />
+  <text
+     font-family="serif"
+     font-style="italic"
+     font-size="1.7461px"
+     text-anchor="start"
+     fill="currentColor"
+     id="text54"
+     x="22.513399"
+     y="1.1561091"><tspan
+       id="tspan52">7:5</tspan></text>
+  <path
+     d="m 0.764,7.9432091 0.404,-1.308 c -0.136,0.048 -0.28,0.092 -0.424,0.092 -0.184,0 -0.348,-0.132 -0.348,-0.316 0,-0.16 0.128,-0.288 0.288,-0.288 0.1,0 0.196,0.06 0.228,0.156 0.04,0.112 0.02,0.236 0.136,0.236 0.064,0 0.22,-0.204 0.24,-0.272 l 0.184,-0.604 c -0.136,0.048 -0.272,0.088 -0.416,0.088 -0.184,0 -0.348,-0.132 -0.348,-0.316 0,-0.16 0.132,-0.288 0.292,-0.288 0.1,0 0.192,0.06 0.224,0.156 0.04,0.112 0.02,0.236 0.136,0.236 0.06,0 0.2,-0.196 0.228,-0.252 0.024,-0.048 0.092,-0.048 0.112,0 l -0.716,2.68 c -0.032,0.028 -0.068,0.04 -0.108,0.04 -0.04,0 -0.08,-0.012 -0.112,-0.04 z"
+     fill="currentColor"
+     id="path56"
+     style="stroke-width:0.004" />
+  <path
+     d="m 2.15,5.4432091 c 0,-0.124 0.1,-0.224 0.224,-0.224 0.124,0 0.224,0.1 0.224,0.224 0,0.124 -0.1,0.224 -0.224,0.224 -0.124,0 -0.224,-0.1 -0.224,-0.224 z"
+     fill="currentColor"
+     id="path58"
+     style="stroke-width:0.004" />
+  <path
+     d="m 25.6256,5.4432091 c 0,-0.124 0.1,-0.224 0.224,-0.224 0.124,0 0.224,0.1 0.224,0.224 0,0.124 -0.1,0.224 -0.224,0.224 -0.124,0 -0.224,-0.1 -0.224,-0.224 z"
+     fill="currentColor"
+     id="path60"
+     style="stroke-width:0.004" />
+  <path
+     d="m 24.4636,6.9432091 0.468,-1.304 c -0.136,0.048 -0.276,0.088 -0.42,0.088 -0.184,0 -0.348,-0.132 -0.348,-0.316 0,-0.16 0.132,-0.288 0.292,-0.288 0.1,0 0.192,0.06 0.224,0.156 0.04,0.112 0.024,0.236 0.14,0.236 0.064,0 0.216,-0.192 0.244,-0.252 0.024,-0.048 0.092,-0.048 0.112,0 l -0.492,1.68 c -0.032,0.028 -0.068,0.04 -0.108,0.04 -0.04,0 -0.08,-0.012 -0.112,-0.04 z"
+     fill="currentColor"
+     id="path62"
+     style="stroke-width:0.004" />
+  <rect
+     x="16.7784"
+     y="2.6099091"
+     width="0.13"
+     height="3.1472001"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect64" />
+  <path
+     d="m 16.4762,5.3992091 c 0.22,0 0.432,0.112 0.432,0.356 0,0.284 -0.22,0.484 -0.408,0.596 -0.14,0.084 -0.3,0.136 -0.464,0.136 -0.22,0 -0.432,-0.112 -0.432,-0.356 0,-0.284 0.22,-0.484 0.408,-0.596 0.14,-0.084 0.3,-0.136 0.464,-0.136 z"
+     fill="currentColor"
+     id="path66"
+     style="stroke-width:0.004" />
+</svg>
