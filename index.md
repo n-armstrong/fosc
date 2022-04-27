@@ -8,7 +8,7 @@ Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://j
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```
+```supercollider
 m = FoscMusicMaker().(durations: 1/4 ! 4, divisions: #[[2,3,-2]], pitches: (60..72));
 m.show;
 ```
