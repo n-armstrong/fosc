@@ -44,6 +44,7 @@
             durs = ratio.slice(nil, 0);
             if (durs.isSequenceableCollection.not) { durs = [durs] };
             multiplier = val / durs.abs.sum;
+            
             ratio.do { |elem|
                 if (elem.isSequenceableCollection) {
                     n = elem[0] * multiplier;
