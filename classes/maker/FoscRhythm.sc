@@ -274,7 +274,7 @@ FoscRhythm : FoscTreeContainer {
         var selection, selections;
         
         selection = this.prRecurse(this, this.prGetPreprolatedDuration);
-        selections = selection.leaves.groupBy { |a, b| a.parent != b.parent };
+        selections = selection.leaves.partitionBy { |a, b| a.parent != b.parent };
         selections.do { |each| each.beam(beamRests: false) };
 
         ^selection;

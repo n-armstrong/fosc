@@ -25,7 +25,7 @@ Partition selection by sizes and beam each new selection.
 
 a = FoscStaff(FoscLeafMaker().((60..75), [1/32]));
 set(a).autoBeaming = false;
-a[0..].groupBySizes(#[3,4,6,3]).do { |sel| sel.beam };
+a[0..].partitionBySizes(#[3,4,6,3]).do { |sel| sel.beam };
 a.show;
 
 
@@ -35,7 +35,7 @@ Beams can be tweaked.
 
 a = FoscStaff(FoscLeafMaker().((60..75), [1/32]));
 set(a).autoBeaming = false;
-a[0..].groupBySizes(#[3,4,6,3]).do { |selection|
+a[0..].partitionBySizes(#[3,4,6,3]).do { |selection|
     b = FoscStartBeam(direction: 'up', tweaks:#['positions', [6,6], 'color', 'grey']);
     selection.beam(startBeam: b);
 };
@@ -48,7 +48,7 @@ Specify spanning beams using 'durations' and 'spanBeamCount'.
 
 x = FoscLeafMaker().((60..83), [1/16]);
 d = [[1/4, 1/8],[1/8, 1/4],[1/4, 1/8],[1/8, 1/4]];
-m = x.groupBySizes(#[6,6,6,6]);
+m = x.partitionBySizes(#[6,6,6,6]);
 m.do { |sel, i| sel.beam(durations: d[i], spanBeamCount: 1) };
 x.show;
 ------------------------------------------------------------------------------------------------------------ */

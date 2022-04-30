@@ -506,130 +506,6 @@ FoscSelection : FoscSequence {
         ^this.str;
     }
     /* --------------------------------------------------------------------------------------------------------
-    • groupBy (synonymous with 'separate')
-    
-    Groups components by predicate function.
-
-    Returns a selection of selections.
-    
-    a = FoscLeafMaker().(#[nil, 60, 61, nil, 62, 63, 64], [1/8]);
-    b = a.leaves.groupBy { |a, b| a.isPitched != b.isPitched };
-    b.do { |each| each.items.postln };
-    -------------------------------------------------------------------------------------------------------- */
-    groupBy { |function|
-        ^this.separate(function);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • groupByContiguity
-
-    Group items in selection by contiguity.
-
-    a = FoscStaff(FoscLeafMaker().(#[60,60,62,nil,64,64], [1/4,1/24,1/12,1/8,1/4,1/4]));
-    m = a.selectLeaves;
-    tie(m[0..1]);
-    tie(m[4..]);
-    a.show;
-
-    • Group pitched leaves by contiguity.
-
-    m = a.selectLeaves(pitched: true);
-    m = m.groupByContiguity;
-    m.do { |each| each.items.collect { |item| item.str }.postln };
-
-    a.consistsCommands.add('Horizontal_bracket_engraver');
-    t = #[['bracket-flare', [0,0]], ['direction', 'up'], ['staff-padding', 3]];
-    m.do { |each| each.horizontalBracket(tweaks: t) };
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    groupByContiguity {
-        var result, selection, timespanA, timespanB;
-        
-        result = [];
-        selection = [this[0]];
-        
-        this[1..].do { |item|
-            timespanA = selection.last.prGetTimespan;
-            timespanB = item.prGetTimespan;
-            if (timespanA.stopOffset == timespanB.startOffset) {
-                selection = selection.add(item);
-            } {
-                result = result.add(this.species.new(selection));
-                selection = [item];
-            };
-        };
-        
-        if (selection.notEmpty) { result = result.add(this.species.new(selection)) };
-        
-        ^this.species.new(result);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • groupByPitch
-
-    Group items in selection by pitch.
-
-    a = FoscStaff(FoscLeafMaker().(#[60,[60,64,67],62,62,62,nil,[65,69],[65,69]], [1/8]));
-    m = a.selectLeaves;
-    m[2..3].tie;
-    m = a.selectLogicalTies.groupByPitch;
-    m.items.do { |each| each.items.collect { |item| item.str }.postln };
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    groupByPitch {
-        ^this.leaves(pitched: true).separate { |a, b|
-            case
-            { a.respondsTo('writtenPitch') && b.respondsTo('writtenPitch') } {
-                a.writtenPitch != b.writtenPitch;
-            }
-            { a.respondsTo('writtenPitches') && b.respondsTo('writtenPitches') } {
-                a.writtenPitches != b.writtenPitches;
-            }
-            { true };
-        };
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • groupByPitched
-
-    Group items in selection by pitched and non-pitched leaves.
-
-    a = FoscStaff(FoscLeafMaker().(#[60,[60,64,67],62,62,62,nil,[65,69],[65,69]], [1/8]));
-    m = a.selectLeaves;
-    m[2..3].tie;
-    m = a.selectLogicalTies.groupByPitched;
-    m.items.do { |each| each.items.collect { |item| item.str }.postln };
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    // groupByPitched {
-    //     ^this.leaves.separate { |a, b| a.isPitched != b.isPitched };
-    // }
-    /* --------------------------------------------------------------------------------------------------------
-    • groupBySizes
-
-    • TODO: 'overhang' argument rather than 'isCyclic'
-
-    a = FoscLeafMaker().((60..72), [1/8]);
-    a = a.groupBySizes([2,3,5,2,1]);
-    a.do { |each| if (each.size > 1) { each.slur } };
-    a.show;
-
-    a = FoscLeafMaker().((60..72), [1/8]);
-    a = a.groupBySizes([2,3], isCyclic: true);
-    a.do { |each| if (each.size > 1) { each.slur } };
-    a.show;
-    -------------------------------------------------------------------------------------------------------- */
-    groupBySizes { |sizes, isCyclic=false|
-        var selections;
-        
-        if (isCyclic) {
-            sizes = sizes.repeatToAbsSum(this.size);
-        } {
-            sizes = sizes.extendToAbsSum(this.size);
-        };
-        
-        selections = items.clumps(sizes).collect { |each| FoscSelection(each) };
-        
-        ^this.species.new(selections);
-    }
-    /* --------------------------------------------------------------------------------------------------------
     • illustrate
 
     a = FoscMusicMaker();
@@ -833,27 +709,13 @@ FoscSelection : FoscSequence {
     b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[-2,2], pitches: "c' d' ef' f'");
     b = FoscStaff([b]);
     b.doLeaves({ |leaf| leaf.cs.postln }, pitched: true);
-
-
-    c = FoscIteration(b).logicalTies(pitched: true);
+    c = b.selectLeaves.logicalTies(pitched: true);
     c.do { |e| e.cs.postln };
-    c.all;
-
-
-    a = FoscMusicMaker(beamEachRun: true);
-    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,2], pitches: "c' d' ef' f'");
-    b.areContiguousSameParent;
-
-    a = FoscMusicMaker(beamEachRun: true);
-    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[-2,2], pitches: "c' d' ef' f'");
     -------------------------------------------------------------------------------------------------------- */
     logicalTies { |pitched, graceNotes=false|
-        var components, iterator;
-
+        var iterator;
         iterator = FoscIteration(this).logicalTies(pitched, graceNotes);
-        components = iterator.all;
-        
-        ^FoscSelection(components);
+        ^FoscSelection(iterator.all);
     }
     /* --------------------------------------------------------------------------------------------------------
     • notEmpty
@@ -864,24 +726,83 @@ FoscSelection : FoscSequence {
     a = FoscSelection([]);
     a.notEmpty;
     -------------------------------------------------------------------------------------------------------- */
-    /* --------------------------------------------------------------------------------------------------------
-    • reverseDo
+        /* --------------------------------------------------------------------------------------------------------
+    • partitionBy (synonymous with 'separate')
+    
+    Group components by predicate function.
 
-    Iterates over all components in selection in reverse.
+    Return a selection of selections.
 
-    a = FoscSelection([FoscNote(60, 1/4), FoscNote(62, 1/4)]);
-    a.reverseDo { |each| each.str.postln };
+    
+    a = FoscLeafMaker().(#[nil, 60, 61, nil, 62, 63, 64], [1/8]);
+    b = a.leaves.partitionBy { |a, b| a.isPitched != b.isPitched };
+    b.do { |each| each.items.postln };
     -------------------------------------------------------------------------------------------------------- */
+    partitionBy { |function|
+        var newItems;
+        
+        function = function ? false;
+        newItems = items.separate(function);
+        newItems = newItems.collect { |each| FoscSelection(each) };
+        
+        ^this.species.new(newItems);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • partitionByContiguity
+
+    Group items in selection by contiguity.
+
+    a = FoscStaff(FoscLeafMaker().(#[60,60,62,nil,64,64], [1/4,1/24,1/12,1/8,1/4,1/4]));
+    m = a.selectLeaves;
+    tie(m[0..1]);
+    tie(m[4..]);
+    a.show;
+
+    • Group pitched leaves by contiguity.
+
+    m = a.selectLeaves(pitched: true);
+    m = m.partitionByContiguity;
+    m.do { |each| each.items.collect { |item| item.str }.postln };
+
+    a.consistsCommands.add('Horizontal_bracket_engraver');
+    t = #[['bracket-flare', [0,0]], ['direction', 'up'], ['staff-padding', 3]];
+    m.do { |each| each.horizontalBracket(tweaks: t) };
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    partitionByContiguity {
+        var result, selection, timespanA, timespanB;
+        
+        result = [];
+        selection = [this[0]];
+        
+        this[1..].do { |item|
+            timespanA = selection.last.prGetTimespan;
+            timespanB = item.prGetTimespan;
+            if (timespanA.stopOffset == timespanB.startOffset) {
+                selection = selection.add(item);
+            } {
+                result = result.add(this.species.new(selection));
+                selection = [item];
+            };
+        };
+        
+        if (selection.notEmpty) { result = result.add(this.species.new(selection)) };
+        
+        ^this.species.new(result);
+    }
+    // groupByContiguity {
+    //     ^this.partitionByContiguity;
+    // }
     /* --------------------------------------------------------------------------------------------------------
     • partitionByDurations
 
-    Partitions selection by durations.
+    Group selection by durations.
 
-    Parts must equal durations exactly when 'fill' is 'exact'.
+    Groups must equal durations exactly when 'fill' is 'exact'.
 
-    Parts must be less than or equal to durations when 'fill' is 'less'.
+    Groups must be less than or equal to durations when 'fill' is 'less'.
 
-    Parts must be greater or equal to durations when 'fill' is 'more'.
+    Groups must be greater or equal to durations when 'fill' is 'more'.
 
     Reads durations cyclically when 'isCylic' is true.
 
@@ -905,7 +826,7 @@ FoscSelection : FoscSequence {
 
     • Example 2
 
-    Partitions leaves into one part equal to exactly 3/8, truncating overhang.
+    Groups leaves into one part equal to exactly 3/8, truncating overhang.
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69,71,72], [1/8]));
     b = a[0..].partitionByDurations([3/8], isCyclic: false, overhang: false);
@@ -927,7 +848,7 @@ FoscSelection : FoscSequence {
     
     • Example 4
 
-     Cyclically partitions leaves into parts equal to (or just less than) 3/16, truncating overhang.
+    Cyclically partitions leaves into parts equal to (or just less than) 3/16, truncating overhang.
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,65,67,69,71,72], [1/8]));
     b = a[0..].partitionByDurations([3/16], isCyclic: true, fill: 'less', overhang: false);
@@ -945,32 +866,6 @@ FoscSelection : FoscSequence {
     b.do { |sel| sel.items.collect { |each| each.str }.postln };
     b.do { |sel| if (sel.size > 1) { sel.slur } };
     a.show;
-
-
-    • Example 6
-
-    Cyclically partitions exactly 1.5 seconds at a time.
-
-
-    • Example 7
-
-    Cyclically partitions exactly 1.5 seconds at a time with overhang returned at end.
-
-
-    • Example 8
-
-    Partitions exactly 1.5 seconds one time.
-
-
-    • Example 9
-
-    Cyclically partitions 0.75 seconds with part durations allowed to be just less than 0.75 seconds.
-
-
-    • Example 10
-
-    Partitions 0.75 seconds just once with part duration allowed to be just less than 0.75 seconds.
-
     -------------------------------------------------------------------------------------------------------- */
     partitionByDurations { |durations, isCyclic=false, fill='exact', inSeconds=false, overhang=false|
         var result, part, currentDurationIndex, targetDuration, cumulativeDuration, componentsCopy;
@@ -1005,7 +900,6 @@ FoscSelection : FoscSequence {
                     cumulativeDuration = FoscDuration(0);
                     currentDurationIndex = currentDurationIndex + 1;
                     
-                    // targetDuration = durations[currentDurationIndex];
                     if (isCyclic) {
                         targetDuration = durations.wrapAt(currentDurationIndex);
                     } {
@@ -1024,7 +918,6 @@ FoscSelection : FoscSequence {
                         cumulativeDuration = part.collect { |each| each.prGetDuration(inSeconds) }.sum; 
                         currentDurationIndex = currentDurationIndex + 1;
                         
-                        // targetDuration = durations[currentDurationIndex];
                         if (isCyclic) {
                             targetDuration = durations.wrapAt(currentDurationIndex);
                         } {
@@ -1047,7 +940,6 @@ FoscSelection : FoscSequence {
                         cumulativeDuration = FoscDuration(0);
                         currentDurationIndex = currentDurationIndex + 1;
                         
-                        //targetDuration = durations[currentDurationIndex];
                         if (isCyclic) {
                             targetDuration = durations.wrapAt(currentDurationIndex);
                         } {
@@ -1067,6 +959,76 @@ FoscSelection : FoscSequence {
         
         ^result;
     }
+    // groupByDurations { |durations, isCyclic=false, fill='exact', inSeconds=false, overhang=false|
+    //     ^this.partitionByDurations(durations, isCyclic, fill, inSeconds, overhang);
+    // }
+    /* --------------------------------------------------------------------------------------------------------
+    • partitionByPitch
+
+    Group items in selection by pitch.
+
+    a = FoscStaff(FoscLeafMaker().(#[60,[60,64,67],62,62,62,nil,[65,69],[65,69]], [1/8]));
+    m = a.selectLeaves;
+    m[2..3].tie;
+    m = a.selectLogicalTies.partitionByPitch;
+    m.items.do { |each| each.items.collect { |item| item.str }.postln };
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    partitionByPitch {
+        ^this.leaves(pitched: true).separate { |a, b|
+            case
+            { a.respondsTo('writtenPitch') && b.respondsTo('writtenPitch') } {
+                a.writtenPitch != b.writtenPitch;
+            }
+            { a.respondsTo('writtenPitches') && b.respondsTo('writtenPitches') } {
+                a.writtenPitches != b.writtenPitches;
+            }
+            { true };
+        };
+    }
+    // groupByPitch {
+    //     ^this.partitionByPitch;
+    // }
+    /* --------------------------------------------------------------------------------------------------------
+    • partitionBySizes
+
+    • TODO: 'overhang' argument rather than 'isCyclic'
+
+    a = FoscLeafMaker().((60..72), [1/8]);
+    a = a.partitionBySizes([2,3,5,2,1]);
+    a.do { |each| if (each.size > 1) { each.slur } };
+    a.items.do { |each| each.items.collect { |item| item.str }.postln };
+    a.show;
+
+    a = FoscLeafMaker().((60..72), [1/8]);
+    a = a.partitionBySizes([2,3], isCyclic: true);
+    a.do { |each| if (each.size > 1) { each.slur } };
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    partitionBySizes { |sizes, isCyclic=false|
+        var selections;
+        
+        if (isCyclic) {
+            sizes = sizes.repeatToAbsSum(this.size);
+        } {
+            sizes = sizes.extendToAbsSum(this.size);
+        };
+        
+        selections = items.clumps(sizes).collect { |each| FoscSelection(each) };
+        
+        ^this.species.new(selections);
+    }
+    // groupBySizes { |sizes, isCyclic=false|
+    //     ^this.partitionBySizes(sizes, isCyclic);
+    // }
+    /* --------------------------------------------------------------------------------------------------------
+    • reverseDo
+
+    Iterates over all components in selection in reverse.
+
+    a = FoscSelection([FoscNote(60, 1/4), FoscNote(62, 1/4)]);
+    a.reverseDo { |each| each.str.postln };
+    -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
     • put
 
@@ -1139,29 +1101,9 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     runs {
         var result;
-        result = this.leaves.groupBy { |a, b| a.isPitched != b.isPitched };
+        result = this.leaves.partitionBy { |a, b| a.isPitched != b.isPitched };
         result = result.items.select { |each| each[0].isPitched };
         ^this.species.new(result);
-    }
-    /* --------------------------------------------------------------------------------------------------------
-    • separate
-    
-    Groups components by predicate function.
-
-    Returns a selection of selections.
-    
-    a = FoscLeafMaker().(#[nil, 60, 61, nil, 62, 63, 64], [1/8]);
-    b = a.leaves.separate { |a, b| a.isPitched != b.isPitched };
-    b.do { |each| each.items.postln };
-    -------------------------------------------------------------------------------------------------------- */
-    separate { |function|
-        var newItems;
-        
-        function = function ? false;
-        newItems = items.separate(function);
-        newItems = newItems.collect { |each| FoscSelection(each) };
-        
-        ^this.species.new(newItems);
     }
     /* --------------------------------------------------------------------------------------------------------
     • size
@@ -1329,7 +1271,7 @@ FoscSelection : FoscSequence {
 
         logicalTies = this.selectLogicalTies;
         if (isCyclic) { mask = mask.repeatToAbsSum(logicalTies.size) };
-        logicalTies = logicalTies.groupBySizes(mask.abs)[0..(mask.size - 1)];
+        logicalTies = logicalTies.partitionBySizes(mask.abs)[0..(mask.size - 1)];
         
         logicalTies.do { |each, i|
             leaves = each.leaves;
@@ -1480,7 +1422,7 @@ FoscSelection : FoscSequence {
     mutate(a).rewritePitches((60..72));
     a.show;
 
-    m = a.selectLeaves.groupBySizes(#[2,5,1,1]);
+    m = a.selectLeaves.partitionBySizes(#[2,5,1,1]);
     m.do { |part| part.prFuseLeaves };
     a.show;
     -------------------------------------------------------------------------------------------------------- */
@@ -1497,7 +1439,7 @@ FoscSelection : FoscSequence {
         if (leaves.size <= 1) { ^leaves };
         leaves.prDetachBeams;
 
-        groups = leaves.groupBy { |a, b| a.parent != b.parent };
+        groups = leaves.partitionBy { |a, b| a.parent != b.parent };
         groups.doAdjacentPairs { |a, b| b.first.writtenPitch_(a.first.writtenPitch) };
         
         groups.do { |leaves, i|
@@ -1545,7 +1487,7 @@ FoscSelection : FoscSequence {
 
         leaves.prDetachBeams;
         leaves.prDetachTies;
-        groups = leaves.groupBy { |a, b| a.parent != b.parent };
+        groups = leaves.partitionBy { |a, b| a.parent != b.parent };
         
         groups.do { |leaves, i|
             totalPreprolated = leaves.prGetPreprolatedDuration;
@@ -1629,7 +1571,7 @@ FoscSelection : FoscSequence {
     /* --------------------------------------------------------------------------------------------------------
     • duration
 
-    • TODO: DEPRECATE ?
+    !!!TODO: DEPRECATE
     -------------------------------------------------------------------------------------------------------- */
     duration {
         ^this.prGetContentsDuration;
@@ -1637,7 +1579,7 @@ FoscSelection : FoscSequence {
     /* --------------------------------------------------------------------------------------------------------
     • music
 
-    • TODO: DEPRECATE !
+    !!!TODO: DEPRECATE
     -------------------------------------------------------------------------------------------------------- */
     music {
         ^items;
@@ -1645,7 +1587,7 @@ FoscSelection : FoscSequence {
     /* --------------------------------------------------------------------------------------------------------
     • prIterateTopDown
     
-    • TODO: DEPRECATE !
+    !!!TODO: DEPRECATE
     -------------------------------------------------------------------------------------------------------- */
     prIterateTopDown {
         ^this.flat.items.prIterateTopDown;

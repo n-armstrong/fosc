@@ -55,12 +55,12 @@ b = a.(durations: 1/4 ! 10, divisions: #[[1,1,1,1]], mask: m.mask);
 b.show;
 ------------------------------------------------------------------------------------------------------------ */
 FoscSieve {
-    classvar <nameToOperator;
-    var <indices, period;
-    var <sieves, <operator, <inverted=false;
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // INIT
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    classvar <nameToOperator;
+    var <indices, period;
+    var <sieves, <operator, <inverted=false;
     *initClass {
         nameToOperator = (
             'union': 'or',
@@ -69,20 +69,15 @@ FoscSieve {
         );
     }
     *new { |indices, period|
-        // if (indices.notNil) {
-        //     assert(indices.every { |each| each.isInteger }, thisMethod, 'indices', indices);
-        // };
-        
-        // if (period.notNil) {
-        //     assert(period.isInteger && { period > 0 }, thisMethod, 'period', period);
-        // };
-        
         ^super.new.init(indices, period);
     }
     init { |argIndices, argPeriod|
         indices = argIndices;
         period = argPeriod;
     }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC CLASS PROPERTIES
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • *allIndices (index_all)
 

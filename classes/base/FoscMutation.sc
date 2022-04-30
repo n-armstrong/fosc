@@ -179,7 +179,7 @@ FoscMutation {
     b = a.(1/4 ! 3, #[[1,1,1,1,1]], pitches: (60..74));
     b.show;
 
-    m = b.selectLeaves.groupBySizes(#[2,5,1,1]);
+    m = b.selectLeaves.partitionBySizes(#[2,5,1,1]);
     m = b[3..11];
     // m.do { |sel| mutate(sel).fuseLeaves };
     b.show;
@@ -672,11 +672,14 @@ FoscMutation {
             if (client.isKindOf(FoscSelection).not) {
                 throw("%:%: client must be a selection.".format(this.species, thisMethod.name));
             };
+            
             client.do { |component| component.prScale(multiplier) }; 
         }
     }
     /* --------------------------------------------------------------------------------------------------------
     • split
+
+    !!!TODO: rename 'partitionByDurations' for consistency with FoscSelection
 
     Splits component or selection by durations.
 
@@ -938,7 +941,7 @@ FoscMutation {
 
     a = FoscStaff(FoscLeafMaker().(#[60,62,64,60,62,64], [1/8]));
     set(a).autoBeaming = false;
-    b = a.selectLeaves.groupBySizes(#[3,3]);
+    b = a.selectLeaves.partitionBySizes(#[3,3]);
     b.do { |each|
         each.beam;
         each.slur;

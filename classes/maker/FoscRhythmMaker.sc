@@ -235,7 +235,7 @@ FoscRhythmMaker : Fosc {
     //     logicalTies = FoscSelection(selections).selectLogicalTies;
     //     mask = mask.repeatToAbsSum(logicalTies.size); // mask pattern repeats cyclically
         
-    //     logicalTies.groupBySizes(mask.abs).do { |each, i|
+    //     logicalTies.partitionBySizes(mask.abs).do { |each, i|
     //         leaves = each.selectLeaves;
     //         if (mask[i] > 0) { leaves.prFuseLeaves } { leaves.prFuseLeavesAndReplaceWithRests };
     //     };
