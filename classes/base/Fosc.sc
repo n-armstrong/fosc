@@ -14,7 +14,7 @@ Fosc {
     *lilypondVersion {
         var str;
         str = "% --version".format(this.lilypondPath).unixCmdGetStdOut;
-        str = str.copyRange(*[str.findRegexp("\\s[0-9]")[0][0]+1, str.find("\n") - 1]);
+        str = str.copyRange(*[str.findRegexp("\\s[0-9]")[0][0]+1, min(str.find("\n"), str.find(" (")?99) - 1]);
         ^str;
     }
     /* --------------------------------------------------------------------------------------------------------
