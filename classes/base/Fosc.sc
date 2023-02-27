@@ -54,7 +54,7 @@ Fosc {
     Fosc.rootDirectory;
     -------------------------------------------------------------------------------------------------------- */
     *rootDirectory {
-        ^"%/fosc".format(Platform.userExtensionDir);
+        ^Fosc.filenameSymbol.asString.dirname.dirname.dirname;
     }
     /* --------------------------------------------------------------------------------------------------------
     • *stylesheetDirectory
