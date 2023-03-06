@@ -65,7 +65,7 @@ FoscContainer : FoscComponent {
         var lists, recurse, eventList;
 
         if (this.isSimultaneous.not) {
-            throw("'eventLists' not implemented for non-simultaneous containers. Use 'eventList'.");
+            ^throw("'eventLists' not implemented for non-simultaneous containers. Use 'eventList'.");
         };
 
         lists = [];
@@ -101,7 +101,7 @@ FoscContainer : FoscComponent {
         if (bool) {
             this.do { |component|
                 if (component.isKindOf(FoscContainer).not) {
-                    throw("%:%: simultaneous containers must only contain other containers: %"
+                    ^throw("%:%: simultaneous containers must only contain other containers: %"
                         .format(this.species, thisMethod.name, component));
                 };
             };
@@ -440,7 +440,7 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     insert { |index, component|
         if (index.isInteger.not || { index < 0 }) {
-            throw("%:%: index must be a non-negative integer: %."
+            ^throw("%:%: index must be a non-negative integer: %."
                 .format(this.species, thisMethod.name, index));
         };
 
@@ -495,7 +495,7 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     put { |index, component|
         if (index.isInteger.not || { index < 0 }) {
-            throw("%:%: index must be a non-negative integer: %."
+            ^throw("%:%: index must be a non-negative integer: %."
                 .format(this.species, thisMethod.name, index));
         };
         this.prSetItem(index, component);
@@ -521,7 +521,7 @@ FoscContainer : FoscComponent {
         index = components.indexOf(component);
         
         if (index.isNil) {
-            throw("%:%: component not found in container.".format(this.species, thisMethod.name));
+            ^throw("%:%: component not found in container.".format(this.species, thisMethod.name));
         };
         
         ^this.prDelItem(index);
@@ -546,7 +546,7 @@ FoscContainer : FoscComponent {
         component = components[index];
         
         if (component.isNil) {
-            throw("%:%: no component found at index: %.".format(this.species, thisMethod.name, index));
+            ^throw("%:%: no component found at index: %.".format(this.species, thisMethod.name, index));
         };
         
         ^this.prDelItem(index);
@@ -635,7 +635,7 @@ FoscContainer : FoscComponent {
         var contents;
         
         if (this.prGetParentage.parent.notNil) {
-            throw("%:%: can't eject contents of in-score container.".format(this.species, thisMethod.name));
+            ^throw("%:%: can't eject contents of in-score container.".format(this.species, thisMethod.name));
         };
 
         contents = this[0..];
@@ -907,17 +907,17 @@ FoscContainer : FoscComponent {
         { [Symbol, String].includes(index.species) } {
             if (namedChildren.keys.includes(index).not) {
                 ^nil;
-                //throw("%:%: can't find component named %.".format(this.species, thisMethod.name, index));
+                //^throw("%:%: can't find component named %.".format(this.species, thisMethod.name, index));
             };
             
             if (namedChildren[index].size > 1) {
-                throw("%:%: multiple components named %.".format(this.species, thisMethod.name, index));
+                ^throw("%:%: multiple components named %.".format(this.species, thisMethod.name, index));
             };
 
             ^namedChildren[index][0];
         };
 
-        throw("%:%: can't get item at index: %.".format(this.species, thisMethod.name, index))
+        ^throw("%:%: can't get item at index: %.".format(this.species, thisMethod.name, index))
     }
     /* --------------------------------------------------------------------------------------------------------
     • prGetPreprolatedDuration
@@ -949,7 +949,7 @@ FoscContainer : FoscComponent {
         
             components.do { |component|
                 if (component.isKindOf(FoscComponent).not) {
-                    throw("%:new: must be a FoscComponent: %".format(this.species, component));
+                    ^throw("%:new: must be a FoscComponent: %".format(this.species, component));
                 };
             };
         };
@@ -1164,12 +1164,12 @@ FoscContainer : FoscComponent {
         assert(object.every { |each| each.isKindOf(FoscComponent) });
         
         if (object.any { |each| each.isKindOf(FoscGraceContainer) }) {
-            throw("%:%: grace container must be attached to note or chord."
+            ^throw("%:%: grace container must be attached to note or chord."
                 .format(this.species, thisMethod.name));
         };
         
         if (this.prCheckForCycles(object)) {
-            throw("%:%: attempted to induce cycles.".format(this.species, thisMethod.name));
+            ^throw("%:%: attempted to induce cycles.".format(this.species, thisMethod.name));
         };
         
         start = index.first;
@@ -1462,7 +1462,7 @@ FoscContainer : FoscComponent {
                         break.value;
                     };
                 };
-                throw("%:%: can't split empty container: %.".format(this.species, thisMethod.name, bottom));
+                ^throw("%:%: can't split empty container: %.".format(this.species, thisMethod.name, bottom));
             };
         };
         
@@ -1489,7 +1489,7 @@ FoscContainer : FoscComponent {
                     break.value;
                 };
             };
-            throw("%:%: should not be able to get here.".format(this.species, thisMethod.name));
+            ^throw("%:%: should not be able to get here.".format(this.species, thisMethod.name));
         };
       
 
@@ -1608,7 +1608,7 @@ FoscContainer : FoscComponent {
             };
         } {
             if (measures.size > 1) {
-                throw("%:%: measures can not nest.".format(this.species, thisMethod.name));
+                ^throw("%:%: measures can not nest.".format(this.species, thisMethod.name));
             };
         };
         // any duration-crossing leaf will be at end of list
@@ -1643,7 +1643,7 @@ FoscContainer : FoscComponent {
                         break.value;
                     };
                     //!!!
-                    // throw("%:%: can't split empty container: %."
+                    // ^throw("%:%: can't split empty container: %."
                     //     .format(this.species, thisMethod.name, bottom));
                 };
             };
@@ -1663,7 +1663,7 @@ FoscContainer : FoscComponent {
                     break.value;
                 };
             };
-            throw("%:%: should not be able to get here.".format(this.species, thisMethod.name));
+            ^throw("%:%: should not be able to get here.".format(this.species, thisMethod.name));
         };
         // crawl back up through duration-crossing containers and fracture spanners if requested
         block { |break|
@@ -1719,7 +1719,7 @@ FoscContainer : FoscComponent {
     -------------------------------------------------------------------------------------------------------- */
     *prRemovePowersOfTwo { |n|
         if (n.isKindOf(Integer).not || { n <= 0 }) {
-            throw("%:%: n must be a positive Integer: %.".format(this.species, thisMethod.name, n));
+            ^throw("%:%: n must be a positive Integer: %.".format(this.species, thisMethod.name, n));
         };
 
         while { n % 2 == 0 } { n = n.div(2) };

@@ -20,7 +20,7 @@ FoscTimespan : Fosc {
         startOffset = this.prInitializeOffset(argStartOffset);
         stopOffset = this.prInitializeOffset(argStopOffset);
         if (stopOffset < startOffset) {
-            throw("%::new: stopOffset % is less than startOffset %."
+            ^throw("%::new: stopOffset % is less than startOffset %."
                 .format(this.species, stopOffset.str, startOffset.str));
         };
     }

@@ -68,12 +68,12 @@ FoscNoteHeadList : FoscTypedList {
         count = result.size;
         case
         { count == 0 } {
-            throw("%:%: missing note-head.".format(this.species, thisMethod.name));
+            ^throw("%:%: missing note-head.".format(this.species, thisMethod.name));
         }
         { count == 1 } {
             ^result[0];
         }
-        { throw("%:%: extra note-head.".format(this.species, thisMethod.name)) };
+        { ^throw("%:%: extra note-head.".format(this.species, thisMethod.name)) };
     }
     /* --------------------------------------------------------------------------------------------------------
     • pop

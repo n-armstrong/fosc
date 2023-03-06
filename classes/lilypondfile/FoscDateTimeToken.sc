@@ -29,7 +29,7 @@ FoscDateTimeToken : Fosc {
     var dateString;
     *new { |dateString|
         if ((dateString.isString || { dateString.isNil }).not) {
-            throw("%::new: dateString must be string or nil.".format(this.species));
+            ^throw("%::new: dateString must be string or nil.".format(this.species));
         };
         ^super.new.init(dateString);
     }

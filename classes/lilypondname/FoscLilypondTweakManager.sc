@@ -134,7 +134,7 @@ FoscLilyPondTweakManager : FoscLilyPondNameManager {
                 # grob, attribute, value = attributeTuple;
             }
             {
-                throw("%:%: invalid attribute tuple: %."
+                ^throw("%:%: invalid attribute tuple: %."
                     .format(this.species, thisMethod.name, attributeTuple));
             };
             string = FoscLilyPondFormatManager.makeLilypondTweakString(attribute, value, directed, grob);
@@ -163,7 +163,7 @@ FoscLilyPondTweakManager : FoscLilyPondNameManager {
     *setTweaks { |object, tweaks|
         var manager, attribute, value, grob;
         if (object.respondsTo('tweaks').not) {
-            throw("%:% does not allow tweaks (yet).".format(object, thisMethod.name));
+            ^throw("%:% does not allow tweaks (yet).".format(object, thisMethod.name));
         };
         if (tweaks.isNil) {
             ^nil;
@@ -172,7 +172,7 @@ FoscLilyPondTweakManager : FoscLilyPondNameManager {
             tweaks = tweaks.prAttributeTuples;
         };
         if (tweaks.isSequenceableCollection.not) {
-            throw("%:%: tweaks must be an array of tuples (not tweaks!)."
+            ^throw("%:%: tweaks must be an array of tuples (not tweaks!)."
                 .format(this.species, thisMethod.name));
         };
         //!!!TODO: deprecate
@@ -199,7 +199,7 @@ FoscLilyPondTweakManager : FoscLilyPondNameManager {
                 grob[attribute] = value;
             }
             {
-                throw("%:%: tweak tuple must have length 2 or 3: %."
+                ^throw("%:%: tweak tuple must have length 2 or 3: %."
                     .format(this.species, thisMethod.name, tweak));
             };  
         };

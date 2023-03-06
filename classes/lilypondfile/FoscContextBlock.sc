@@ -5,18 +5,8 @@
 
 A LilyPond file \context block.
 
-
-a = FoscContextBlock(sourceLilypondType: 'Staff', name: 'FluteStaff', type: 'Engraver_group', alias: 'Staff');
-
-a.removeCommands.add('Forbid_line_break_engraver');
-a.consistsCommands.add('Horizontal_bracket_engraver');
-a.acceptsCommands.add('FluteUpperVoice');
-a.acceptsCommands.add('FluteLowerVoice');
-a.items.add("\\accidentalStyle dodecaphonic");
-override(a).beam.positions = #[4,4];
-set(a).autoBeaming = false;
-set(a).tupletFullLength = true;
-set(a).proportionalNotationDuration = FoscSchemeMoment(#[1,24]);
+a = FoscContextBlock(sourceLilypondType: 'Score');
+a.items.add("\\proportionalNotationDuration = #(ly:make-moment 1/8)");
 a.format;
 ------------------------------------------------------------------------------------------------------------ */
 FoscContextBlock : FoscBlock {
@@ -58,48 +48,57 @@ FoscContextBlock : FoscBlock {
             string = indent ++ "\\" ++ sourceLilypondType;
             result = result.add(string);
         };
+        
         if (name.notNil) {
             string = indent ++ "\\name %".format(name);
             result = result.add(string);
         };
+        
         if (type.notNil) {
             string = indent ++ "\\type %".format(type);
             result = result.add(string);
         };
+        
         if (alias.notNil) {
             string = indent ++ "\\alias %".format(alias);
             result = result.add(string);
         };
+        
         removeCommands.do { |statement|
             string = indent ++ "\\remove %".format(statement);
             result = result.add(string);
         };
+        
         consistsCommands.do { |statement|
             string = indent ++ "\\consists %".format(statement);
             result = result.add(string);
         };
+        
         acceptsCommands.do { |statement|
             string = indent ++ "\\accepts %".format(statement);
             result = result.add(string);
         };
 
-        overrides = override(this).prListFormatContributions('override');
-        overrides.do { |statement|
-            string = indent ++ statement.format;
-            result = result.add(string);
-        };
+        // overrides = override(this).prListFormatContributions('override');
 
-        settingContributions = [];
-        set(this).prAttributeTuples.do { |each|
-            # key, val = each;
-            key = key.asString.strip("_");
-            settingContribution = manager.formatLilypondContextSettingInWithBlock(key, val);
-            settingContributions = settingContributions.add(settingContribution);
-        };
-        settingContributions.sort.do { |settingContribution|
-            string = indent ++ settingContribution;
-            result = result.add(string);
-        };
+        // overrides.do { |statement|
+        //     string = indent ++ statement.format;
+        //     result = result.add(string);
+        // };
+
+        // settingContributions = [];
+
+        // set(this).prAttributeTuples.do { |each|
+        //     # key, val = each;
+        //     key = key.asString.strip("_");
+        //     settingContribution = manager.formatLilypondContextSettingInWithBlock(key, val);
+        //     settingContributions = settingContributions.add(settingContribution);
+        // };
+
+        // settingContributions.sort.do { |settingContribution|
+        //     string = indent ++ settingContribution;
+        //     result = result.add(string);
+        // };
 
         items.do { |item|
             case
@@ -113,7 +112,9 @@ FoscContextBlock : FoscBlock {
                 result = result.addAll(pieces);
             };
         };
+
         result = result.add("}");
+        
         ^result;
 
     }

@@ -102,7 +102,7 @@ FoscLilyPondGrobNameManager : FoscLilyPondNameManager {
         var manager, result, context, grob, attribute, value;
         var overrideString, revertString;
         if (['override', 'revert'].includes(contributionType).not) {
-            throw("%:% % is not a valid contributionType."
+            ^throw("%:% % is not a valid contributionType."
                 .format(this.species, thisMethod.name, contributionType))
         };
         manager = FoscLilyPondFormatManager;
@@ -117,7 +117,7 @@ FoscLilyPondGrobNameManager : FoscLilyPondNameManager {
                 # context, grob, attribute, value = attributeTuple;
             }
             { 
-                throw("%:% invalid attribute tuple: %."
+                ^throw("%:% invalid attribute tuple: %."
                     .format(this.species, thisMethod.name, attributeTuple));
             };
             if (contributionType == 'override') {

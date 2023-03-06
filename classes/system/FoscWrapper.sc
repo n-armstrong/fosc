@@ -220,7 +220,7 @@ FoscWrapper : Fosc {
             };
         } 
         {
-            throw("%:%: must be context, symbol or string: %."
+            ^throw("%:%: must be context, symbol or string: %."
                 .format(this.species, thisMethod.name, localContext));
         };  
 
@@ -358,6 +358,6 @@ FoscWrapper : Fosc {
             message = message ++ "% in %.".format(wrapper.component, wrapperContext.name);
         };
         
-        throw(message);
+        ^throw(message);
     }
 }

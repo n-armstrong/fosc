@@ -421,7 +421,7 @@ FoscDynamic : Fosc {
         if (name == 'niente') { ^"" };
 
         if (FoscDynamic.lilypondDynamicCommands.includes(name).not) {
-            throw("%: % is not a Lilypond dynamic command.".format(this.species, name));
+            ^throw("%: % is not a Lilypond dynamic command.".format(this.species, name));
         };
         
         ^this.prGetLilypondFormat;

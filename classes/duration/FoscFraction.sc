@@ -38,6 +38,7 @@ FoscFraction : AbstractFunction {
                 [numerator, denominator];
             };
         };
+        
         ^super.new.init(pair);
     }
     init { |argPair|
@@ -419,7 +420,7 @@ FoscFraction : AbstractFunction {
     -------------------------------------------------------------------------------------------------------- */
     performBinaryOpOnSimpleNumber { |selector, number|
         if (FoscFraction.methodNames.includes(selector).not) {
-            throw("% does not implement: %.".format(this.species, selector));
+            ^throw("% does not implement: %.".format(this.species, selector));
         };
         ^this.species.new(number).perform(selector, this);
     }

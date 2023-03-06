@@ -51,7 +51,7 @@ FoscComponent : Fosc {
     a = FoscStaff(FoscLeafMaker().((60..63), [1/32]));
     b = FoscStaff(FoscLeafMaker().((67..70), [1/32]));
     c = FoscScore([a, b]);
-    c.eventList; // throw exception
+    c.eventList; // ^throw exception
     c.eventLists.do { |each| each.printAll; Post.nl };
 
     c.do { |voice| voice.postln };
@@ -64,7 +64,7 @@ FoscComponent : Fosc {
         events = [];
         
         if (this.isKindOf(FoscContainer) && { this.isSimultaneous }) {
-            throw("'eventList' not implemented for simultaneous containers. Use 'eventLists'.");
+            ^throw("'eventList' not implemented for simultaneous containers. Use 'eventLists'.");
         } {
             logicalTies = this.selectLogicalTies;
             amps = this.prGetAmps(logicalTies);
@@ -77,7 +77,7 @@ FoscComponent : Fosc {
                 case
                 { leaf.isKindOf(FoscNote) } {
                     midinote = leaf.writtenPitch.midinote;
-                    midinote = [midinote];
+                    //midinote = [midinote];
                 }
                 { leaf.isKindOf(FoscChord) } {
                     midinote = leaf.writtenPitches.midinotes;
@@ -201,33 +201,29 @@ FoscComponent : Fosc {
 
     • Example 2
 
-    Include a path to include files (stylesheets, etc.)
+    Include a path to custom include files (stylesheets, etc.)
 
-    a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
-    p = "%/custom.ily".format(Fosc.stylesheetDirectory);
-    f = a.illustrate(includes: [p]);
-    f.show;
+    Fosc.tuning_('et72');
+    a = FoscNote("cfts'", 1/4);
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
     illustrate { |paperSize, staffSize, includes|
-        var lilypondFile;
+        var lincludes, lilypondFile;
         
-        if (includes.isNil) {
-            includes = ["%/default.ily".format(Fosc.stylesheetDirectory)];
+        lincludes = ["%/default.ily".format(Fosc.stylesheetDirectory)];
+        if (Fosc.tuning.notNil) { lincludes = lincludes ++ [Fosc.tuning.stylesheetPath] };
+        
+        if (includes.notNil) {
+            if (includes.isKindOf(SequenceableCollection).not) { includes = [includes] };
+            lincludes = lincludes ++ includes;
         };
-        
-        // if (File.exists(stylesheetPath).not) {
-        //     warn("Default stylesheet not found at: %.".format(stylesheetPath));
-        // } {
-        //     includes = [stylesheetPath];
-        // };
         
         lilypondFile = FoscLilyPondFile(
             this,
             paperSize: paperSize,
-            includes: includes,
+            includes: lincludes,
             staffSize: staffSize
         );
-        
 
         ^lilypondFile;
     }
@@ -315,7 +311,7 @@ FoscComponent : Fosc {
         nonIndicatorPrototype = [FoscAfterGraceContainer, FoscGraceContainer];
 
         if (context.notNil && nonIndicatorPrototype.any { |type| attachment.isKindOf(type) }) {
-            throw("%:attach: set context for indicators, not %.".format(target, attachment));
+            ^throw("%:attach: set context for indicators, not %.".format(target, attachment));
         };
 
         if (attachment.respondsTo('prBeforeAttach')) { attachment.prBeforeAttach(target) };
@@ -328,7 +324,7 @@ FoscComponent : Fosc {
                 message = "%.prAttachmentTestAll():";
                 result.insert(0, message);
                 message = result.join("\n");
-                throw(message);
+                ^throw(message);
             };
         };
 
@@ -337,7 +333,7 @@ FoscComponent : Fosc {
         case
         { graceContainer.any { |type| attachment.isKindOf(type) } } {
             if (target.isKindOf(FoscLeaf).not) {
-                throw("%:attach: grace containers attach to a single leaf.".format(target));
+                ^throw("%:attach: grace containers attach to a single leaf.".format(target));
             };
             attachment.prAttach(target);
             ^target;
@@ -356,11 +352,11 @@ FoscComponent : Fosc {
                 isAcceptable = true;
             };
             if (isAcceptable.not) {
-                throw("Can't attach % to a container: %.".format(attachment, target));
+                ^throw("Can't attach % to a container: %.".format(attachment, target));
             };
         }
         { target.isKindOf(FoscLeaf).not } {
-            throw("%:attach: indicator % must attach to leaf, not: %.".format(target, attachment, target));
+            ^throw("%:attach: indicator % must attach to leaf, not: %.".format(target, attachment, target));
         };
 
         component = target;
@@ -509,7 +505,7 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     override {
         if (this.respondsTo('overrides').not) {
-            throw("%: does not respond to override.".format(this.species));
+            ^throw("%: does not respond to override.".format(this.species));
         };
 
         if (this.overrides.isNil) {
@@ -527,7 +523,7 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     set {
         if (this.respondsTo('lilypondSettingNameManager').not) {
-            throw("%: does not respond to set.".format(this.species));
+            ^throw("%: does not respond to set.".format(this.species));
         };
 
         if (this.lilypondSettingNameManager.isNil) {
@@ -727,7 +723,7 @@ FoscComponent : Fosc {
         var constants, type, manager;
         
         if (this.respondsTo('tweaks').not) {
-            throw("% does not respond to tweak.".format(this.species));
+            ^throw("% does not respond to tweak.".format(this.species));
         };
         constants = #['above', 'below', 'down', 'left', 'right', 'up'];
         type = [Boolean, SimpleNumber, String, SequenceableCollection, FoscScheme];
@@ -966,7 +962,7 @@ FoscComponent : Fosc {
         # parent, start, stop = selection.prGetParentAndStartStopIndices;
         
         if (parent.isNil) {
-            throw("%:%: can't extract a component without a parent.".format(this.species, thisMethod.name));
+            ^throw("%:%: can't extract a component without a parent.".format(this.species, thisMethod.name));
         };
         
         components = if (this.respondsTo('components')) { this.components } { [] };
@@ -1080,14 +1076,14 @@ FoscComponent : Fosc {
     //     case
     //     { slotIdentifier.isInteger } {
     //         if (slotIdentifier.inclusivelyBetween(1, 7).not) {
-    //             throw("%:%: slotIdentifier must be between 1 and 7.".format(this.species, thisMethod.name));
+    //             ^throw("%:%: slotIdentifier must be between 1 and 7.".format(this.species, thisMethod.name));
     //         };
     //         slotIndex = slotIdentifier - 1;
     //         slotName = slotNames[slotIndex];
     //     }
     //     { [String, Symbol].any { |type| slotIdentifier.isKindOf(type) } } {
     //         if (slotNames.includes(slotName).not) {
-    //             throw("%:% % is not in slotNames.".format(this.species, thisMethod.name, slotName));
+    //             ^throw("%:% % is not in slotNames.".format(this.species, thisMethod.name, slotName));
     //         };
     //     };
     //     methodName = "prFormat%Slot".format(slotName.asString.capitalizeFirst);
@@ -1381,11 +1377,11 @@ FoscComponent : Fosc {
         case 
         { indicators.isEmpty } {
             ^nil;
-            // throw("%:% no attached indicators found matching %."
+            // ^throw("%:% no attached indicators found matching %."
             //     .format(this.species, thisMethod.name,type));
         }
         { indicators.size > 1 } {
-            throw("%:% multiple attached indicators found matching %."
+            ^throw("%:% multiple attached indicators found matching %."
                 .format(this.species, thisMethod.name,type));
         }
         { ^indicators[0] };
@@ -1510,7 +1506,7 @@ FoscComponent : Fosc {
             this.prUpdateNow(offsetsInSeconds: true);
             
             if (startOffsetInSeconds.isNil) {
-                throw("%:%: missing metronome mark.".format(this.species, thisMethod.name));
+                ^throw("%:%: missing metronome mark.".format(this.species, thisMethod.name));
             };
             
             ^FoscTimespan(startOffsetInSeconds, stopOffsetInSeconds);
@@ -1719,7 +1715,7 @@ FoscComponent : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prUpdateLater { |offsets=false, offsetsInSeconds=false|
         if (offsets.not && offsetsInSeconds.not) {
-            throw("%:%: either offsets or offsetsInSeconds must be true."
+            ^throw("%:%: either offsets or offsetsInSeconds must be true."
                 .format(this.species, thisMethod.name))
         };
         

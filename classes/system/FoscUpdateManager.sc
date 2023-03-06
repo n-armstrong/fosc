@@ -226,7 +226,7 @@ FoscUpdateManager : Fosc {
                 ^measureNumber;
             };
         };
-        throw("can not find measure number: %, %.".format(component, measureNumberStartOffsets));
+        ^throw("can not find measure number: %, %.".format(component, measureNumberStartOffsets));
     }
     /* --------------------------------------------------------------------------------------------------------
     • prUpdateAllIndicators
@@ -331,7 +331,7 @@ FoscUpdateManager : Fosc {
             ^this;
         };
 
-        throw("%:%: can't find stop offset in %.".format(this.species, thisMethod.name, timespans));
+        ^throw("%:%: can't find stop offset in %.".format(this.species, thisMethod.name, timespans));
     }
     /* --------------------------------------------------------------------------------------------------------
     • prUpdateComponentOffsets

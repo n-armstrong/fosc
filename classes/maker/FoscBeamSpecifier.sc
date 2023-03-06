@@ -198,7 +198,7 @@ FoscBeamSpecifier : Fosc {
                     components = components.add(selection);
                 }
                 {
-                    throw("%:value: selection is of the wrong type: %.".format(this.species, selection.cs));
+                    ^throw("%:value: selection is of the wrong type: %.".format(this.species, selection.cs));
                 };
             };
 

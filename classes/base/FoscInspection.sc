@@ -30,7 +30,7 @@ FoscInspection : Fosc {
         //type = [FoscComponent, FoscSpanner, Nil];
         type = [FoscComponent, Nil];
         if (type.any { |type| client.isKindOf(type) }.not) {
-            throw("%: client must be component, spanner, or nil: %.".format(this.species, client));
+            ^throw("%: client must be component, spanner, or nil: %.".format(this.species, client));
         };
         ^super.new.init(client);
     }
@@ -295,7 +295,7 @@ FoscInspection : Fosc {
         // return result
         var result;
         if (client.isKindOf(FoscComponent).not) {
-            throw("%:%: can only get effective on a FoscComponent: %."
+            ^throw("%:%: can only get effective on a FoscComponent: %."
                 .format(this.species, thisMethod.name, client));
         };
         if (attributes.notNil) { assert(attributes.isKindOf(Dictionary)) };
@@ -390,7 +390,7 @@ FoscInspection : Fosc {
         if (indicators.size == 1) {
             ^indicators.as(Array)[0];
         } {
-            throw("%:%: multiple indicators attached to client.".format(this.species, thisMethod.name));
+            ^throw("%:%: multiple indicators attached to client.".format(this.species, thisMethod.name));
         };
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -399,7 +399,7 @@ FoscInspection : Fosc {
     // abjad 3.0
     indicators { |type, unwrap=true|
         if (client.isKindOf(FoscComponent).not) {
-            throw(
+            ^throw(
                 "%:%: can only get indicators on a FoscComponent: %."
                     .format(this.species, thisMethod.name, client);
             );
@@ -848,7 +848,7 @@ FoscInspection : Fosc {
         } {
             if (spanners.size == 1) { ^spanners.as(Array)[0] };
         };
-        throw("%:%: multiple spanners attached to client.".format(this.species, thisMethod.name));
+        ^throw("%:%: multiple spanners attached to client.".format(this.species, thisMethod.name));
     }   
     /* --------------------------------------------------------------------------------------------------------
     • spanners

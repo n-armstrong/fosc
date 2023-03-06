@@ -182,7 +182,7 @@ FoscSlotContributions : Fosc {
     -------------------------------------------------------------------------------------------------------- */
 	update { |slotContributions|
 		if (slotContributions.isKindOf(FoscSlotContributions).not) {
-			throw("%:%: argument must be a FoscSlotContributions.".format(this.species, thisMethod.name))
+			^throw("%:%: argument must be a FoscSlotContributions.".format(this.species, thisMethod.name))
 		};
 
 		articulations.addAll(slotContributions.articulations);

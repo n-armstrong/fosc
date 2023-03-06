@@ -15,7 +15,7 @@ FoscLineage : FoscSelection {
     var <component, <components;
     *new { |component|
         if ([FoscComponent, nil].any { |type| component.isKindOf(type) }.not) {
-            throw("FoscLineage:new: component must be a FoscComponent or nil: %.".format(component));
+            ^throw("FoscLineage:new: component must be a FoscComponent or nil: %.".format(component));
         };
         ^super.new.initFoscLineage(component);
     }

@@ -16,18 +16,22 @@ FoscParentage : FoscSequence {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	var <component;
 	*new { |component, graceNotes=false| 
-        assert([FoscComponent, Nil].any { |type| component.isKindOf(type) });
+        //assert([FoscComponent, Nil].any { |type| component.isKindOf(type) });
         ^super.new.init(component, graceNotes);
 	}
 	init { |argComponent, graceNotes|
 		var parent, type;
+        
         component = argComponent;
         items = [];
+        
         if (component.notNil) {
             parent = component;
             type = [FoscAfterGraceContainer, FoscGraceContainer];
+            
             while { parent.notNil } {
                 items = items.add(parent);
+                
                 if (graceNotes && { type.any { |type| parent.isKindOf(type) } }) {
                     parent = parent.mainLeaf;
                 } {
@@ -130,11 +134,12 @@ FoscParentage : FoscSequence {
     a = FoscTuplet(2/3, [FoscNote(60, 1/4)]);
     a[0].prGetParentage.prolation.str;
     -------------------------------------------------------------------------------------------------------- */
-    // abjad 3.0
     prolation {
         var prolations, product;
+        
         prolations = [FoscMultiplier(1)] ++ this.prProlations;
         product = prolations.reduce('*');
+        
         ^product;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -168,13 +173,17 @@ FoscParentage : FoscSequence {
     // DEPRECATED
     scoreIndex {
         var result, current, index;
+        
         result = [];
+        
         current = this[0];
+
         this[1..].do { |parent|
             index = parent.indexOf(current);
             result = result.insert(0, index);
             current = parent;
         };
+        
         ^result;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,9 +208,11 @@ FoscParentage : FoscSequence {
     firstInstanceOf { |type|
         if (type.isNil) { type = FoscComponent };
         if (type.isSequenceableCollection.not) { type = [type] };
+        
         items.do { |component|
             if (type.any { |type| component.isKindOf(type) }) { ^component };
         };
+        
         ^nil;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -215,12 +226,14 @@ FoscParentage : FoscSequence {
     d = FoscScore([c], name: 'foo');
     p = FoscParentage(b[0]);
     l = p.logicalVoice;
-    -------------------------------------------------------------------------------------------------------- */  
+    -------------------------------------------------------------------------------------------------------- */
     logicalVoice {
         var keys, logicalVoice;
+        
         keys = #['score', 'staff_group', 'staff', 'voice'];
         logicalVoice = ();
         keys.do { |key| logicalVoice[key] = "" };
+        
         items.do { |component|
             case
             { component.isKindOf(FoscVoice) } {
@@ -250,6 +263,7 @@ FoscParentage : FoscSequence {
                 };
             };
         };
+        
         ^logicalVoice;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -270,12 +284,15 @@ FoscParentage : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     *prIDString { |component|
         var lhs, rhs;
+        
         lhs = component.species.name;
+        
         if (component.respondsTo('name') && { component.name.notNil }) {
             rhs = component.name;
         } {
             rhs = component.identityHash;
         };
+        
         ^"%-%".format(lhs, rhs);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -290,16 +307,20 @@ FoscParentage : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     prProlations {
         var prolations, default, prolation;
+        
         prolations = [];
         default = FoscMultiplier(1);
+        
         this.do { |parent|
             if (parent.respondsTo('impliedProlation')) {
                 prolation = parent.impliedProlation;
             } {
                 prolation = default;
             };
+            
             prolations = prolations.add(prolation);
         };
+        
         ^prolations;
     }
 }

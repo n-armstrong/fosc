@@ -28,7 +28,7 @@ FoscSchemeMoment : FoscScheme {
 		{ args.size == 0 } {
 			args = FoscDuration(1, 4);
 		}
-		{ throw("Can not initialize % from: %.".format(this.name, args)) };
+		{ ^throw("Can not initialize % from: %.".format(this.name, args)) };
 		^super.new(args);
 	}
 

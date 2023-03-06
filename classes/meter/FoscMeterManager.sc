@@ -198,7 +198,7 @@ FoscMeterManager : Fosc {
                     each.yield;
                 }
                 {
-                    throw("%:%: undhandled component: %.".format(this.species, thisMethod.name, expr));
+                    ^throw("%:%: undhandled component: %.".format(this.species, thisMethod.name, expr));
                 };
             };
             if (currentLeafGroup.notNil) {

@@ -81,7 +81,7 @@ FoscTupletSpecifier : Fosc {
                 tuplet.denominator_(localDenominator);
             }
             {
-                throw("%:%: invalid value for denominator: %"
+                ^throw("%:%: invalid value for denominator: %"
                     .format(this.species, thisMethod.name, localDenominator));
             };
         };

@@ -47,14 +47,14 @@
     \context {
         \StaffGroup
     }
-    \context {
-        \Staff
-        \remove Time_signature_engraver
-    }
-    \context {
-        \RhythmicStaff
-        \remove Time_signature_engraver
-    }
+    % \context {
+    %     \Staff
+    %     \remove Time_signature_engraver
+    % }
+    % \context {
+    %     \RhythmicStaff
+    %     \remove Time_signature_engraver
+    % }
 }
 
 \paper {

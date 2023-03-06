@@ -295,12 +295,12 @@ FoscMutation {
 
         if (wrappers) {
             if (1 < donors.size || { donors[0].isKindOf(FoscLeaf).not }) {
-                throw("%:%: set wrappers only with single leaf: %."
+                ^throw("%:%: set wrappers only with single leaf: %."
                     .format(this.species, thisMethod.name, donors));
             };
             
             if (1 < newContents.size || { newContents[0].isKindOf(FoscLeaf).not }) {
-                throw("%:%: set wrappers only with single leaf: %."
+                ^throw("%:%: set wrappers only with single leaf: %."
                     .format(this.species, thisMethod.name, newContents));
             };
             
@@ -320,7 +320,7 @@ FoscMutation {
         # parent, start, stop = donors.prGetParentAndStartStopIndices;
 
         if (parent.isNil) {
-            throw("%:%: can't replace component/s without a parent: %."
+            ^throw("%:%: can't replace component/s without a parent: %."
                 .format(this.species, thisMethod.name, donors));
         };
 
@@ -351,13 +351,34 @@ FoscMutation {
     mutate(a).respellWithFlats;
     a.format;
     a.show;
+
+
+    p = "cs' ds' e' fs'";
+    m = FoscMusicMaker().(durations: 1/4 ! 4, pitches: p);
+    mutate(m).respellWithFlats;
+    a.show;
+
+
+    m = FoscNote("cs'", 1/4);
+    m.noteHead.writtenPitch.respell('flat');
+
+    m = FoscPitchClass("cs");
+    m = m.respell('flat');
+    m.cs;
     -------------------------------------------------------------------------------------------------------- */
     respellWithFlats {
+        // FoscIteration(client).leaves(pitched: true).do { |leaf|
+        //     if (leaf.isKindOf(FoscChord)) {
+        //         leaf.noteHeads.do { |noteHead| noteHead.writtenPitch.respellWithFlats };
+        //     } {
+        //         leaf.writtenPitch_(leaf.writtenPitch.respellWithFlats);
+        //     };
+        // };
         FoscIteration(client).leaves(pitched: true).do { |leaf|
             if (leaf.isKindOf(FoscChord)) {
-                leaf.noteHeads.do { |noteHead| noteHead.writtenPitch.respellWithFlats };
+                leaf.noteHeads.do { |noteHead| noteHead.writtenPitch.respell('flat') };
             } {
-                leaf.writtenPitch_(leaf.writtenPitch.respellWithFlats);
+                leaf.writtenPitch_(leaf.writtenPitch.respell('flat'));
             };
         };
     }
@@ -532,11 +553,94 @@ FoscMutation {
         selection = this.client;
         if (selection.isKindOf(FoscContainer)) { selection = FoscSelection(selection) };
         if (selection.isKindOf(FoscSelection).not) {
-            throw("%:%: client must be a selection.".format(this.species, thisMethod.name));
+            ^throw("%:%: client must be a selection.".format(this.species, thisMethod.name));
         };
         result = FoscMeter.prRewriteMeter(selection, meter, boundaryDepth, initialOffset, maximumDotCount,
             rewriteTuplets);
         ^result;
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • prRewriteMeter
+
+    m = #[[2,4],[4,4],[2,4]];
+    a = FoscLeafMaker().(#[60,62,64,65], [3/8,6/8,2/8,5/8]);
+    a = FoscMeterSpecifier(m, attachTimeSignatures: true).([a]);
+    FoscStaff(a).show;
+
+
+    a = Segment(durations: 4/4 ! 2, divisions: 1 ! 16);
+    a.mask = #[3,4,2,4,5];
+    // a.split([1/4], isCyclic: true).do { |sel| sel.beam };
+    a.show;
+
+    b = mutate(a.currentSelection).rewriteMeters(#[2,4] ! 4);
+    FoscStaff(b).show;
+
+    a.rewriteMeters(#[2,4] ! 4);
+    a.show(staffSize: 14);
+
+    a = Segment(durations: 4/4 ! 2, divisions: 1 ! 16);
+    a.mask = #[3,4,2,4,5];
+    // a.split([1/4], isCyclic: true).do { |sel| sel.beam };
+    a.rewriteMeters(#[2,4] ! 4);
+    a.show(staffSize: 14);
+    -------------------------------------------------------------------------------------------------------- */
+    rewriteMeters { |meters, boundaryDepth, maximumDotCount, rewriteTuplets=true, attachTimeSignatures=true, attachBeams=false|
+        var music, selections, durations, meterDuration, musicDuration, newSelections, staff, container, contents;
+        var timeSignature, prevTimeSignature;
+
+        music = this.client;
+        meters = meters.collect { |each| FoscMeter(each) };
+        durations = meters.collect { |each| FoscDuration(each) };
+        meterDuration = durations.sum;
+        musicDuration = music.duration;
+
+        if (meterDuration != musicDuration) {
+            error("%:%: duration of meters must be equal to duration of selections: meters: %, selections: %."
+                .format(this.species, thisMethod.name, meterDuration.str, musicDuration.str));
+            ^nil;
+        };
+
+        newSelections = [];
+        staff = FoscStaff();
+
+        selections = FoscMeter.prSplitAtMeasureBoundaries(music, meters);
+
+        selections.do { |selection|
+            container = FoscContainer(selection);
+            staff.add(container);
+        };
+
+        staff.do { |container, i|
+            mutate(container[0..]).rewriteMeter(
+                meter: meters[i],
+                boundaryDepth: boundaryDepth,
+                maximumDotCount: maximumDotCount,
+                rewriteTuplets: rewriteTuplets
+            );
+        };
+
+        staff.do { |container|
+            contents = container[0..];
+            contents.do { |component| component.prSetParent(nil) };
+            newSelections = newSelections.add(contents);
+        };
+
+        //!!!TODO: rebeam at boundary depth
+        if (attachBeams) {
+            warn("FoscMutation:rewriteMeters: 'attachBeams' argument not yet implemented");
+            // newSelections.do { |selection| selection.beam };
+        };
+
+        if (attachTimeSignatures) {
+            newSelections.do { |selection, i|
+                timeSignature = FoscTimeSignature(meters[i]);
+                if (timeSignature != prevTimeSignature) { selection.leafAt(0).attach(timeSignature) };
+                prevTimeSignature = timeSignature;
+            };
+        };
+
+        ^newSelections;
     }
     /* --------------------------------------------------------------------------------------------------------
     • rewritePitches
@@ -558,26 +662,26 @@ FoscMutation {
     mutate(a).rewritePitches("c' <c' e' g'> ef'");
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-    rewritePitches { |pitches, wrap=false|     
+    rewritePitches { |pitches, isCyclic=true|     
         var selection;
 
         case
         { client.isKindOf(FoscContainer) } {
             selection = mutate(client).ejectContents;
-            selection = this.prRewritePitches(selection, pitches, wrap);
+            selection = this.prRewritePitches(selection, pitches, isCyclic);
             client.addAll(selection);
         }
         { client.isKindOf(FoscSelection) } {
             // if (client.areContiguousLogicalVoice.not) {
-            //     throw("%:%: client must contain only contiguous components: %."
+            //     ^throw("%:%: client must contain only contiguous components: %."
             //         .format(this.species, thisMethod.name, client.items));
             // };
 
-            selection = this.prRewritePitches(client, pitches, wrap);
+            selection = this.prRewritePitches(client, pitches, isCyclic);
             client.instVarPut('items', selection.items);
         }
         {
-            throw("%:%: client must be a FoscContainer or FoscSelection: %."
+            ^throw("%:%: client must be a FoscContainer or FoscSelection: %."
                 .format(this.species, thisMethod.name, client));
         };
     }
@@ -670,7 +774,7 @@ FoscMutation {
             client.prScale(multiplier);
         } {
             if (client.isKindOf(FoscSelection).not) {
-                throw("%:%: client must be a selection.".format(this.species, thisMethod.name));
+                ^throw("%:%: client must be a selection.".format(this.species, thisMethod.name));
             };
             
             client.do { |component| component.prScale(multiplier) }; 
@@ -678,8 +782,6 @@ FoscMutation {
     }
     /* --------------------------------------------------------------------------------------------------------
     • split
-
-    !!!TODO: rename 'partitionByDurations' for consistency with FoscSelection
 
     Splits component or selection by durations.
 
@@ -962,7 +1064,7 @@ FoscMutation {
         var selection, parent, start, stop;
         
         if (container.isKindOf(FoscContainer).not || { container.size != 0 }) {
-            throw("%:%: must be empty container: %.".format(this.species, thisMethod.name, container));
+            ^throw("%:%: must be empty container: %.".format(this.species, thisMethod.name, container));
         };
         
         if (client.isKindOf(FoscComponent)) {
@@ -976,7 +1078,7 @@ FoscMutation {
         # parent, start, stop = selection.prGetParentAndStartStopIndices;
         
         if (selection.areContiguousLogicalVoice.not) {
-            throw("%:%: must be contiguous components in same logical voice: %."
+            ^throw("%:%: must be contiguous components in same logical voice: %."
                 .format(this.species, thisMethod.name, selection));
         };
         

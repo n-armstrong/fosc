@@ -85,8 +85,8 @@ FoscFixedDurationContainer : FoscContainer {
 	prCheckDuration {
 		var preProlatedDuration;
 		preProlatedDuration = this.prGetContentsDuration;
-		if (preProlatedDuration < targetDuration) { throw("% is underfull".format(this.species)) };
-		if (targetDuration < preProlatedDuration) { throw("% is overfull".format(this.species)) };
+		if (preProlatedDuration < targetDuration) { ^throw("% is underfull".format(this.species)) };
+		if (targetDuration < preProlatedDuration) { ^throw("% is overfull".format(this.species)) };
 	}
 	/* --------------------------------------------------------------------------------------------------------
 	• prGetLilypondFormat

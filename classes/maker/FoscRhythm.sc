@@ -49,7 +49,7 @@ FoscRhythm : FoscTreeContainer {
             { each.isInteger } { FoscRhythmLeaf(each) }
             { each.isKindOf(FoscTreeNode) } { each }
             { each.isSequenceableCollection } { FoscRhythm(*each) }
-            { throw("%::new: bad value: %.".format(this.species, each.asCompileString)) };
+            { ^throw("%::new: bad value: %.".format(this.species, each.asCompileString)) };
         };
         
         this.addAll(items);
@@ -387,7 +387,7 @@ FoscRhythmLeaf : FoscTreeNode {
         if (mixin.respondsTo(selector)) {
             ^mixin.performList(selector, [this].addAll(args));
         } {
-            throw(DoesNotUnderstandError(this, selector, args));
+            ^throw(DoesNotUnderstandError(this, selector, args));
         };
     }
     /* --------------------------------------------------------------------------------------------------------

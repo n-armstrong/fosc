@@ -13,6 +13,8 @@
 !!!TODO
 - when 'tuning' is nil, default to et24 accidental spellings
 - see: https://abjad.github.io/_mothballed/pitch-conventions.html#default-accidental-spelling
+
+FoscPitchManager.tuning.name
 ------------------------------------------------------------------------------------------------------------ */
 FoscPitchManager : Fosc {
 	classvar <tuning;
@@ -33,6 +35,53 @@ FoscPitchManager : Fosc {
             (0: 'c', 2: 'd', 4: 'e', 5: 'f', 7: 'g', 9: 'a', 11: 'b');
 
         respellWithDefault = ('ds': 'ef', 'as': 'bf');
+        respellWithSharp = ();
+        respellWithFlat = ();
+
+        StartUp.add {
+            if (tuning.isNil) { this.tuning_(FoscTuning.et24) };
+        };
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC CLASS PROPERTIES
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* --------------------------------------------------------------------------------------------------------
+    • *tuning
+
+    Get 'tuning'.
+
+    FoscPitchManager.tuning.name;
+    -------------------------------------------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------------------------------------------
+    • *tuning_
+
+    Called when FoscTuning:current is set.
+
+    FoscPitchManager.tuning_('et72');
+    FoscPitchManager.tuning.name;
+    -------------------------------------------------------------------------------------------------------- */
+    *tuning_ { |ltuning|
+        case 
+        { ltuning.isString } {
+            ltuning = ltuning.asSymbol;
+        }
+        { ltuning.isKindOf(Symbol) } {
+            ltuning = FoscTuning.perform(ltuning);
+        }
+        { ltuning.isKindOf(FoscTuning) } {
+            // pass
+        }
+        { ltuning.isNil } {
+            ltuning = FoscTuning.et24;
+        }
+        {
+            ^throw("Bad argument for %:%: %.".format(this.species, thisMethod.name, tuning));
+        };
+
+        tuning = ltuning;
+
+        this.prUpdateRegexes;
+        this.prUpdateRespellLibrary;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC CLASS METHODS: TESTING
@@ -53,7 +102,7 @@ FoscPitchManager : Fosc {
 
     • Example 2 - non-default tuning
 
-    FoscTuning.current.name;
+    Fosc.tuning.name;
 	FoscPitchManager.isAccidentalName("xs"); // fails when FoscTuning:current is 'et24'
 
 	FoscTuning.et72.accidentalNames;
@@ -145,7 +194,7 @@ FoscPitchManager : Fosc {
         var index, result;
 
         if (this.isAccidentalName(name).not) {
-            throw("%:%: accidental name is not in FoscTuning: '%'."
+            ^throw("%:%: accidental name is not in FoscTuning: '%'."
                 .format(tuning.species, thisMethod.name, name));
         };
 
@@ -381,7 +430,7 @@ FoscPitchManager : Fosc {
         var pitchClass, newName;
 
         if (this.isPitchName(name).not) {
-            throw("%:%: pitch class name not found in FoscTuning: current: '%'.".
+            ^throw("%:%: pitch class name not found in FoscTuning: current: '%'.".
                 format(this.species, thisMethod.name, name));
         };
 
@@ -474,16 +523,6 @@ FoscPitchManager : Fosc {
         
         ^accidentalNames[index];
     }
-    /* --------------------------------------------------------------------------------------------------------
-    • *update
-
-    Called when FoscTuning:current is set.
-    -------------------------------------------------------------------------------------------------------- */
-    *update {
-        tuning = FoscTuning.current;
-        this.prUpdateRegexes;
-        this.prUpdateRespellLibrary;
-    }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PRIVATE CLASS METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -530,10 +569,6 @@ FoscPitchManager : Fosc {
         var alterations, accidentalNames, diatonicPitchClassNames, flatIndices, sharpIndices, m, n, j;
         var index, current, prev, next, flat, sharp;
 
-        //!!! TODO: move this to init level ?
-        respellWithSharp = ();
-        respellWithFlat = ();
-
         alterations = tuning.alterations;
         accidentalNames = tuning.accidentalNames;
         diatonicPitchClassNames = #['a','b','c','d','e','f','g'];
@@ -554,32 +589,25 @@ FoscPitchManager : Fosc {
             prev = diatonicPitchClassNames.wrapAt(index - 1);
             next = diatonicPitchClassNames.wrapAt(index + 1);
 
-
-            // Post.nl;
-            // "f, n -> s".postln;
-
             // naturals, flats -> sharps
             flatIndices.do { |index, i|
                 j = if (#['c','f'].includes(pitchClassName)) { i + m } { i + n };
-                if (alterations[j] > 0) {
+   
+                if (alterations[j] > 0 ) {
                     flat = (current ++ accidentalNames[index]).asSymbol;
                     sharp = prev ++ accidentalNames[j];
                     respellWithSharp[flat] = sharp;
-                    //[flat, sharp].postln;
                 };
             };
-
-            // Post.nl;
-            // "s, n -> f".postln;
 
             // naturals, sharps -> flats
             sharpIndices.do { |index, i|
                 j = if (#['b','e'].includes(pitchClassName)) { i + m } { i };
+
                 if (alterations[j] < 0) {
                     sharp = (current ++ accidentalNames[index]).asSymbol;
                     flat = next ++ accidentalNames[j];
                     respellWithFlat[sharp] = flat;
-                    //[sharp, flat].postln;
                 };
             };
         };

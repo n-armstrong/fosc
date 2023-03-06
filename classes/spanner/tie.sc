@@ -54,11 +54,11 @@ a.show;
         leaves = this.leaves;
         //!!!TODO: leaves = this.leaves(doNotIterateGraceContainer: true);
         
-        if (leaves.size < 2) { throw("Tie selection must contain two or more notes.") };
+        if (leaves.size < 2) { ^throw("Tie selection must contain two or more notes.") };
 
         leaves.do { |leaf|
             if ([FoscNote, FoscChord].any { |type| leaf.isKindOf(type) }.not) {
-                throw("Attempt to tie a non-pitched leaf: %.".format(leaf));
+                ^throw("Attempt to tie a non-pitched leaf: %.".format(leaf));
             };
         };
 

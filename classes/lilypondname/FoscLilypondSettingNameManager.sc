@@ -25,7 +25,7 @@ FoscLilyPondSettingNameManager : FoscLilyPondNameManager {
                 ^vars[name.asSymbol];
             } {
                 typeName = this.name.asString;
-                throw("% has not attribute: %".format(typeName, name));
+                ^throw("% has not attribute: %".format(typeName, name));
             };
         }
         // !!!TODO: contexts import from ly files not yet implemented
@@ -43,7 +43,7 @@ FoscLilyPondSettingNameManager : FoscLilyPondNameManager {
                 ^vars[name.asSymbol];
             } {
                 typeName = this.name.asString;
-                throw("% has not attribute: %".format(typeName, name));
+                ^throw("% has not attribute: %".format(typeName, name));
             };
         };
     }

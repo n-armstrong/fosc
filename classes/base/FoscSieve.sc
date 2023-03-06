@@ -479,7 +479,7 @@ FoscSieve {
         type = [FoscContainer, FoscSelection, SequenceableCollection];
         
         if (type.any { |type| object.isKindOf(type) }.not) {
-            throw("%:%: argument must be a FoscContainer, FoscSelection or SequenceableCollection: %."
+            ^throw("%:%: argument must be a FoscContainer, FoscSelection or SequenceableCollection: %."
                 .format(this.species, thisMethod.name, object));
         };
         

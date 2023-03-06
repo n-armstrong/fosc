@@ -15,7 +15,7 @@
             ^MethodError(thisMethod, this).throw;
         } {
             //^FoscValueError(method, argName, val).throw;
-            throw("ERROR: %:%: bad value for '%': %.".format(this, method, argName, val.cs));
+            ^throw("ERROR: %:%: bad value for '%': %.".format(this, method, argName, val.cs));
         };
     }
 }

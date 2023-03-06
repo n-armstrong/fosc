@@ -23,7 +23,7 @@ FoscStaffGroup : FoscContext {
     -------------------------------------------------------------------------------------------------------- */
     prOnInsertionCheck { |index, node|
         if (node.isKindOf(FoscStaff).not) {
-            throw("%: can't insert a % in this container.".format(this.species, node.species)); 
+            ^throw("%: can't insert a % in this container.".format(this.species, node.species)); 
         };
         super.prOnInsertionCheck(index, node);
     }

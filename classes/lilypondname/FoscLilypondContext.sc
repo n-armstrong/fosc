@@ -86,7 +86,7 @@ FoscLilyPondContext : Fosc {
     
     a = FoscLilyPondContext('Staff');
     a.name;
-    a = FoscLilyPondContext('blerk');       // throw exception
+    a = FoscLilyPondContext('blerk');       // ^throw exception
     FoscLilyPondContext.listAllContexts;
     -------------------------------------------------------------------------------------------------------- */
     *new { |name='Voice'|
@@ -94,7 +94,7 @@ FoscLilyPondContext : Fosc {
     }
     init { |argName|
     	if (LilypondContexts.includes(argName).not) {
-    		throw("%: % is not a valid lilypond context name.".format(this.species, argName));
+    		^throw("%: % is not a valid lilypond context name.".format(this.species, argName));
     	};
     	name = argName;
     }

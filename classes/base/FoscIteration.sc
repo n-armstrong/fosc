@@ -23,7 +23,7 @@ FoscIteration {
         
         if (type.any { |type| client.isKindOf(type) }.not) {
             names = type.collect { |each| each.name }.join(", ");
-            throw("FoscIteration:new: client must be one of: %.".format(names));
+            ^throw("FoscIteration:new: client must be one of: %.".format(names));
         };
 
         ^super.new.init(client);
@@ -359,6 +359,14 @@ FoscIteration {
     // }
     /* --------------------------------------------------------------------------------------------------------
     • logicalTies
+
+
+    !!!TODO: this is buggy with selections
+
+    a = FoscMusicMaker(beamEachRun: true);
+    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,-2], pitches: "c' d' ef' f'");
+    b.logicalTies(pitched: true).do { |e| e.cs.postln };
+    b.show;
 
 
     • iterate all logicalTies

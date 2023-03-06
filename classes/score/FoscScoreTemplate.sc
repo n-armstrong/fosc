@@ -35,12 +35,15 @@ FoscScoreTemplate : Fosc {
 
         staves.do { |staff|
             leaf = staff.leafAt(0);
-            clef = leaf.prGetIndicator(FoscClef);
-            
-            if (clef.isNil) {
-                clef = FoscInspection(staff).annotation('defaultClef');
-                if (clef.notNil) { wrapper = leaf.attach(clef, wrapper: true) };
-                wrappers = wrappers.add(wrapper);
+
+            if (leaf.notNil) {
+                clef = leaf.prGetIndicator(FoscClef);
+                
+                if (clef.isNil) {
+                    clef = FoscInspection(staff).annotation('defaultClef');
+                    if (clef.notNil) { wrapper = leaf.attach(clef, wrapper: true) };
+                    wrappers = wrappers.add(wrapper);
+                };
             };
         };
 

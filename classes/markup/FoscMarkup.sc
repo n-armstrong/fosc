@@ -219,6 +219,9 @@ FoscMarkup : Fosc {
     m = FoscMarkup("foo");
     m.illustrate;
     m.show;
+
+    m = FoscMarkup("foo");
+    m.writeSVG(Platform.userHomeDir ++ "/Desktop/markup.svg");
     -------------------------------------------------------------------------------------------------------- */
     illustrate {
     	var lilypondFile, markup;
@@ -367,7 +370,7 @@ FoscMarkup : Fosc {
             contents = expr;
         }
         {
-            throw("%:%: must be FoscMarkup, FoscMarkupCommand, or String: %.".
+            ^throw("%:%: must be FoscMarkup, FoscMarkupCommand, or String: %.".
                 format(this.species, thisMethod.name, expr));
         };
         ^contents;
@@ -679,7 +682,7 @@ FoscMarkup : Fosc {
         var glyphScheme, command;
         glyphName = glyphName.asString;
         if (LilypondMusicGlyphs.includes(glyphName).not) {
-            throw("%:%: % is not a valid Lilypond glyph name."
+            ^throw("%:%: % is not a valid Lilypond glyph name."
                 .format(this.species, thisMethod.name, glyphName));
         };
         glyphScheme = FoscScheme(glyphName).forceQuotes_(true);
@@ -789,7 +792,7 @@ FoscMarkup : Fosc {
         var command;
         if (postscript.isKindOf(FoscPostscript)) { postscript = postscript.str };
         if (postscript.isString.not) {
-            throw("%:% postscript argument must be a String or FoscPostscript."
+            ^throw("%:% postscript argument must be a String or FoscPostscript."
                 .format(this.species, thisMethod.name));
         };
         command = FoscMarkupCommand('postscript', postscript);

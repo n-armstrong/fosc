@@ -87,7 +87,7 @@ a.show;
             # startDynamic, dynamicTrend, stopDynamic = indicators; 
         }
         {
-            throw("%:%: bad value for indicators: %.".format(this.species, thisMethod.name, indicators));
+            ^throw("%:%: bad value for indicators: %.".format(this.species, thisMethod.name, indicators));
         };
 
         //assert(startDynamic.isKindOf(FoscDynamic));

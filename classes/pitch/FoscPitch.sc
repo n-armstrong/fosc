@@ -52,8 +52,6 @@ a.show;
 a = FoscPitch(0.5);
 a.str;
 a.show;
-
-FoscOctave
 ------------------------------------------------------------------------------------------------------------ */
 FoscPitch : Fosc {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,7 +82,7 @@ FoscPitch : Fosc {
             ^name;
         }
         { 
-            throw("Can't initialize % from value: %".format(this.species, name));
+            ^throw("Can't initialize % from value: %".format(this.species, name));
         };
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,7 +207,7 @@ FoscPitch : Fosc {
         { expr.isKindOf(FoscPitch) } { expr.midinote }
         { expr.isNumber } { expr }
         {
-            throw("Bad argument type for %:%: '%'".format(this.species, thisMethod.name, expr));
+            ^throw("Bad argument type for %:%: '%'".format(this.species, thisMethod.name, expr));
         };
 
         // respell = case
@@ -223,7 +221,7 @@ FoscPitch : Fosc {
     }
     /* --------------------------------------------------------------------------------------------------------
     • format
-
+    
     a = FoscPitch("cs'");
     a.format;
     -------------------------------------------------------------------------------------------------------- */
@@ -379,14 +377,29 @@ FoscPitch : Fosc {
 
     a = FoscPitch("cs''");
     a.illustrate.format;
+
+    btf
+
+
+    Fosc.tuning_('et72');
+    a = FoscPitch("cfts'");
+    a.show;
     -------------------------------------------------------------------------------------------------------- */
-    illustrate {
-        var note, includes, lilypondFile;
+    illustrate { |paperSize, staffSize, includes|
+        var note, lincludes, lilypondFile;
 
         note = FoscNote(this, 1/4);
         if (this < 55) { note.attach(FoscClef('bass')) };
-        includes = "%/noteheads.ily".format(Fosc.stylesheetDirectory);
-        lilypondFile = FoscLilyPondFile([note], includes: [includes]);
+        lincludes = ["%/noteheads.ily".format(Fosc.stylesheetDirectory)];
+        if (Fosc.tuning.notNil) { lincludes = lincludes ++ [Fosc.tuning.stylesheetPath] };
+        if (includes.notNil) { lincludes = lincludes ++ includes };
+        
+        lilypondFile = FoscLilyPondFile(
+            [note],
+            paperSize: paperSize,
+            includes: lincludes,
+            staffSize: staffSize
+        );
         
         ^lilypondFile;
     }
@@ -416,6 +429,39 @@ FoscPitch : Fosc {
     invert { |axis|
         axis = this.species.new(axis);
         ^(axis + (axis - this));
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • respell
+
+    def respell(self, accidental="sharps"):
+        """
+        Respells named pitch with ``accidental``.
+
+        ..  container:: example
+
+            >>> abjad.NamedPitch("cs").respell(accidental="flats")
+            NamedPitch('df')
+
+            >>> abjad.NamedPitch("df").respell(accidental="sharps")
+            NamedPitch('cs')
+
+        """
+        if accidental == "sharps":
+            dictionary = _pitch_class_number_to_pitch_class_name_with_sharps
+        else:
+            assert accidental == "flats"
+            dictionary = _pitch_class_number_to_pitch_class_name_with_flats
+        name = dictionary[self.pitch_class.number]
+        candidate = type(self)((name, self.octave.number))
+        if candidate.number == self.number - 12:
+            candidate = type(self)(candidate, octave=candidate.octave.number + 1)
+        elif candidate.number == self.number + 12:
+            candidate = type(self)(candidate, octave=candidate.octave.number - 1)
+        assert candidate.number == self.number
+        return candidate
+    -------------------------------------------------------------------------------------------------------- */
+    respell {
+        ^this.notYetImplemented;
     }
     /* --------------------------------------------------------------------------------------------------------
     • simplify
@@ -471,7 +517,7 @@ FoscPitch : Fosc {
         return type(self)(pitch_name, arrow=self.arrow)
     -------------------------------------------------------------------------------------------------------- */
     simplify {
-        // NOT YET IMPLEMENTED
+        ^this.notYetImplemented;
     }
     /* --------------------------------------------------------------------------------------------------------
     • transpose

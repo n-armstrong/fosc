@@ -13,6 +13,7 @@
 
 m = FoscPitchSegment(#[60,62,64]);
 m.cs;
+m.show;
 
 
 • Example 2  - initialize with list of lilypond names

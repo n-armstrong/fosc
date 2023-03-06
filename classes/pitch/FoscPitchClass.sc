@@ -23,6 +23,14 @@ Get nearest approximation in FoscTuning:current
 a = FoscPitchClass(1/3);
 a.number;
 a.str;
+
+
+
+a = FoscPitchClass("cs");
+a.number;
+a.name_("ef");
+a.number;
+a.name;
 ------------------------------------------------------------------------------------------------------------ */
 FoscPitchClass : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,6 +39,9 @@ FoscPitchClass : Fosc {
     var <name, <accidental;
     *new { |name|
         ^super.new.init(name);
+    }
+    name_ { |lname|
+        this.init(lname);
     }
     init { |argName|
         name = argName;
@@ -57,7 +68,7 @@ FoscPitchClass : Fosc {
             ^name;
         }
         { 
-            throw("Can't initialize % from value: %".format(this.species, name));
+            ^throw("Can't initialize % from value: %".format(this.species, name));
         };
 
         accidental = FoscAccidental(FoscPitchManager.prSplitLilypondPitchName(name)[1]);
@@ -147,7 +158,7 @@ FoscPitchClass : Fosc {
         { expr.isKindOf(FoscPitchClass) } { expr.number }
         { expr.isNumber } { expr }
         {
-            throw("Bad argument type for %:%: '%'".format(this.species, thisMethod.name, expr));
+            ^throw("Bad argument type for %:%: '%'".format(this.species, thisMethod.name, expr));
         };
 
         respell = case
@@ -296,9 +307,91 @@ FoscPitchClass : Fosc {
     }
     /* --------------------------------------------------------------------------------------------------------
     • respell
+
+    FoscPitchManager.respellPitchName("df'", 'sharp');      // YES
+    FoscPitchManager.respellPitchName("ds'", 'flat');       // YES
+    
+    FoscPitchManager.respellPitchName("bs", 'flat');        // NO
+    FoscPitchManager.respellPitchName("dss", 'flat');       // NO
+    FoscPitchManager.respellPitchName("cf", 'sharp');       // NO
+
+    FoscPitchManager.respellPitchName("cqs", 'flat');       // YES 
+    FoscPitchManager.respellPitchName("ctqf", 'no');        // YES
+    
+    FoscPitchManager.respellPitchName("c", 'sharp');        // YES
+    FoscPitchManager.respellPitchName("c", 'flat');         // YES
+
+
+    m = FoscPitchClass("cs");
+    m = m.respell('flat');
+    m.cs;
+
+    m = FoscPitchClass("df");
+    m = m.respell('sharp');
+    m.cs;
+
+    m = FoscPitchClass("cqs");
+    m = m.respell('flat');
+    m.cs;
+
+    m = FoscPitchClass("ctqs");
+    m = m.respell('flat');
+    m.cs;
+
+    m = FoscPitchClass("dqf");
+    m = m.respell('sharp');
+    m.cs;
+
+    m = FoscPitchClass("dtqf");
+    m = m.respell('sharp');
+    m.cs;
+
+
+
+    Fosc.tuning = 'et72';
+
+    m = FoscPitchClass("csts");
+    m.cs;
+    m.respell('flat').cs;
+    m.respell('sharp').cs;
+
+    m = FoscPitchClass("dftf");
+    m.cs;
+    m.respell('sharp').cs;
+
+    m = FoscPitchClass("c");
+    m.cs;
+    m.respell('sharp').cs;
+
+
+    //!!! NOT WORKING
+    m = FoscPitchClass("bs");
+    m.cs;
+    m.respell('flat').cs;
+
+
+    m = FoscPitchClass("cqs");
+    m.accidental.semitones;
     -------------------------------------------------------------------------------------------------------- */
+    // respell {
+    //     var accidental, pitchClassName;
+
+    //     if (this.accidental.semitones > 0) {
+    //         accidental = 'flat';
+    //     } {
+    //         accidental = 'sharp';
+    //     };
+
+    //     pitchClassName = FoscPitchManager.respellPitchClassName(this.name, accidental);
+        
+    //     ^this.species.new(pitchClassName);
+    // }
     respell { |accidental='sharp'|
-        // NOT YET IMPLEMENTED
+        var pitchClassName;
+
+        pitchClassName = FoscPitchManager.respellPitchClassName(this.name, accidental);
+        
+        ^this.species.new(pitchClassName);
     }
     /* --------------------------------------------------------------------------------------------------------
     • respellWithFlat

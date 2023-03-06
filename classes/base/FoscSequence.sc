@@ -50,7 +50,7 @@ FoscSequence : Fosc {
     ++ { |object|
         var localItems, newItems;
         if (this.species != object.species) {
-            throw("%:%: can't concatenate objects that are not of the same type: %, %."
+            ^throw("%:%: can't concatenate objects that are not of the same type: %, %."
                 .format(this.species, thisMethod.name, this, object));
         };
         localItems = items.copyImmutable;

@@ -307,11 +307,11 @@ FoscLogicalTie : FoscSelection {
         var denominator, noteDurations, pitches, notes, tuplet;
         
         if (this.head.parent.isNil) {
-            throw("%:%: leaves must have a parent.".format(this.species, thisMethod.name));
+            ^throw("%:%: leaves must have a parent.".format(this.species, thisMethod.name));
         };
         
         if (this.areContiguousSameParent.not) {
-            throw("%:%: leaves must all be children of the same parent."
+            ^throw("%:%: leaves must all be children of the same parent."
                 .format(this.species, thisMethod.name));
         };
         
@@ -350,7 +350,7 @@ FoscLogicalTie : FoscSelection {
     //     var denominator, noteDurations, notes, tuplet;
 
     //     if (this.areContiguousSameParent.not) {
-    //         throw("%:%: leaves must all be children of the same parent."
+    //         ^throw("%:%: leaves must all be children of the same parent."
     //             .format(this.species, thisMethod.name));
     //     };
         

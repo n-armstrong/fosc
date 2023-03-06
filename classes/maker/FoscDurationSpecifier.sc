@@ -272,7 +272,7 @@ FoscDurationSpecifier : Fosc {
         meterDuration = durations.sum;
         musicDuration = selections.collect { |each| FoscInspection(each).duration }.sum;
         if (meterDuration != musicDuration) {
-            throw("%:%: duration of meters does not equal duration of selections: % - %."
+            ^throw("%:%: duration of meters does not equal duration of selections: % - %."
                 .format(this.species, thisMethod.name, meterDuration.str, musicDuration.str));
         };
         voice = FoscVoice(selections);

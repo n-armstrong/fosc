@@ -38,6 +38,7 @@ FoscNote : FoscLeaf {
         var leaf, isCautionary=false, isForced=false, isParenthesized=false;
         if (writtenPitch.isKindOf(FoscLeaf)) {
             leaf = writtenPitch;
+
             case 
             { leaf.isKindOf(FoscChord) } {
                 writtenDuration = leaf.writtenDuration;
@@ -46,6 +47,7 @@ FoscNote : FoscLeaf {
                 isCautionary = leaf.noteHeads[0].isCautionary ? false;
                 isForced = leaf.noteHeads[0].isForced ? false;
                 isParenthesized = leaf.noteHeads[0].isParenthesized ? false;
+                
                 ^super.new(writtenDuration, multiplier, tag).prCopyOverrideAndSetFromLeaf(leaf)
                     .initFoscNote(writtenPitch, isCautionary, isForced, isParenthesized);
             }
@@ -56,13 +58,16 @@ FoscNote : FoscLeaf {
                 isCautionary = leaf.noteHead.isCautionary ? false;
                 isForced = leaf.noteHead.isForced ? false;
                 isParenthesized = leaf.noteHead.isParenthesized ? false;
+                
                 ^super.new(writtenDuration, multiplier, tag).prCopyOverrideAndSetFromLeaf(leaf)
                     .initFoscNote(writtenPitch, isCautionary, isForced, isParenthesized);
             };
         };
+
         writtenPitch = writtenPitch ? 60;
         writtenDuration = writtenDuration ?? { FoscDuration(1, 4) };
-		^super.new(writtenDuration, multiplier, tag)
+		
+        ^super.new(writtenDuration, multiplier, tag)
             .initFoscNote(writtenPitch, isCautionary, isForced, isParenthesized);
 	}
 	initFoscNote { |writtenPitch, isCautionary, isForced, isParenthesized|

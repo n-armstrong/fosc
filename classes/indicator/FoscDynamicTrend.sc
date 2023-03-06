@@ -229,7 +229,7 @@ FoscDynamicTrend : Fosc {
         { shape.contains(">") } {
             strings = strings.add(FoscDynamicTrend.decrescendoStart);
         } {
-            throw("%:%: bad value for shape: %.".format(this.species, thisMethod.name, shape));
+            ^throw("%:%: bad value for shape: %.".format(this.species, thisMethod.name, shape));
         };
         //!!!TODO: if (leftBroken) { strings = FoscDynamicTrend.prTagHide(string) }; 
         ^strings;

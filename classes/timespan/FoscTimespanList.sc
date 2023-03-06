@@ -131,7 +131,7 @@ FoscTimespanList : FoscTypedList {
                 if (timespan.respondsTo(key)) {
                     val = timespan.perform(key);
                 } {
-                    // 'throw' not caught here
+                    // '^throw' not caught here
                     error("%:illustrate: timespan does not respond to: '%'".format(this.species, key));
                     ^nil;
                 };
@@ -1644,7 +1644,7 @@ FoscTimespanList : FoscTypedList {
     prGetOffsets { |object|
         try { ^[object.startOffset, object.stopOffset] };  
         try { ^object.timespan.offsets };
-        throw("%:%: can't get offsets for object: %.".format(this.species, thisMethod.name, object));
+        ^throw("%:%: can't get offsets for object: %.".format(this.species, thisMethod.name, object));
     }
     /* --------------------------------------------------------------------------------------------------------
     • prGetTimespan

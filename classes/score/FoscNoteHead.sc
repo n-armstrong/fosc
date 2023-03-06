@@ -20,6 +20,7 @@ FoscNoteHead : Fosc {
     }
     init { |writtenPitch, argClient, argIsCautionary, argIsForced, argIsParenthesized, argTweaks|
         var noteHead, key, val;
+        
         case
         { writtenPitch.isKindOf(this.species) } {
             noteHead = writtenPitch;
@@ -28,6 +29,7 @@ FoscNoteHead : Fosc {
             argIsForced = noteHead.isForced;
             tweaks = noteHead.tweaks;
         };
+        
         this.writtenPitch_(writtenPitch ? 60);
         client = argClient;
         isCautionary = argIsCautionary;
@@ -75,6 +77,7 @@ FoscNoteHead : Fosc {
         if (object.isKindOf(this.species)) {
            ^(writtenPitch == object.writtenPitch);
         };
+
         ^false;
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -128,11 +131,13 @@ FoscNoteHead : Fosc {
     str {
         var result;
         result = "";
+        
         if (this.writtenPitch.notNil) {
             result = this.writtenPitch.str;
             if (isForced) { result = result ++ "!" };
             if (isCautionary) { result = result ++ "?" };
         };
+        
         ^result;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,17 +151,21 @@ FoscNoteHead : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetFormatPieces {
         var result, strings, kernel;
+        
         assert(writtenPitch.notNil);
         result = [];
         if (isParenthesized) { result = result.add("\\parenthesize") };
+        
         if (tweaks.notNil) {
             strings = tweaks.prListFormatContributions(directed: false);
             result = result.addAll(strings);
         };  
+        
         kernel = writtenPitch.format;
         if (isForced) { kernel = kernel ++ "!" };   
         if (isCautionary) { kernel = kernel ++ "?" };
         result = result.add(kernel);
+        
         ^result; 
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -179,9 +188,11 @@ FoscNoteHead : Fosc {
     prGetLilypondFormat { |formattedDuration|
         var pieces, pieces_, result;
         pieces = this.prGetFormatPieces;
+
         if (formattedDuration.notNil) {
             pieces[pieces.lastIndex] = pieces[pieces.lastIndex] ++ formattedDuration;
         };
+        
         if (alternative.notNil) {
             pieces = FoscLilyPondFormatManager.tag(pieces);
             pieces_ = alternative[0].prGetFormatPieces;
@@ -190,8 +201,10 @@ FoscNoteHead : Fosc {
             };
             pieces_ = FoscLilyPondFormatManager.tag(pieces_, deactivate: true, tag: alternative[1]);
             pieces = pieces.addAll(pieces_);
-        };  
+        };
+
         result = pieces.join("\n");
+        
         ^result;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -58,7 +58,7 @@ FoscAfterGraceContainer : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prAttach { |leaf|
         if (leaf.isKindOf(FoscLeaf).not) {
-            throw("%:%: must attach to leaf: %.".format(this.species, thisMethod.name, leaf));
+            ^throw("%:%: must attach to leaf: %.".format(this.species, thisMethod.name, leaf));
         };
         leaf.afterGraceContainer_(this);
         carrier = leaf;

@@ -41,9 +41,9 @@ FoscSelection : FoscSequence {
     eventList {
         var container, eventList;
 
-        if (this.areContiguousLogicalVoice.not) {
-            throw("%:%: components in selection are not contiguous.".format(this.species, thisMethod.name));
-        };
+        // if (this.areContiguousLogicalVoice.not) {
+        //     ^throw("%:%: components in selection are not contiguous.".format(this.species, thisMethod.name));
+        // };
 
         container = FoscContainer(this);
         eventList = container.eventList;
@@ -84,7 +84,7 @@ FoscSelection : FoscSequence {
         
         items.do { |item|
             if (type.any { |type| item.isKindOf(type) }.not) {
-                throw("%:new: 'items' must contain components and/or selections: %"
+                ^throw("%:new: 'items' must contain components and/or selections: %"
                     .format(this.species, item));
             };
         };
@@ -511,26 +511,34 @@ FoscSelection : FoscSequence {
     a = FoscMusicMaker();
     b = a.(durations: [1/4], divisions: #[[1,1],[3,-2],[-4,3]]);
     b.show(staffSize: 15);
+
+
+    Fosc.tuning_('et72');
+    m = FoscMusicMaker().(durations: 1/4 ! 4, pitches: "cetf' dfxf' estf' frs'");
+    m.show;
     -------------------------------------------------------------------------------------------------------- */
     illustrate { |paperSize, staffSize, includes|
-        var isRhythmicTemplate=true, template, score, lilypondFile;
+        var isRhythmicTemplate=true, lincludes, template, score, lilypondFile;
 
         this.doLeaves({ |leaf|
             if (leaf.isKindOf(FoscNote) && { leaf.writtenPitch != 60 }) { isRhythmicTemplate = false };
         }, pitched: true);
 
         if (isRhythmicTemplate) {
-            includes = ["%/rhythm-sketch.ily".format(Fosc.stylesheetDirectory)];
+            //lincludes = ["%/rhythm-sketch.ily".format(Fosc.stylesheetDirectory)];
+            lincludes = ["%/default.ily".format(Fosc.stylesheetDirectory)];
             template = FoscGroupedRhythmicStavesScoreTemplate(staffCount: 1);
         } {
-            includes = ["%/default.ily".format(Fosc.stylesheetDirectory)];
+            lincludes = ["%/default.ily".format(Fosc.stylesheetDirectory)];
+            if (Fosc.tuning.notNil) { lincludes = lincludes ++ [Fosc.tuning.stylesheetPath] };
             template = FoscStavesScoreTemplate(staffCount: 1); 
         };
+
+        if (includes.notNil) { lincludes = lincludes ++ includes };
         
         score = template.();
         score['v1'].add(this.deepCopy);
-        //if (includes.isNil) { includes = [this.defaultStylesheetPath] };
-        lilypondFile = score.illustrate(paperSize, staffSize, includes);
+        lilypondFile = score.illustrate(paperSize, staffSize, lincludes);
         
         ^lilypondFile;
     }
@@ -711,6 +719,13 @@ FoscSelection : FoscSequence {
     b.doLeaves({ |leaf| leaf.cs.postln }, pitched: true);
     c = b.selectLeaves.logicalTies(pitched: true);
     c.do { |e| e.cs.postln };
+
+
+
+    a = FoscMusicMaker(beamEachRun: true);
+    b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,-2], pitches: "c' d' ef' f'");
+    b.logicalTies(pitched: true).do { |e| e.cs.postln };
+    b.show;
     -------------------------------------------------------------------------------------------------------- */
     logicalTies { |pitched, graceNotes=false|
         var iterator;
@@ -910,7 +925,7 @@ FoscSelection : FoscSequence {
                 }
                 { targetDuration < candidateDuration } {
                     case { fill == 'exact' } {
-                        throw("%:%: must partition exactly.".format(this.species, thisMethod.name));
+                        ^throw("%:%: must partition exactly.".format(this.species, thisMethod.name));
                     }
                     { fill == 'less' } {
                         result = result.add(part);
@@ -927,7 +942,7 @@ FoscSelection : FoscSequence {
                         if (targetDuration.isNil) { break.value };
                         
                         if (targetDuration < cumulativeDuration) {
-                            throw(
+                            ^throw(
                                 "%:%: target duration % is less than cumulative duration %."
                                     .format(this.species, thisMethod.name, targetDuration, cumulativeDuration);
                             );
@@ -1021,6 +1036,19 @@ FoscSelection : FoscSequence {
     // groupBySizes { |sizes, isCyclic=false|
     //     ^this.partitionBySizes(sizes, isCyclic);
     // }
+    /* --------------------------------------------------------------------------------------------------------
+    • pitches_
+
+    a = FoscLeafMaker().((60..72), [1/8]);
+    a.pitches = (62..74);
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    pitches_ { |pitches|
+        var mutation;
+        mutation = mutate(this).rewritePitches(pitches);
+        //mutation.client.leaves.do { |leaf| leaf.writtenPitch.cs.postln };
+        
+    }
     /* --------------------------------------------------------------------------------------------------------
     • reverseDo
 
@@ -1266,7 +1294,7 @@ FoscSelection : FoscSequence {
     a.selectLeaves.prApplyMask(#[3,3,3]);
     a.show;
     -------------------------------------------------------------------------------------------------------- */
-    prApplyMask { |mask, isCyclic=false|
+    prApplyMask { |mask, isCyclic=true|
         var logicalTies, leaves;
 
         logicalTies = this.selectLogicalTies;
@@ -1392,7 +1420,7 @@ FoscSelection : FoscSequence {
     -------------------------------------------------------------------------------------------------------- */
     prFuse {
         if (this.areContiguousLogicalVoice.not) {
-            throw("%:%: components must be contiguous and in same logical voice."
+            ^throw("%:%: components must be contiguous and in same logical voice."
                 .format(this.species, thisMethod.name));
         };
         case
@@ -1403,7 +1431,7 @@ FoscSelection : FoscSequence {
             ^this.prFuseTuplets;
         }
         {
-            throw("%:%: can not fuse.".format(this.species, thisMethod.name));
+            ^throw("%:%: can not fuse.".format(this.species, thisMethod.name));
         }; 
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -1432,7 +1460,7 @@ FoscSelection : FoscSequence {
         leaves = this.leaves;
 
         if (leaves.areContiguousLogicalVoice.not || { leaves.areLeaves.not }) {
-            throw("%:%: all components must be contiguous leaves.".format(this.species, thisMethod.name));
+            ^throw("%:%: all components must be contiguous leaves.".format(this.species, thisMethod.name));
         };
 
         leaves = this;
@@ -1482,7 +1510,7 @@ FoscSelection : FoscSequence {
         leaves = this.leaves;
 
         if (leaves.areContiguousLogicalVoice.not || { leaves.areLeaves.not }) {
-            throw("%:%: components must be contiguous leaves.".format(this.species, thisMethod.name));
+            ^throw("%:%: components must be contiguous leaves.".format(this.species, thisMethod.name));
         };
 
         leaves.prDetachBeams;
@@ -1537,7 +1565,7 @@ FoscSelection : FoscSequence {
         var first, last, parent, firstIndex, lastIndex;
         
         if (this.areContiguousSameParent.not) {
-            throw("%:%: components are not contiguous.".format(this.species, thisMethod.name));
+            ^throw("%:%: components are not contiguous.".format(this.species, thisMethod.name));
         };
         
         if (this.size > 0) {
@@ -1573,8 +1601,8 @@ FoscSelection : FoscSequence {
 
     !!!TODO: DEPRECATE
     -------------------------------------------------------------------------------------------------------- */
-    duration {
-        ^this.prGetContentsDuration;
+    duration { |inSeconds=false|
+        ^this.prGetContentsDuration(inSeconds);
     }
     /* --------------------------------------------------------------------------------------------------------
     • music

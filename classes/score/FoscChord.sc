@@ -260,7 +260,7 @@ FoscChord : FoscLeaf {
         reattackDuration = this.prTremoloReattackDuration;
         repeatCount = writtenDuration / reattackDuration / 2;
         if ((repeatCount % 1) == 0) {
-            throw("%:%: tremolo duration % can't have % beams.".format(
+            ^throw("%:%: tremolo duration % can't have % beams.".format(
                 this.species, thisMethod.name, writtenDuration.pair, tremolo.beamCount));
         };
         repeatCount = repeatCount.asFloat.asInteger;

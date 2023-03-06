@@ -77,7 +77,7 @@ FoscTreeContainer : FoscTreeNode {
     -------------------------------------------------------------------------------------------------------- */
     remove { |item|
         if (items.includes(item).not) {
-            throw("%:%: item not found: %".format(this.species, thisMethod.name, item));
+            ^throw("%:%: item not found: %".format(this.species, thisMethod.name, item));
         };
         item.prSetParent(nil);
         items.remove(item);

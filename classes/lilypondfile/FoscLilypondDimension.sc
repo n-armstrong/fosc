@@ -32,7 +32,7 @@ FoscLilyPondDimension : Fosc {
     *new { |value=0, unit='cm'|
         unit = unit.asSymbol;
         if (#['cm', 'in', 'mm', 'pt'].includes(unit).not) {
-            throw("%::new: unit must be 'cm', 'in', 'mm', or 'pt'.".format(this.species));
+            ^throw("%::new: unit must be 'cm', 'in', 'mm', or 'pt'.".format(this.species));
         };
         ^super.new.init(value, unit);
     }

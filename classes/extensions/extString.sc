@@ -11,53 +11,6 @@
 		^(this[0].toUpper ++ this[1..]);
 	}
 	/* --------------------------------------------------------------------------------------------------------
-	• splitWhiteSpace
-
-	Splits white space of any length, including tabs.
-
-	"c' d' es'    f'\tg'".split WhiteSpace;
-	-------------------------------------------------------------------------------------------------------- */
-	splitWhiteSpace {
-		^this.findRegexp("[^\\s]+").flop[1];
-	}
-	/* --------------------------------------------------------------------------------------------------------
-	• splitWords
-
-	"scale degrees 4 and 5.".splitWords;
-	"scale degrees 4and5.".splitWords;
-	"scaleDegrees4and5.".splitWords;
-	"ScaleDegrees4and 5.".splitWords;
-	"scale-degrees-4-and-5.".splitWords;
-	"SCALE_DEGREES_4_AND_5.".splitWords;
-	"one < two".splitWords;
-	"one! two!".splitWords;
-	-------------------------------------------------------------------------------------------------------- */
-	splitWords {
-		var wordLikeChars, result;
-		
-		result = this.copy;
-		wordLikeChars = #[$<, $>, $!];
-		
-		result = result.separate { |a, b|
-			a.isAlphaNum.not
-			|| { b.isAlphaNum.not }
-			|| { a.isLower && b.isUpper }
-			|| { a.isAlpha && b.isDecDigit }
-			|| { a.isDecDigit && b.isAlpha }
-			|| { wordLikeChars.includes(b) }
-		};
-		
-		result = result.collect { |each| each.removeWhiteSpace };
-		
-		result = result.collect { |each|
-			each.reject { |char| char.isAlphaNum.not && wordLikeChars.includes(char).not };
-		};
-		
-		result = result.select { |each| each.notEmpty };
-		
-		^result;
-	}
-	/* --------------------------------------------------------------------------------------------------------
 	• ditto
 
 	!!! DEPRECATE - use 'wrapExtend'
@@ -176,6 +129,53 @@
     	indices.doAdjacentPairs { |a, b| result = result.add(string.copyRange(a + 1, b - 1) ) };
     	^result;
     }
+    /* --------------------------------------------------------------------------------------------------------
+	• splitWhiteSpace
+
+	Splits white space of any length, including tabs.
+
+	"c' d' es'    f'\tg'".split WhiteSpace;
+	-------------------------------------------------------------------------------------------------------- */
+	splitWhiteSpace {
+		^this.findRegexp("[^\\s]+").flop[1];
+	}
+	/* --------------------------------------------------------------------------------------------------------
+	• splitWords
+
+	"scale degrees 4 and 5.".splitWords;
+	"scale degrees 4and5.".splitWords;
+	"scaleDegrees4and5.".splitWords;
+	"ScaleDegrees4and 5.".splitWords;
+	"scale-degrees-4-and-5.".splitWords;
+	"SCALE_DEGREES_4_AND_5.".splitWords;
+	"one < two".splitWords;
+	"one! two!".splitWords;
+	-------------------------------------------------------------------------------------------------------- */
+	splitWords {
+		var wordLikeChars, result;
+		
+		result = this.copy;
+		wordLikeChars = #[$<, $>, $!];
+		
+		result = result.separate { |a, b|
+			a.isAlphaNum.not
+			|| { b.isAlphaNum.not }
+			|| { a.isLower && b.isUpper }
+			|| { a.isAlpha && b.isDecDigit }
+			|| { a.isDecDigit && b.isAlpha }
+			|| { wordLikeChars.includes(b) }
+		};
+		
+		result = result.collect { |each| each.removeWhiteSpace };
+		
+		result = result.collect { |each|
+			each.reject { |char| char.isAlphaNum.not && wordLikeChars.includes(char).not };
+		};
+		
+		result = result.select { |each| each.notEmpty };
+		
+		^result;
+	}
 	/* --------------------------------------------------------------------------------------------------------
 	• strip
 

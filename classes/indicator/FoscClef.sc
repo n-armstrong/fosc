@@ -209,7 +209,7 @@ FoscClef : Fosc {
             { suffix == "8" } { alteration = 7 }
             { suffix == "15" } { alteration = 13 }
             {
-                throw("%:%: bad clef alteration suffix: %.".format(this.species, thisMethod.name, suffix));
+                ^throw("%:%: bad clef alteration suffix: %.".format(this.species, thisMethod.name, suffix));
             }
         }
         { name.includes($^) } {
@@ -220,7 +220,7 @@ FoscClef : Fosc {
             { suffix == "15" } { alteration = -13 }
             {
                 suffix.class.postln;
-                throw("%:%: bad clef alteration suffix: %.".format(this.species, thisMethod.name, suffix));
+                ^throw("%:%: bad clef alteration suffix: %.".format(this.species, thisMethod.name, suffix));
             };
         }
         {

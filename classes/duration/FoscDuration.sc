@@ -477,7 +477,7 @@ FoscDuration : FoscFraction {
     dotCount {
         ^if (this.isAssignable) {
             numerator.asBinaryString.select { |each| each == $1 }.size - 1;
-        } { throw("%:%: duration % is not assignable.".format(this.species, thisMethod.name, this.str)) };
+        } { ^throw("%:%: duration % is not assignable.".format(this.species, thisMethod.name, this.str)) };
     }
     /* --------------------------------------------------------------------------------------------------------
     • equalOrGreaterAssignable
@@ -667,7 +667,7 @@ FoscDuration : FoscFraction {
     lilypondDurationString {
         var undottedRational, undottedRationalStr, dotStr;
         if (this.isAssignable.not) {
-            throw("%:%: duration % is not assignable.".format(this.species, thisMethod.name, this.str));
+            ^throw("%:%: duration % is not assignable.".format(this.species, thisMethod.name, this.str));
         };
         undottedRational = this.equalOrLesserPowerOfTwo;
         undottedRationalStr = case
@@ -675,7 +675,7 @@ FoscDuration : FoscFraction {
         { undottedRational == 2 } { "\\breve" }
         { undottedRational == 4 } { "\\longa" }
         { undottedRational == 8 } { "\\maxima" }
-        { throw("%: Cannot process undotted rational.").format(this.species) };
+        { ^throw("%: Cannot process undotted rational.").format(this.species) };
         dotStr = "".catList("." ! this.dotCount);
         ^(undottedRationalStr ++ dotStr);
     }

@@ -75,7 +75,7 @@ FoscGraceContainer : FoscContainer {
     -------------------------------------------------------------------------------------------------------- */
     prAttach { |leaf|
         if (leaf.isKindOf(FoscLeaf).not) {
-            throw("%:%: must attach to leaf: %.".format(this.species, thisMethod.name, leaf));
+            ^throw("%:%: must attach to leaf: %.".format(this.species, thisMethod.name, leaf));
         };
         leaf.instVarPut('graceContainer', this);
         mainLeaf = leaf;

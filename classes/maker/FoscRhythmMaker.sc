@@ -288,7 +288,7 @@ FoscRhythmMaker : Fosc {
         assert(selections.size > 0);
         selections.do { |each|
             if (each.isKindOf(FoscSelection).not) {
-                throw("%:prValidateSelections: validation failed.".format(this.species));
+                ^throw("%:prValidateSelections: validation failed.".format(this.species));
             };
         };
     }
@@ -298,11 +298,11 @@ FoscRhythmMaker : Fosc {
     prValidateTuplets { |selections|
         FoscIteration(selections).components(type: FoscTuplet).do { |tuplet|
             if (tuplet.multiplier.isNormalized.not) {
-                throw("%::prValidateTuplets: tuplet multiplier is not normalized: %."
+                ^throw("%::prValidateTuplets: tuplet multiplier is not normalized: %."
                     .format(this.species, tuplet.multiplier.str));
             };
             if (tuplet.size < 1) {
-                throw("%::prValidateTuplets: tuplet has no children.".format(this.species));
+                ^throw("%::prValidateTuplets: tuplet has no children.".format(this.species));
             }; 
         };
     }

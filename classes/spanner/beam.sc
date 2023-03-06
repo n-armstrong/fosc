@@ -168,7 +168,7 @@ x.show;
         spanBeamCount = spanBeamCount ? 1;
         leafDurations = originalLeaves.items.collect { |each| each.prGetDuration };
         //!!!TODO: parts = leafDurations.partitionBySums(durations, overhang: true);
-        //!!!TODO: throw error if durations.sum > leafDurations.sum ???
+        //!!!TODO: ^throw error if durations.sum > leafDurations.sum ???
         durations = durations.collect { |each| FoscDuration(each) };
         durations = durations.truncateToAbsSum(leafDurations.sum);
         parts = leafDurations.split(durations, overhang: true);

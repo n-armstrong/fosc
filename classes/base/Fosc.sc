@@ -6,6 +6,8 @@ Fosc {
     // PUBLIC CLASS PROPERTIES: CONFIGURATION
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     classvar >lilypondPath="lilypond";
+    classvar <tuning;
+    classvar <>xmlVersion="4.0";
     /* --------------------------------------------------------------------------------------------------------
     • *lilypondVersion
     
@@ -63,6 +65,39 @@ Fosc {
     -------------------------------------------------------------------------------------------------------- */
     *stylesheetDirectory {
         ^"%/stylesheets".format(this.rootDirectory);
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *tuning_
+
+    Fosc.tuning_('et72');
+    Fosc.tuning.name;
+    FoscPitchManager.tuning.name;
+
+    a = FoscNote("cfts'", 1/4);
+    a.show;
+    -------------------------------------------------------------------------------------------------------- */
+    *tuning_ { |ltuning|
+        case 
+        { ltuning.isString } {
+            ltuning = ltuning.asSymbol;
+            ltuning = FoscTuning.perform(ltuning);
+        }
+        { ltuning.isKindOf(Symbol) } {
+            ltuning = FoscTuning.perform(ltuning);
+        }
+        { ltuning.isKindOf(FoscTuning) } {
+            // pass
+        }
+        { ltuning.isNil } {
+            // pass
+        }
+        {
+            ^throw("Bad argument for %:%: %.".format(this.species, thisMethod.name, tuning));
+        };
+
+        tuning = ltuning;
+        
+        FoscPitchManager.tuning = tuning;
     }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC INSTANCE METHODS: SPECIAL METHODS
@@ -171,7 +206,7 @@ Fosc {
     -------------------------------------------------------------------------------------------------------- */
     lilypond {
         if (this.respondsTo('prGetLilypondFormat').not) {
-            throw("% does not respond to 'prGetLilypondFormat'.".format(this));
+            ^throw("% does not respond to 'lilypond'.".format(this));
         };
 
         ^this.prGetLilypondFormat;
@@ -179,7 +214,7 @@ Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • format
 
-    !!!TODO: For deprecation
+    !!!TODO: DEPRECATE
     -------------------------------------------------------------------------------------------------------- */
     format {
         ^this.lilypond;
@@ -196,6 +231,17 @@ Fosc {
     mutate {
 		^FoscMutation(this);
 	}
+    /* --------------------------------------------------------------------------------------------------------
+    • parentage
+
+    a = FoscNote(60, 1/4);
+    b = FoscVoice([a]);
+    p = a.parentage;
+    p.components;
+    -------------------------------------------------------------------------------------------------------- */
+    parentage { |graceNotes=false|
+        ^FoscParentage(this, graceNotes: graceNotes);
+    }
     /* --------------------------------------------------------------------------------------------------------
     • select
     -------------------------------------------------------------------------------------------------------- */
@@ -231,7 +277,7 @@ Fosc {
         var illustrateEnvir, path;
         
         if (this.respondsTo('illustrate').not) {
-            throw("% does not respond to 'illustrate' and can't be shown.".format(this));
+            ^throw("% does not respond to 'illustrate' and can't be shown.".format(this));
         };
 
         if (includes.notNil && { includes.isSequenceableCollection.not }) { includes = [includes] };
@@ -757,7 +803,7 @@ Fosc {
         isIterable = type.any { |type| object.isKindOf(type) };
         
         if (isIterable.not) {
-            throw("%: receiver is not iterable: %.".format(method.name, object));
+            ^throw("%: receiver is not iterable: %.".format(method.name, object));
         };
     }
 }

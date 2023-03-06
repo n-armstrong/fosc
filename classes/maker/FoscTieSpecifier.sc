@@ -12,7 +12,7 @@ FoscTieSpecifier : Fosc {
     var <stripTies, <tieAcrossDivisions, <tieConsecutiveNotes;
     *new { |stripTies=false, tieAcrossDivisions=false, tieConsecutiveNotes=false|
         if (stripTies && tieConsecutiveNotes) {
-            throw("FoscTieSpecifier:new: can't tie leaves and strip ties at the same time.");
+            ^throw("FoscTieSpecifier:new: can't tie leaves and strip ties at the same time.");
         };
         ^super.new.init(stripTies, tieAcrossDivisions, tieConsecutiveNotes);
     }

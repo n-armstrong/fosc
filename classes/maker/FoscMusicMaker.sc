@@ -101,6 +101,16 @@ Pitches are applied after the mask.
 a = FoscMusicMaker(beamEachRun: true);
 b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,1,-1], pitches: "c' d' ef' f'");
 b.show;
+
+
+• Example 10
+
+Use FoscMask to specify a masking 'pattern' that repeats every division in 'divisions'
+
+a = FoscMusicMaker();
+m = FoscMask(divisions: #[6,5,4], pattern: #[[1,1,-inf]]);
+b = a.(durations: 1/8 ! 3, divisions: #[[1,1,1,1,1]], mask: m);
+b.show;
 ------------------------------------------------------------------------------------------------------------ */
 FoscMusicMaker : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,11 +172,23 @@ FoscMusicMaker : Fosc {
     a = FoscMusicMaker();
     b = a.(durations: [[5,16]], mask: #[-1,1,1,1,1], pitches: (60..64));
     b.show;
+
+
+    a = FoscMusicMaker();
+    b = a.(durations: 1/8 ! 4, divisions: #[[1,1,1,1,1]], mask: #[1,-10,1,-8]);
+    b.show;
+
+
+    a = FoscMusicMaker();
+    m = FoscMask(divisions: #[6,5,4], pattern: #[[1,1,-inf]]);
+    b = a.(durations: 1/8 ! 3, divisions: #[[1,1,1,1,1]], mask: m);
+    b.show;
     -------------------------------------------------------------------------------------------------------- */
     value { |durations, divisions, mask, pitches|
         var selections, selection;
 
         if (pitches.isString) { pitches = FoscPitchManager.pitchStringToPitches(pitches) };
+        if (mask.isKindOf(FoscMask)) { mask = mask.mask };
         selections = this.prMakeSelections(durations, divisions, pitches);
         selections = this.prApplyMask(selections, mask);
         if (tupletSpecifier.notNil) { selections = tupletSpecifier.(selections, durations) };

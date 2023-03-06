@@ -25,7 +25,7 @@ FoscAccidental : Fosc {
         { val.isKindOf(FoscAccidental) } {
             ^val;
         }
-		{ throw("Can not initialize % from value: %.".format(this.name, val)) };
+		{ ^throw("Can not initialize % from value: %.".format(this.name, val)) };
 	}
 	init { |argName|
         name = argName.asString;

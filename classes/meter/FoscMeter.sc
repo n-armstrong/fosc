@@ -22,7 +22,7 @@ a.numerator;
 a.preferredBoundaryDepth;
 a.rootNode;
 
-FoscDuration
+FoscMeter([5/4,[2,3]])
 ------------------------------------------------------------------------------------------------------------ */
 FoscMeter : Fosc {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ FoscMeter : Fosc {
         { object.isKindOf(FoscRhythm) } {
             object.do { |node|
                 if (node.prolation.denominator.isPowerOfTwo.not) {
-                    throw("%:%: can't contain tuplets.".format(this.species, thisMethod.name));
+                    ^throw("%:%: can't contain tuplets.".format(this.species, thisMethod.name));
                 };
             };
             rootNode = object;
@@ -72,7 +72,7 @@ FoscMeter : Fosc {
             factors = this.prFactors(numerator);
             this.prRecurse(rootNode, factors, denominator, increaseMonotonic);
         }
-        { throw("%:%: can't initialize from %.".format(this.species, thisMethod.name, object.species)) };
+        { ^throw("%:%: can't initialize from %.".format(this.species, thisMethod.name, object.species)) };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
@@ -366,7 +366,7 @@ FoscMeter : Fosc {
         var logicalTieStartsInOffsets, logicalTieStopsInOffsets, splitOffset, logicalTies, shards;
 
         if (components.isKindOf(FoscSelection).not) {
-            throw("%:%: components must be a FoscSelection: %."
+            ^throw("%:%: components must be a FoscSelection: %."
                 .format(this.species, thisMethod.name, components));
         };
 
@@ -463,7 +463,7 @@ FoscMeter : Fosc {
         lastStartOffset = FoscInspection(components.last).timespan.startOffset;
         difference = lastStartOffset - firstStartOffset + initialOffset;
         if (difference >= meter.impliedTimeSignature.duration) {
-            throw("%:%: offset difference is greater than duration of implied time signature: %."
+            ^throw("%:%: offset difference is greater than duration of implied time signature: %."
                 .format(this.species, thisMethod.name, difference.str));
         };
         firstOffset = FoscInspection(components[0]).timespan.startOffset;
@@ -508,6 +508,47 @@ FoscMeter : Fosc {
                 );
             };
         };
+    }
+    /* --------------------------------------------------------------------------------------------------------
+    • *prSplitAtMeasureBoundaries
+  
+    
+    • Example 1
+
+    a = FoscLeafMaker().(#[60,62,64,65], [3/8,6/8,2/8,5/8]);
+    //a.show;
+    b = FoscMeterSpecifier.prSplitAtMeasureBoundaries([a], #[[4,4],[4,4]]);
+    FoscStaff(b).show;
+
+
+    • Example 2
+
+    a = FoscLeafMaker().(#[60,62,64,65], [3/8,6/8,2/8,5/8]);
+    //a.show;
+    b = FoscMeterSpecifier.prSplitAtMeasureBoundaries(a, #[[2,4],[2,4],[2,4],[2,4]]);
+    FoscStaff(b).show;
+
+    FoscMutation
+
+    l = Layer(divisions: 1!10, subdivisions: #[[1,1,1,1,1],[1,1,1]], tempo: 72);
+    l.applySegmentation(#[9,11,11,9]);
+    l.applyMasks(#[[-1,2,3]]);
+    l.asFoscComponent;
+    l.format;
+    l.show;
+    -------------------------------------------------------------------------------------------------------- */
+    *prSplitAtMeasureBoundaries { |selections, meters|
+        var durations, container, components, componentDurations, partSizes;
+        
+        durations = meters.collect { |each| FoscDuration(each) };
+        container = FoscContainer(selections);
+        mutate(container[0..]).split(durations: durations, tieSplitNotes: true);
+        components = mutate(container).ejectContents;
+        componentDurations = components.items.collect { |each| each.prGetDuration };
+        partSizes = componentDurations.split(durations).collect { |each| each.size };
+        selections = components.partitionBySizes(partSizes).items;
+        
+        ^selections;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC CLASS METHODS

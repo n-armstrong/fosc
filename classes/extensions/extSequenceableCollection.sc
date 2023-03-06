@@ -93,7 +93,7 @@
     extendToAbsSum { |sum|
         var result, difference;
         
-        if (sum <= 0) { throw("%:%: sum must be greater than 0.".format(this.species, thisMethod.name)) };
+        if (sum <= 0) { ^throw("%:%: sum must be greater than 0.".format(this.species, thisMethod.name)) };
         result = this.copy;
         if (result.abs.sum == sum) { ^this };
         difference = sum - (result.abs.sum);
@@ -368,14 +368,14 @@
 		
         if (this.size != 2) {
             msg = "%:reduceFraction: receiver size must be 2: %.".format(this.species, this.size);
-            throw(msg);
+            ^throw(msg);
         };
 		
         this.do { |item|
             if (item === inf || { item === -inf }) { ^this };
 			
             if (item.isKindOf(Integer).not) {
-				throw("%:reduceFraction: items in receiver must be integers: %."
+				^throw("%:reduceFraction: items in receiver must be integers: %."
                     .format(this.species, item));
 			};
 		};
@@ -425,7 +425,7 @@
         var sequenceSum, completeRepetitions, items, overage, elementSum, candidateOverage;
         var absoluteAmountToKeep, signedAmountToKeep, i;
         
-        if (sum <= 0) { throw("%:%: sum must be greater than 0.".format(this.species, thisMethod.name)) };
+        if (sum <= 0) { ^throw("%:%: sum must be greater than 0.".format(this.species, thisMethod.name)) };
         
         switch(allowTotal,
             'exact', {  
@@ -560,7 +560,7 @@
 	truncateToAbsSum { |sum|
 		var items, total=0, sign, trimmedPart;
 		
-        if (sum <= 0) { throw("%:%: sum must be greater than 0.".format(this.species, thisMethod.name)) };
+        if (sum <= 0) { ^throw("%:%: sum must be greater than 0.".format(this.species, thisMethod.name)) };
 		items = [];
 		
         block { |break|
@@ -600,7 +600,7 @@
 	truncateToSum { |sum|
 		var items, total=0;
 		
-        if (sum <= 0) { throw("%:%: sum must be greater than 0.".format(this.species, thisMethod.name)) };
+        if (sum <= 0) { ^throw("%:%: sum must be greater than 0.".format(this.species, thisMethod.name)) };
 		items = [];
 		
         block { |break|
@@ -738,7 +738,7 @@
                 result[index] = contents;
                 ^result;
             } {
-                throw("%:%: index out of range: %.".format(this.species, thisMethod.name, index))
+                ^throw("%:%: index out of range: %.".format(this.species, thisMethod.name, index))
             };
         }
         { index.isSequenceableCollection } {
@@ -772,7 +772,7 @@
             };
         }
         {
-            throw("%:%: bad value for 'index': %.".format(this.species, thisMethod.name, index));
+            ^throw("%:%: bad value for 'index': %.".format(this.species, thisMethod.name, index));
         };
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

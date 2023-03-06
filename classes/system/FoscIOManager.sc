@@ -14,7 +14,7 @@ FoscIOManager : Fosc {
         var returnCode;
         
         if (File.exists(path).not) {
-            throw("%:%: path does not exist: %.".format(this.name, thisMethod.name, path));
+            ^throw("%:%: path does not exist: %.".format(this.name, thisMethod.name, path));
         };
         
         path = shellQuote(path);
@@ -42,7 +42,7 @@ FoscIOManager : Fosc {
     *lastOutputFileName { |extension, outputDirectory|
         var pattern, allFileNames, allOutput, result;
         
-        pattern = "\\d{4,4}.[a-z]{2,3}";
+        pattern = "\\d{4,4}.[a-zA-Z]{2,3}";
         outputDirectory = outputDirectory ?? { Fosc.outputDirectory };
         if (File.exists(outputDirectory).not) { ^nil };
         allFileNames = "%/*".format(outputDirectory).pathMatch.collect { |each| each.basename };
@@ -66,7 +66,7 @@ FoscIOManager : Fosc {
         var returnCode;
         
         if (File.exists(sourcePath).not) {
-            throw("%:%: sourcePath does not exist: %.".format(this.name, thisMethod.name, sourcePath));
+            ^throw("%:%: sourcePath does not exist: %.".format(this.name, thisMethod.name, sourcePath));
         };
         
         sourcePath = shellQuote(sourcePath);
@@ -107,7 +107,7 @@ FoscIOManager : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     *openFile { |path|
         if (File.exists(path).not) {
-            throw("%:%: path does not exist: %.".format(this.name, thisMethod.name, path));
+            ^throw("%:%: path does not exist: %.".format(this.name, thisMethod.name, path));
         };
         
         openOS(path);
@@ -118,6 +118,23 @@ FoscIOManager : Fosc {
     a = FoscNote(60, 1/4);
     b = a.write.asPDF(clean: true);
     openOS(b);
+
+    systemCmd("/opt/local/bin/lilypond \"/Users/newton/Library/Application Support/SuperCollider/fosc-output/0001.ly\"");
+
+    Fosc.lilypondVersion;
+
+    a = FoscNote(60, 1/4);
+    a.show;
+
+    m = "/opt/local/bin/lilypond  -dno-point-and-click -o '/Users/newton/Library/Application Support/SuperCollider/fosc-output/0001' '/Users/newton/Library/Application Support/SuperCollider/fosc-output/0001.ly'";
+
+    runInTerminal(m);
+
+    unixCmd(m);
+
+    systemCmd("ls -l /opt/local/bin");
+
+    FoscIOManager.runLilypond("%/0001.ly".format(Fosc.outputDirectory));
     -------------------------------------------------------------------------------------------------------- */
     *runLilypond { |path, flags, outputPath, executablePath, clean=false|
         var lilypondBase, command, exitCode, success;

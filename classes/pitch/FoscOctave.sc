@@ -68,7 +68,7 @@ FoscOctave : Fosc {
             ^number;
         }
         {
-            throw("Can't initialize % from value: %".format(this.species, number));
+            ^throw("Can't initialize % from value: %".format(this.species, number));
         };
 
 		number = number.asInteger;
@@ -109,7 +109,7 @@ FoscOctave : Fosc {
 		octaveName = octaveName.asString;
 
 		if (FoscPitchManager.isOctaveName(octaveName).not) {
-			throw("Bad argument type for %:%: '%'".format(this.species, thisMethod.name, octaveName));
+			^throw("Bad argument type for %:%: '%'".format(this.species, thisMethod.name, octaveName));
 		};
 
         number = case

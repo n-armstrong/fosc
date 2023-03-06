@@ -63,7 +63,7 @@ FoscBlock : Fosc {
             if (item.respondsTo('name') && { item.name == name }) { ^item };
             if (item.respondsTo('sourceLilypondType') && { item.sourceLilypondType == name }) { ^item };
         };
-        //throw("%::at: no item found with name: %.".format(this.species, name));
+        //^throw("%::at: no item found with name: %.".format(this.species, name));
         ^nil;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,16 +75,20 @@ FoscBlock : Fosc {
     // abjad 3.0
     prFormattedContextBlocks {
         var result, contextBlocks;
+        
         result = [];
         contextBlocks = [];
+        
         items.do { |item|
             if (item.isKindOf(FoscContextBlock)) {
                 contextBlocks = contextBlocks.add(item);
             };
         };
+        
         contextBlocks.do { |contextBlock|
             result = result.addAll(contextBlock.prGetFormatPieces);
         };
+        
         ^result;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

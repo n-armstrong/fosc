@@ -379,11 +379,11 @@ FoscLeafMaker {
         if (forbiddenDuration.notNil) {
             forbiddenDuration = FoscDuration(forbiddenDuration);
             if (forbiddenDuration.isAssignable.not) {
-                throw("%: forbiddenDuration must be assignable: %."
+                ^throw("%: forbiddenDuration must be assignable: %."
                     .format(this.species, forbiddenDuration.str));
             };
             if (forbiddenDuration.numerator != 1) {
-                throw("%: forbiddenDuration numerator must be 1: %."
+                ^throw("%: forbiddenDuration numerator must be 1: %."
                     .format(this.species, forbiddenDuration.str));
             };
         };

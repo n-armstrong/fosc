@@ -24,7 +24,7 @@ FoscLeaf : FoscComponent {
 	*new { |writtenDuration, multiplier|
         if (writtenDuration.notNil) { writtenDuration = FoscDuration(writtenDuration) };
         if (writtenDuration.isAssignable.not) {
-            throw("%:new: duration is not assignable: %.".format(this, writtenDuration.str));
+            ^throw("%:new: duration is not assignable: %.".format(this, writtenDuration.str));
         };
         if (multiplier.notNil) { multiplier = FoscMultiplier(multiplier) };
 		^super.new.initFoscRhythmLeaf(writtenDuration, multiplier);
@@ -373,7 +373,7 @@ FoscLeaf : FoscComponent {
         if (mark.isImprecise.not) {
             result = this.prGetDuration / mark.referenceDuration / mark.unitsPerMinute * 60;
         } {
-            throw("%:%: can't get duration in seconds - tempo is imprecise."
+            ^throw("%:%: can't get duration in seconds - tempo is imprecise."
                 .format(this.species, thisMethod.name));
         };
         
@@ -763,7 +763,7 @@ FoscLeaf : FoscComponent {
                 'left', { firstResultLeaf.attach(indicator); },
                 'right', { lastResultLeaf.attach(indicator) },
                 {
-                    throw("%:%: indicator direction must be left or right: %"
+                    ^throw("%:%: indicator direction must be left or right: %"
                           .format(this.species, thisMethod.name, direction));
                 };
             );

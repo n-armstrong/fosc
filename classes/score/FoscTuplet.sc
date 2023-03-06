@@ -183,7 +183,7 @@ FoscTuplet : FoscContainer {
     /* --------------------------------------------------------------------------------------------------------
     • forceFraction_
 
-    Sets force fraction flat.
+    Sets force fraction flag.
 
 
     • Example 1
@@ -198,7 +198,7 @@ FoscTuplet : FoscContainer {
         if (bool.isKindOf(Boolean)) {
             forceFraction = bool;
         } {
-            throw("%:%: argument must be a Boolean: %.".format(this.species, thisMethod.name, bool));
+            ^throw("%:%: argument must be a Boolean: %.".format(this.species, thisMethod.name, bool));
         };
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -250,7 +250,7 @@ FoscTuplet : FoscContainer {
         if (bool.isKindOf(Boolean)) {
             isHidden = bool;
         } {
-            throw("%:%: argument must be a Boolean: %.".format(this.species, thisMethod.name, bool));
+            ^throw("%:%: argument must be a Boolean: %.".format(this.species, thisMethod.name, bool));
         };
     }
     /* --------------------------------------------------------------------------------------------------------
@@ -303,14 +303,14 @@ FoscTuplet : FoscContainer {
             rational = FoscMultiplier(multiplier); 
         }
         {
-            throw("%:%: can't set tuplet multipler from: %."
+            ^throw("%:%: can't set tuplet multipler from: %."
                 .format(this.species, thisMethod.name, multiplier));
         };
         
         if (rational > 0) {
             multiplier = rational;
         } {
-            throw("%:%: multiplier must be positive: %."
+            ^throw("%:%: multiplier must be positive: %."
                 .format(this.species, thisMethod.name, multiplier));   
         };
         
@@ -772,7 +772,7 @@ FoscTuplet : FoscContainer {
                 component.writtenDuration_(component.writtenDuration * multiplier);
             }
             {
-                throw("%:%: component type error: %".format(this.species, thisMethod.name, component));
+                ^throw("%:%: component type error: %".format(this.species, thisMethod.name, component));
             };
         };
 

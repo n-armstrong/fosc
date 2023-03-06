@@ -1,6 +1,10 @@
 /* ------------------------------------------------------------------------------------------------------------
 • FoscMeterSpecifier
 
+!!!TODO: can be deprecated. Use instead: mutate(music).rewriteMeters();
+
+
+
 Meter specifier.
 
 
@@ -66,10 +70,12 @@ FoscMeterSpecifier : Fosc {
     //var <publishStorageFormat=true;
     *new { |meters, attachTimeSignatures=false, boundaryDepth, maximumDotCount, rewriteTuplets=false,
         multimeasureRests=false|
+
         meters = meters.collect { |each| FoscMeter(each) };
         assert(attachTimeSignatures.isKindOf(Boolean));  
         assert(rewriteTuplets.isKindOf(Boolean));  
         assert(multimeasureRests.isKindOf(Boolean));  
+        
         ^super.new.init(meters, attachTimeSignatures, boundaryDepth, maximumDotCount, rewriteTuplets,
             multimeasureRests);
     }
@@ -83,24 +89,6 @@ FoscMeterSpecifier : Fosc {
         rewriteTuplets = argRewriteTuplets;
         multimeasureRests = argMultimeasureRests;
     }
-    // var <meters, <boundaryDepth, <maximumDotCount, <rewriteTuplets, <multimeasureRests;
-    // //var <publishStorageFormat=true;
-    // *new { |meters, boundaryDepth, maximumDotCount, rewriteTuplets=false,
-    //     multimeasureRests=true|
-    //     meters = meters.collect { |each| FoscMeter(each) };
-    //     assert(rewriteTuplets.isKindOf(Boolean));  
-    //     assert(multimeasureRests.isKindOf(Boolean));  
-    //     ^super.new.init(meters, boundaryDepth, maximumDotCount, rewriteTuplets,
-    //         multimeasureRests);
-    // }
-    // init { |argMeters, argBoundaryDepth, argMaximumDotCount, argRewriteTuplets, argMultimeasureRests|    
-        
-    //     meters = argMeters;
-    //     boundaryDepth = argBoundaryDepth;
-    //     maximumDotCount = argMaximumDotCount;
-    //     rewriteTuplets = argRewriteTuplets;
-    //     multimeasureRests = argMultimeasureRests;
-    // }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // PUBLIC INSTANCE METHODS: SPECIAL METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -121,7 +121,7 @@ FoscArticulation : Fosc {
         direction = direction.asSymbol.toTridirectionalLilypondString;
         directions = #['up', 'down', 'center', nil];
         if (directions.includes(direction).not) {
-            throw("%::new % is not a valid argument for direction.".format(this.species, direction));
+            ^throw("%::new % is not a valid argument for direction.".format(this.species, direction));
         };
         //!!!TODO:
         // direction_ = String.to_tridirectional_ordinal_constant(direction)

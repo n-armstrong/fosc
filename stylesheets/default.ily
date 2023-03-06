@@ -1,11 +1,13 @@
 #(ly:set-option 'relative-includes #t)
 #(set-global-staff-size 18)
 
+
 \header {
     tagline = ##f
 }
 
 \layout {
+    indent = #0
     \context {
         \Score
         \accidentalStyle modern
@@ -60,3 +62,4 @@
     print-page-number = ##f
     ragged-right = ##t
 }
+
