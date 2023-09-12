@@ -7,7 +7,7 @@ Rehearsal mark.
 
 • Example 1
 
-Initialize from number.
+Initialize from number, display as letter.
 
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
 a = FoscScore([a]);
@@ -19,6 +19,18 @@ a.show;
 
 • Example 2
 
+Initialize from number, display as number.
+
+a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
+a = FoscScore([a]);
+m = FoscRehearsalMark(number: 1);
+a.leafAt(0).attach(m);
+set(a).markFormatter = FoscScheme('format-mark-box-numbers');
+a.show;
+
+
+• Example 3
+
 Initialize from markup.
 
 a = FoscStaff(FoscLeafMaker().(#[60,62,64,65], [1/4]));
@@ -28,7 +40,7 @@ a.leafAt(0).attach(m);
 a.show;
 
 
-• Example 3
+• Example 4
 
 Reharsal mark can be tweaked when markup is not nil.
 
@@ -39,7 +51,7 @@ a.leafAt(0).attach(m);
 a.show;
 
 
-• Example 4
+• Example 5
 
 Tweaks have no effect when markup is nil.
 
