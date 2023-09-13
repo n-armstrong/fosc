@@ -19,12 +19,23 @@ FoscKeySignature : Fosc {
     *new { |tonic="c", mode="major"|
         ^super.new.init(tonic, mode);
     }
-    init { |argTonic, argMode|        
+    init { |argTonic, argMode|
+        argTonic = argTonic.asString;
+        argMode = argMode.asString;
+
+        if (FoscPitchManager.isPitchName(argTonic).not) {
+            throw("FoscKeySignature:new: 'tonic' must be a valid pitch name: \"%\"".format(argTonic));
+        };
+
+       if (#["major", "minor"].includesEqual(argMode).not) {
+            throw("FoscKeySignature:new: 'mode' must be \"major\" or \"minor\": \"%\"".format(argMode));
+        };
+
         tonic = argTonic;
         mode = argMode;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PUBLIC PROPERTIES
+    // PUBLIC INSTANCE PROPERTIES
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • context
@@ -34,7 +45,7 @@ FoscKeySignature : Fosc {
 
     • Example 1   
 
-    a = FoscKeySignature('e', 'major');
+    a = FoscKeySignature("e", "major");
     a.context;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -45,7 +56,7 @@ FoscKeySignature : Fosc {
 
     • Example 1   
 
-    a = FoscKeySignature('e', 'major');
+    a = FoscKeySignature("e", "major");
     a.redraw;
     -------------------------------------------------------------------------------------------------------- */
     /* --------------------------------------------------------------------------------------------------------
@@ -55,19 +66,19 @@ FoscKeySignature : Fosc {
         // pass
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PUBLIC INSTANCE METHODS: SPECIAL METHODS
+    // PUBLIC INSTANCE METHODS
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* --------------------------------------------------------------------------------------------------------
     • format
 
-    Formats clef.
+    Formats key signature.
 
     Returns string.
 
 
     • Example 1
 
-    a = FoscKeySignature('e', 'major');
+    a = FoscKeySignature("e", "major");
     a.format;
     -------------------------------------------------------------------------------------------------------- */
     format {
@@ -79,7 +90,7 @@ FoscKeySignature : Fosc {
     /* --------------------------------------------------------------------------------------------------------
     • prGetLilypondFormat
     
-    a = FoscKeySignature('e', 'major');
+    a = FoscKeySignature("e", "major");
     a.prGetLilypondFormat;
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormat {
@@ -90,8 +101,10 @@ FoscKeySignature : Fosc {
     -------------------------------------------------------------------------------------------------------- */
     prGetLilypondFormatBundle {
         var bundle;
+        
         bundle = FoscLilyPondFormatBundle();
         bundle.opening.commands.add(this.prGetLilypondFormat);
+        
         ^bundle;
     }
 }
