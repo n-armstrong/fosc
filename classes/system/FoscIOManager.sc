@@ -137,14 +137,27 @@ FoscIOManager : Fosc {
     FoscIOManager.runLilypond("%/0001.ly".format(Fosc.outputDirectory));
     -------------------------------------------------------------------------------------------------------- */
     *runLilypond { |path, flags, outputPath, executablePath, clean=false|
-        var lilypondBase, command, exitCode, success;
+        var lilypondBase, filterText, command, exitCode, success;
         
         executablePath = executablePath ?? { Fosc.lilypondPath };
         lilypondBase = path.splitext[0];
         outputPath = outputPath ? lilypondBase;
         flags = ((flags ? "") ++ " %").format("-dno-point-and-click -o");
+
         command = "% % % %".format(executablePath, flags, outputPath.shellQuote, path.shellQuote);
-        exitCode = systemCmd(command);
+
+        filterText = " 2>&1 | grep -vE " ++
+        "'^(Processing|Parsing\\.\\.\\.|Interpreting music\\.\\.\\.|Preprocessing graphical objects\\.\\.\\.|Finding the ideal number of pages\\.\\.\\.|Fitting music on [0-9]+ page[s]?\\.\\.\\.|Drawing systems\\.\\.\\.|Converting to .+)$' | " ++
+		"grep -vE '^$'";
+        exitCode = systemCmd(
+        	command +
+        	Platform.case(
+        		\osx, { filterText },
+        		\linux, { filterText },
+        		\windows, { " 2>NUL" }
+        	)
+        );
+
         success = (exitCode == 0);
         if (success && clean) { File.delete(path) };
         
