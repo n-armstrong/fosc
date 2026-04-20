@@ -137,17 +137,56 @@ FoscIOManager : Fosc {
     FoscIOManager.runLilypond("%/0001.ly".format(Fosc.outputDirectory));
     -------------------------------------------------------------------------------------------------------- */
     *runLilypond { |path, flags, outputPath, executablePath, clean=false|
-        var lilypondBase, command, exitCode, success;
-        
-        executablePath = executablePath ?? { Fosc.lilypondPath };
-        lilypondBase = path.splitext[0];
-        outputPath = outputPath ? lilypondBase;
-        flags = ((flags ? "") ++ " %").format("-dno-point-and-click -o");
-        command = "% % % %".format(executablePath, flags, outputPath.shellQuote, path.shellQuote);
-        exitCode = systemCmd(command);
-        success = (exitCode == 0);
-        if (success && clean) { File.delete(path) };
-        
-        ^success;
-    }
+		var lilypondBase, command, exitCode, success;
+		var filterGrep, filterFindstr, commandWithFilterText;
+
+		executablePath = executablePath ?? { lilypondPath };
+		lilypondBase = path.splitext[0];
+		outputPath = outputPath ? lilypondBase;
+
+		flags = ((flags ? "") ++ "%").format("-dno-point-and-click -o");
+
+		filterGrep = "2>&1 | grep -vE " ++
+		"'^(Processing|Parsing\\.\\.\\.|Interpreting music\\.\\.\\.|" ++
+		"Preprocessing graphical objects\\.\\.\\.|" ++
+		"Finding the ideal number of pages\\.\\.\\.|" ++
+		"Fitting music on [0-9]+ page[s]?\\.\\.\\.|Drawing systems\\.\\.\\.|" ++
+		"Converting to .+)$' | " ++
+		"grep -vE '^$'";
+
+		filterFindstr = "2>&1" +
+		"| findstr /V /R /C:\"^Processing$\"" +
+		"| findstr /V /R /C:\"^Parsing\\.\\.\\.$\"" +
+		"| findstr /V /R /C:\"^Interpreting music\\.\\.\\.$\"" +
+		"| findstr /V /R /C:\"^Preprocessing graphical objects\\.\\.\\.$\"" +
+		"| findstr /V /R /C:\"^Finding the ideal number of pages\\.\\.\\.$\"" +
+		"| findstr /V /R /C:\"^Fitting music on [0-9][0-9]* page[s]*\\.\\.\\.$\"" +
+		"| findstr /V /R /C:\"^Drawing systems\\.\\.\\.$\"" +
+		"| findstr /V /R /C:\"^Converting to .*$\"" +
+		"| findstr /V /R /C:\"^$\"";
+
+		command = "% % % %".format(
+			Fosc.crossPlatformPath(executablePath),
+			flags,
+			Fosc.crossPlatformPath(outputPath),
+			Fosc.crossPlatformPath(path)
+		);
+
+		commandWithFilterText = Platform.case(
+			\linux,   { command + filterGrep },
+			\osx,     { if(Fosc.lilypondPath.contains("homebrew")) {
+					"zsh -lc" + (command + filterGrep).shellQuote
+				}{
+					command + filterGrep
+				}
+			},
+			\windows, { Fosc.crossPlatformPath(command + filterFindstr) }
+		);
+
+		exitCode = systemCmd(commandWithFilterText);
+		success = (exitCode == 0);
+		if (success && clean) { File.delete(path) };
+
+		^success;
+	}
 }
