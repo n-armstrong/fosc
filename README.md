@@ -60,8 +60,8 @@ Fosc.lilypondVersion;
 a = FoscNote(60, 1/4);
 a.show;
 ```
-<!-- ![](./docs/img/displaying-music-1.png) -->
-![](./docs/img/README-1.svg)
+<!-- ![](./HelpSource/Guides/img/displaying-music-1.png) -->
+![](./HelpSource/Guides/img/README-1.svg)
 
 
 <br>Display some notes in sequence.
@@ -69,8 +69,8 @@ a.show;
 a = FoscVoice([FoscNote(60, 1/4), FoscNote(62, 1/8)]);
 a.show;
 ```
-<!-- ![](./docs/img/displaying-music-2.png) -->
-![](./docs/img/README-2.svg)
+<!-- ![](./HelpSource/Guides/img/displaying-music-2.png) -->
+![](./HelpSource/Guides/img/README-2.svg)
 
 <br>View LilyPond output in the Post window.
 ```supercollider
@@ -91,8 +91,8 @@ b = FoscVoice([FoscNote("bf", 1/8), FoscNote("af", 1/4)]);
 c = FoscScore([FoscStaff([a]), FoscStaff([b])]);
 c.show;
 ```
-<!-- ![](./docs/img/displaying-music-3.png) -->
-![](./docs/img/README-3.svg)
+<!-- ![](./HelpSource/Guides/img/displaying-music-3.png) -->
+![](./HelpSource/Guides/img/README-3.svg)
 
 
 ## <br>Augmenting and tweaking score objects
@@ -104,8 +104,8 @@ a.attach(FoscArticulation('>'));
 a.attach(FoscDynamic('f'));
 a.show;
 ```
-<!-- ![](./docs/img/indicators-1.png) -->
-![](./docs/img/README-4.svg)
+<!-- ![](./HelpSource/Guides/img/indicators-1.png) -->
+![](./HelpSource/Guides/img/README-4.svg)
 
 <br>Spanners attach to two or more contiguous leaves.
 ```supercollider
@@ -114,8 +114,8 @@ a.selectLeaves.slur;
 a.selectLeaves.hairpin('p < f');
 a.show;
 ```
-<!-- ![](./docs/img/spanners-1.png) -->
-![](./docs/img/README-5.svg)
+<!-- ![](./HelpSource/Guides/img/spanners-1.png) -->
+![](./HelpSource/Guides/img/README-5.svg)
 
 <br>Override LilyPond Grob properties.
 ```supercollider
@@ -123,8 +123,8 @@ a = FoscNote(60, 1/4);
 override(a).noteHead.style = 'harmonic';
 a.show;
 ```
-<!-- ![](./docs/img/overrides-settings-1.png) -->
-![](./docs/img/README-6.svg)
+<!-- ![](./HelpSource/Guides/img/overrides-settings-1.png) -->
+![](./HelpSource/Guides/img/README-6.svg)
 
 <br>Set LilyPond Context properties.
 ```supercollider
@@ -133,8 +133,8 @@ set(a[0]).instrumentName = FoscMarkup("Violin");
 set(a).proportionalNotationDuration = FoscSchemeMoment(#[1,64]);
 a.show;
 ```
-<!-- ![](./docs/img/overrides-settings-2.png) -->
-![](./docs/img/README-7.svg)
+<!-- ![](./HelpSource/Guides/img/overrides-settings-2.png) -->
+![](./HelpSource/Guides/img/README-7.svg)
 
 
 ## <br>Creating music with FoscMusicMaker
@@ -145,8 +145,8 @@ a = FoscMusicMaker();
 b = a.(durations: 1/4 ! 4, pitches: #[60,62,64,65]);
 b.show;
 ```
-<!-- ![](./docs/img/music-maker-1.png) -->
-![](./docs/img/README-8.svg)
+<!-- ![](./HelpSource/Guides/img/music-maker-1.png) -->
+![](./HelpSource/Guides/img/README-8.svg)
 
 <br>Use a string of LilyPond note names.
 ```supercollider
@@ -154,8 +154,8 @@ a = FoscMusicMaker();
 b = a.(durations: 1/4 ! 4, pitches: "c' d' ef' f'");
 b.show;
 ```
-<!-- ![](./docs/img/music-maker-2.png) -->
-![](./docs/img/README-9.svg)
+<!-- ![](./HelpSource/Guides/img/music-maker-2.png) -->
+![](./HelpSource/Guides/img/README-9.svg)
 
 <br>Pitches are repeated cyclically when the length of *pitches* is less than the length of *durations*.
 ```supercollider
@@ -163,8 +163,8 @@ a = FoscMusicMaker();
 b = a.(durations: [3/8,1/8,2/8,2/8], pitches: #[60,62]);
 b.show;
 ```
-<!-- ![](./docs/img/music-maker-3.png) -->
-![](./docs/img/README-10.svg)
+<!-- ![](./HelpSource/Guides/img/music-maker-3.png) -->
+![](./HelpSource/Guides/img/README-10.svg)
 
 <br>*divisions* embed into *durations* as rhythmic proportions.
 ```supercollider
@@ -172,8 +172,8 @@ a = FoscMusicMaker();
 b = a.(durations: [2/16,3/16,5/16], divisions: #[[3,1],[3,2],[4,3]]);
 b.show;
 ```
-<!-- ![](./docs/img/music-maker-4.png) -->
-![](./docs/img/README-11.svg)
+<!-- ![](./HelpSource/Guides/img/music-maker-4.png) -->
+![](./HelpSource/Guides/img/README-11.svg)
 
 <br>Negative *divisions* are rests.
 ```supercollider
@@ -181,8 +181,8 @@ a = FoscMusicMaker();
 b = a.(durations: [2/16,3/16,5/16], divisions: #[[-3,1],[3,2],[4,-3]]);
 b.show;
 ```
-<!-- ![](./docs/img/music-maker-5.png) -->
-![](./docs/img/README-12.svg)
+<!-- ![](./HelpSource/Guides/img/music-maker-5.png) -->
+![](./HelpSource/Guides/img/README-12.svg)
 
 <br>Rhythm cells are repeated cyclically when the length of *durations* is less than the length of *divisions*.
 ```supercollider
@@ -190,8 +190,8 @@ a = FoscMusicMaker();
 b = a.(durations: [1/4], divisions: #[1,1,1,1,1] ! 4);
 b.show;
 ```
-<!-- ![](./docs/img/music-maker-6.png) -->
-![](./docs/img/README-13.svg)
+<!-- ![](./HelpSource/Guides/img/music-maker-6.png) -->
+![](./HelpSource/Guides/img/README-13.svg)
 
 <br>Rhythm cells are repeated cyclically when the length of *divisions* is less than the length of *durations*.
 ```supercollider
@@ -199,8 +199,8 @@ a = FoscMusicMaker();
 b = a.(durations: 1/4 ! 4, divisions: #[[-1,2,2],[4,-1]]);
 b.show;
 ```
-<!-- ![](./docs/img/music-maker-7.png) -->
-![](./docs/img/README-14.svg)
+<!-- ![](./HelpSource/Guides/img/music-maker-7.png) -->
+![](./HelpSource/Guides/img/README-14.svg)
 
 <br>Apply a *mask* to fuse contiguous musical events. Mask patterns repeat cyclically. *pitches* are added after a *mask* is applied.
 ```supercollider
@@ -208,8 +208,8 @@ a = FoscMusicMaker();
 b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,1], pitches: #[60,62]);
 b.show;
 ```
-<!-- ![](./docs/img/music-maker-8.png) -->
-![](./docs/img/README-15.svg)
+<!-- ![](./HelpSource/Guides/img/music-maker-8.png) -->
+![](./HelpSource/Guides/img/README-15.svg)
 
 <br>Negative *mask* values are rests.
 ```supercollider
@@ -217,8 +217,8 @@ a = FoscMusicMaker();
 b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,-1], pitches: #[60,62]);
 b.show;
 ```
-<!-- ![](./docs/img/music-maker-9.png) -->
-![](./docs/img/README-16.svg)
+<!-- ![](./HelpSource/Guides/img/music-maker-9.png) -->
+![](./HelpSource/Guides/img/README-16.svg)
 
 
 ## <br>Selections
@@ -268,8 +268,8 @@ c = FoscStaff(b);
 c.selectLeaves(pitched: true).do { |each| each.attach(FoscArticulation('>')) };
 c.show;
 ```
-<!-- ![](./docs/img/selections-1.png) -->
-![](./docs/img/README-17.svg)
+<!-- ![](./HelpSource/Guides/img/selections-1.png) -->
+![](./HelpSource/Guides/img/README-17.svg)
 
 
 ## <br>Iteration
@@ -302,8 +302,8 @@ c = FoscStaff(b);
 c.doComponents({ |note| note.attach(FoscArticulation('>')) }, type: FoscNote);
 c.show;
 ```
-<!-- ![](./docs/img/iteration-1.png) -->
-![](./docs/img/README-18.svg)
+<!-- ![](./HelpSource/Guides/img/iteration-1.png) -->
+![](./HelpSource/Guides/img/README-18.svg)
 
 
 <br>Iterate over runs, attaching slurs.
@@ -314,8 +314,8 @@ c = FoscStaff(b);
 c.doRuns { |run| if (run.size > 1) { run.slur } };
 c.show;
 ```
-<!-- ![](./docs/img/iteration-2.png) -->
-![](./docs/img/README-19.svg)
+<!-- ![](./HelpSource/Guides/img/iteration-2.png) -->
+![](./HelpSource/Guides/img/README-19.svg)
 
 
 ## <br>License

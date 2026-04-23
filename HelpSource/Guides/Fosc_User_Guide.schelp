@@ -1,0 +1,543 @@
+TITLE:: Fosc User Guide
+summary:: A SuperCollider API for generating musical notation in LilyPond.
+categories:: Libraries>Music Notation
+related:: Classes/Fosc, Classes/FoscMusicMaker, Classes/FoscScore, Classes/FoscStaff, Classes/FoscVoice, Classes/FoscNote
+
+section::Description
+
+link::https://github.com/n-armstrong/fosc##Fosc:: is a link::https://supercollider.github.io/##SuperCollider:: API for generating musical notation in link::http://lilypond.org/##LilyPond::.
+
+strong::Fosc:: stands for FO-rmalised S-core C-ontrol (FO-r S-uperC-ollider).
+It is a close relative of link::https://abjad.github.io/##Abjad:: and ports much of Abjad's Python code base to SuperCollider.
+
+strong::Fosc:: lets you:
+
+list::
+##Create musical notation in an object-oriented way
+##Generate and transform musical materials
+##Construct powerful component selectors and iterators for modifying musical objects in a score
+##Control all of the typographic details of music notation
+##Play musical scores through scsynth
+::
+
+section::Installation
+
+subsection::Install LilyPond
+
+link::http://lilypond.org/##LilyPond:: is an open-source program that engraves music notation in an automated way.
+strong::Fosc:: uses LilyPond to produce notational output.
+It's recommended that you install the most recent version of LilyPond directly from the LilyPond website.
+
+subsection::Install Fosc
+
+Download the strong::Fosc:: master branch and unzip. Rename the 'fosc-master' folder to 'fosc'. Move the 'fosc' folder to your SuperCollider Extensions directory. Information on installing SuperCollider extensions can be found here: link::Guides/UsingExtensions::
+
+subsection::Configure Fosc
+
+In your sclang startup file, add code to allow strong::Fosc:: to communicate with LilyPond.
+
+note::
+It's possible that your LilyPond executable is installed somewhere different to the standard locations below.
+
+
+list::
+
+## macOS
+
+code::
+Fosc.lilypondPath = "/Applications/LilyPond.app/Contents/Resources/bin/lilypond";
+::
+
+## Linux
+
+code::
+Fosc.lilypondPath = "/usr/local/bin/lilypond";
+::
+::
+
+Once you've saved your changes, recompile the SuperCollider class library and test that strong::Fosc:: is able to call LilyPond.
+
+code::
+Fosc.lilypondVersion;
+::
+
+Example output:
+
+teletype::
+2.19.82
+::
+::
+SCDocHTMLRenderer
+section::Creating score objects
+
+subsection::Display a note
+
+code::
+(
+a = FoscNote(60, 1/4);
+a.show;
+)
+::
+image::img/README-1.svg::
+
+subsection::Display some notes in sequence
+
+code::
+(
+a = FoscVoice([FoscNote(60, 1/4), FoscNote(62, 1/8)]);
+a.show;
+)
+::
+image::img/README-2.svg::
+
+subsection::View LilyPond output in the Post window
+
+code::
+(
+a = FoscVoice([FoscNote(60, 1/4), FoscNote(62, 1/8)]);
+a.lilypond;
+)
+::
+
+Example output:
+
+code::
+(
+\new Voice {
+    c'4
+    d'8
+}
+)
+::
+
+subsection::Display a score
+
+code::
+(
+a = FoscVoice([FoscNote("c'", 1/4), FoscNote("d'", 1/8)]);
+b = FoscVoice([FoscNote("bf", 1/8), FoscNote("af", 1/4)]);
+c = FoscScore([FoscStaff([a]), FoscStaff([b])]);
+c.show;
+)
+::
+image::img/README-3.svg::
+
+section::Augmenting and tweaking score objects
+
+subsection::Indicators attach to leaves
+
+code::
+(
+a = FoscNote(60, 1/4);
+a.attach(FoscArticulation('>'));
+a.attach(FoscDynamic('f'));
+a.show;
+)
+::
+image::img/README-4.svg::
+
+subsection::Spanners attach to two or more contiguous leaves
+
+code::
+(
+a = FoscStaff(#[60,62,64,65].collect { |pitch| FoscNote(pitch, 1/8) });
+a.selectLeaves.slur;
+a.selectLeaves.hairpin('p < f');
+a.show;
+)
+::
+image::img/README-5.svg::
+
+subsection::Override LilyPond grob properties
+
+code::
+(
+a = FoscNote(60, 1/4);
+override(a).noteHead.style = 'harmonic';
+a.show;
+)
+::
+image::img/README-6.svg::
+
+subsection::Set LilyPond context properties
+
+code::
+(
+a = FoscScore([FoscStaff(#[60,62,64,65].collect { |pitch| FoscNote(pitch, 1/8) })]);
+set(a[0]).instrumentName = FoscMarkup("Violin");
+set(a).proportionalNotationDuration = FoscSchemeMoment(#[1,64]);
+a.show;
+)
+::
+image::img/README-7.svg::
+
+section::Creating music with FoscMusicMaker
+
+subsection::Make music from durations and pitches
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/4 ! 4, pitches: #[60,62,64,65]);
+b.show;
+)
+::
+image::img/README-8.svg::
+
+subsection::Use a string of LilyPond note names
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/4 ! 4, pitches: "c' d' ef' f'");
+b.show;
+)
+::
+image::img/README-9.svg::
+
+subsection::Pitches are repeated cyclically when pitches is shorter than durations
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: [3/8,1/8,2/8,2/8], pitches: #[60,62]);
+b.show;
+)
+::
+image::img/README-10.svg::
+
+subsection::Divisions embed into durations as rhythmic proportions
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: [2/16,3/16,5/16], divisions: #[[3,1],[3,2],[4,3]]);
+b.show;
+)
+::
+image::img/README-11.svg::
+
+subsection::Negative divisions are rests
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: [2/16,3/16,5/16], divisions: #[[-3,1],[3,2],[4,-3]]);
+b.show;
+)
+::
+image::img/README-12.svg::
+
+subsection::Rhythm cells repeat cyclically when durations is shorter than divisions
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: [1/4], divisions: #[1,1,1,1,1] ! 4);
+b.show;
+)
+::
+image::img/README-13.svg::
+
+subsection::Rhythm cells repeat cyclically when divisions is shorter than durations
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/4 ! 4, divisions: #[[-1,2,2],[4,-1]]);
+b.show;
+)
+::
+image::img/README-14.svg::
+
+subsection::Apply a mask to fuse contiguous musical events
+
+Mask patterns repeat cyclically. Pitches are added after the mask is applied.
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,1], pitches: #[60,62]);
+b.show;
+)
+::
+image::img/README-15.svg::
+
+subsection::Negative mask values are rests
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/4 ! 4, divisions: #[[1,1,1,1,1]], mask: #[2,-1], pitches: #[60,62]);
+b.show;
+)
+::
+image::img/README-16.svg::
+
+section::Selections
+
+subsection::Select all score components
+
+code::
+(
+a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
+b = a.selectComponents;
+b.do { |each| each.cs.postln };
+)
+::
+
+Example output:
+
+teletype::
+FoscStaff([  ], Staff, false, nil)
+FoscRest(1/4)
+FoscNote("c'", 1/4)
+FoscNote("d'", 1/4)
+::
+
+subsection::Select notes and rests
+
+code::
+(
+a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscNote(62, 1/4)]);
+b = a.selectComponents(type: [FoscNote, FoscRest]);
+b.do { |each| each.cs.postln };
+)
+::
+
+Example output:
+
+teletype::
+FoscRest(1/4)
+FoscNote("c'", 1/4)
+FoscNote("d'", 1/4)
+::
+
+subsection::Select pitched leaves
+
+code::
+(
+a = FoscStaff([FoscRest(1/4), FoscNote(60, 1/4), FoscChord(#[60,64,67], 1/4)]);
+b = a.selectLeaves(pitched: true);
+b.do { |each| each.cs.postln };
+)
+::
+
+Example output:
+
+teletype::
+FoscNote("c'", 1/4)
+FoscChord("c' e' g'", 1/4)
+::
+
+subsection::Attach indicators to all leaves in a selection
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/8 ! 8, pitches: (60..67));
+c = FoscStaff(b);
+c.selectLeaves(pitched: true).do { |each| each.attach(FoscArticulation('>')) };
+c.show;
+)
+::
+image::img/README-17.svg::
+
+section::Iteration
+
+subsection::Iterate over all score components
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/8 ! 8, pitches: (60..67));
+c = FoscStaff(b);
+c.doComponents({ |each| each.cs.postln });
+)
+::
+
+Example output:
+
+teletype::
+FoscStaff([  ], Staff, false, nil)
+FoscNote("c'", 1/8)
+FoscNote("cs'", 1/8)
+FoscNote("d'", 1/8)
+FoscNote("ef'", 1/8)
+FoscNote("e'", 1/8)
+FoscNote("f'", 1/8)
+FoscNote("fs'", 1/8)
+FoscNote("g'", 1/8)
+::
+
+subsection::Iterate over notes, attaching indicators
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/8 ! 4, mask: #[-1,1,1,1], pitches: #[60,61,62]);
+c = FoscStaff(b);
+c.doComponents({ |note| note.attach(FoscArticulation('>')) }, type: FoscNote);
+c.show;
+)
+::
+image::img/README-18.svg::
+
+subsection::Iterate over runs, attaching slurs
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/8 ! 8, mask: #[-1,1,1,1,-1,1,1,1], pitches: (60..65));
+c = FoscStaff(b);
+c.doRuns { |run| if (run.size > 1) { run.slur } };
+c.show;
+)
+::
+image::img/README-19.svg::
+
+section::Playback
+
+subsection::Playback using the default synth
+
+code::
+(
+a = FoscChord([60,64,67], 1/4);
+a.play;
+)
+
+a.show
+::
+
+code::
+(
+a = FoscStaff(FoscLeafMaker().((60..72), [1/8]));
+a[0..].hairpin('pppp < ffff');
+a.play
+)
+
+a.show
+::
+
+code::
+(
+a = FoscStaff(FoscLeafMaker().((60..63), [1/32]));
+b = FoscStaff(FoscLeafMaker().((67..70), [1/32]));
+c = FoscScore([a, b]);
+c.play;
+)
+
+c.show
+::
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/4 ! 10, divisions: #[[1,1,1,1]], mask: [1,2,3], pitches: (60..63));
+b.play;
+)
+
+b.show
+::
+
+subsection::Playback using pattern
+
+code::
+(
+a = FoscStaff(FoscLeafMaker().((60..63), [1/32]));
+p = a.pattern;
+p.play;
+)
+
+a.show
+::
+
+code::
+(
+a = FoscMusicMaker();
+b = a.(durations: 1/4 ! 10, divisions: #[[1,1,1,1]], mask: [1,2,3], pitches: (60..63));
+p = b.pattern;
+p.play;
+)
+
+a.show
+::
+
+code::
+(
+a = FoscStaff(FoscLeafMaker().((60..63), [1/32]));
+b = FoscStaff(FoscLeafMaker().((67..70), [1/32]));
+c = FoscScore([a, b]);
+p = c.pattern;
+p.play;
+)
+c.show
+::
+
+subsection:: Playback using custom synth
+
+You can use your own synthdefs with Fosc's play mechanism by accessing the pattern property of any Fosc components or selection:
+
+code::
+s.boot;
+(
+SynthDef('beep', { |midinote, amp|
+var src;
+src = SinOsc.ar(midinote.midicps, 0, amp);
+src = src * EnvGen.kr(Env.perc, doneAction: 2);
+Out.ar(0, Pan2.ar(src, 0));
+}).add;
+)
+
+(
+a = FoscMusicMaker().(durations: [1/16], pitches: (60..72));
+p = Pbindf(a.pattern, \instrument, 'beep');
+p.play;
+)
+
+a.show
+::
+
+You can access the eventList property of any Fosc component or selection for making your own modifications or additions:
+
+code::
+a = FoscMusicMaker().(durations: [1/16], pitches: (60..72));
+a.eventList;
+::
+
+subsection::Stop, pause and resume
+
+subsubsection:: Stop
+
+code::
+(
+a = FoscLeafMaker().(#[60,62,nil].wrapExtend(12), [3/8,1/8,5/16,1/16]);
+a.play;
+)
+
+//a.isPlaying;
+a.stop;
+//a.isPlaying;
+
+a.show
+::
+
+subsubsection:: Pause and resume
+
+code::
+(
+a = FoscLeafMaker().(#[60,62,nil].wrapExtend(12), [3/8,1/8,5/16,1/16]);
+a.play;
+)
+
+a.pause;
+
+a.resume;
+
+a.show
+::
+
+
+section::License
+
+strong::Fosc:: is free software available under version 3.0 of the GNU General Public License.
