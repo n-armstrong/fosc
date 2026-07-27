@@ -26,7 +26,7 @@ __Fosc__ lets you:
 
 ### <br>Install Fosc
 
-Download the __fosc__ master branch and unzip. Rename the 'fosc-master' folder to 'fosc'. Move the 'fosc' folder to your SuperCollider Extensions directory. Information on installing SuperCollider extensions can be found here: https://doc.sccode.org/Guides/UsingExtensions.html. 
+Install `Fosc` in SuperCollider: `Quarks.install("https://github.com/n-armstrong/fosc")`.
 
 
 ### <br>Configure Fosc
