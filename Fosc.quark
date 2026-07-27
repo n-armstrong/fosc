@@ -1,0 +1,6 @@
+(
+  name: "Fosc",
+  summary: "API for generating musical notation in LilyPond.",
+  license: "GPL",
+  copyright: "Newton Armstrong"
+)
